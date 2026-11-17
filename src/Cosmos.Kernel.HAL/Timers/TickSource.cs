@@ -1,5 +1,6 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
+using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.Boot;
 using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
@@ -235,10 +236,30 @@ internal abstract class TickSource
     /// <summary>
     /// Blocks for the specified number of milliseconds by waiting for a
     /// one-shot software timer to fire. Requires the tick to be running.
+    /// A thread waits parked, and the timer's interrupt wakes it on whatever
+    /// CPU it runs: thread context with interrupts enabled, like every wait
+    /// that parks. With one flow (no scheduler, or boot code before
+    /// <c>Main</c>'s thread exists) the caller halts between the ticks. A
+    /// tick source that overrides this says what its own wait does.
     /// </summary>
     /// <param name="ms">Milliseconds to wait.</param>
     public virtual void Wait(uint ms)
     {
+        SchedulerThread? current = SchedulerManager.CurrentThreadIfRunning;
+        if (current is not null && !current.IsIdle)
+        {
+            // The tick's interrupt is taken on the boot CPU, and the caller
+            // may run on any (Main runs on a compute CPU, SMP phase 5b). A
+            // halt there ends only on that CPU's own next interrupt, up to a
+            // scheduler tick after the timer fired; a signal readies the
+            // thread at once, by interrupt when its CPU is another, and
+            // leaves that CPU to other threads meanwhile.
+            InterruptEvent elapsed = new();
+            RegisterTimer(new TimerEntry(elapsed.Signal, ms * NanosecondsPerMillisecond, recurring: false));
+            elapsed.Wait();
+            return;
+        }
+
         TimerEntry timer = new(static () => { }, ms * NanosecondsPerMillisecond, recurring: false);
         RegisterTimer(timer);
 
