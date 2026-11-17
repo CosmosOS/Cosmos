@@ -463,7 +463,12 @@ jobs:
               echo "export ${LIB_VAR}=\"\$DIR/lib\${${LIB_VAR}:+:\$${LIB_VAR}}\""
               # QEMU ignores QEMU_DATADIR; it searches exec_dir/../share/qemu.
               # Our layout keeps share/qemu as a sibling of the binary, so pass -L explicitly.
-              echo 'exec "$DIR/$(basename "$0").real" -L "$DIR/share/qemu" "$@"'
+              # qemu-img loads no firmware and refuses the option.
+              if [ "$bin" = "qemu-img" ]; then
+                echo 'exec "$DIR/$(basename "$0").real" "$@"'
+              else
+                echo 'exec "$DIR/$(basename "$0").real" -L "$DIR/share/qemu" "$@"'
+              fi
             } > "pkg/qemu/$bin"
             chmod +x "pkg/qemu/$bin"
           done
