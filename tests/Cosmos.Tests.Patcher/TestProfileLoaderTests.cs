@@ -520,6 +520,48 @@ public class TestProfileLoaderTests : IDisposable
         Assert.Contains("keyed by architecture", ex.Message);
     }
 
+    // A modifier may carry only a CPU count: it applies to every profile of
+    // its architectures, lands on the cell as its -smp, and two of them in one
+    // combination contradict each other the way two gic-versions do.
+    [Fact]
+    public void LoadFor_CpuCountModifierSetsTheCellsCpus()
+    {
+        const string catalog = """
+        {
+          "profiles": [
+            { "name": "plain" }
+          ],
+          "modifiers": [
+            { "name": "smp4", "cpus": 4 },
+            { "name": "smp2", "cpus": 2 }
+          ]
+        }
+        """;
+        WriteCatalogAndSuite(catalog, "plain", "smp4,smp2");
+
+        TestProfile[] cells = TestProfileLoader.LoadFor(_suiteDir, "x64").ToArray();
+
+        Assert.Equal(3, cells.Length);
+        Assert.Equal(1, Assert.Single(cells, c => c.Name == "plain").CpuCount);
+        Assert.Equal(4, Assert.Single(cells, c => c.Name == "plain+smp4").CpuCount);
+        Assert.Equal(2, Assert.Single(cells, c => c.Name == "plain+smp2").CpuCount);
+    }
+
+    [Fact]
+    public void LoadFor_RejectsACpuCountBelowOne()
+    {
+        const string catalog = """
+        {
+          "profiles": [ { "name": "plain" } ],
+          "modifiers": [ { "name": "smp0", "cpus": 0 } ]
+        }
+        """;
+        WriteCatalogAndSuite(catalog, "plain", "smp0");
+
+        InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => TestProfileLoader.LoadFor(_suiteDir, "x64"));
+        Assert.Contains("smp0", ex.Message, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void LoadFor_FallsBackToTheDefaultProfileWhenTheSuiteOptsIntoNothing()
     {

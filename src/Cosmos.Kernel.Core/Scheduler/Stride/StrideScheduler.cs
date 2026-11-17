@@ -265,7 +265,13 @@ internal class StrideScheduler : IScheduler
 
     public bool OnTick(PerCpuState cpuState, SchedulerThread current, ulong elapsedNs)
     {
-        s_onTickLogCount++;
+        // CPU 0's ticks pace the log: every CPU ticks at the same period, and
+        // a count every CPU advanced would log N times as often. The line
+        // writes numbers only; an application processor's tick must not box.
+        if (cpuState.CpuId == 0)
+        {
+            s_onTickLogCount++;
+        }
 
         if (current is null)
         {
@@ -301,7 +307,7 @@ internal class StrideScheduler : IScheduler
         UpdateGlobalPass(cpuData);
 
         // Log every 100 ticks
-        if (s_onTickLogCount % 100 == 0)
+        if (cpuState.CpuId == 0 && s_onTickLogCount % 100 == 0)
         {
             IO.Serial.WriteString("[STRIDE] OnTick: current=");
             IO.Serial.WriteNumber(current.Id);

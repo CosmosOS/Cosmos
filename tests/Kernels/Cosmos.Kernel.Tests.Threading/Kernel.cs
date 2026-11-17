@@ -24,7 +24,7 @@ namespace Cosmos.Kernel.Tests.Threading;
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 95;
+    private const int ExpectedTestCount = 97;
 
     /// <summary>Size of one per-CPU block, as <c>PerCpuBlock</c> lays it out and the native stubs assume.</summary>
     private const int PerCpuBlockNativeSize = 128;
@@ -40,6 +40,7 @@ public class Kernel : Sys.Kernel
     private const int PerCpuBootStackTopOffset = 0x40;
     private const int PerCpuOnlineOffset = 0x48;
     private const int PerCpuStoppedForGcOffset = 0x50;
+    private const int PerCpuGicRedistributorBaseOffset = 0x58;
 
     /// <summary>Lock/unlock increment iterations each worker thread performs in the lock and spinlock contention tests.</summary>
     private const int LockIterationsPerThread = 100;
@@ -100,6 +101,13 @@ public class Kernel : Sys.Kernel
 
     /// <summary>A CPU id past any plausible registered count, used to hand the interrupt path state it cannot use.</summary>
     private const uint UnregisteredCpuId = 4096;
+
+    /// <summary>CPUs the smp4 cell's machine has: what the bootloader lists and the kernel starts there.</summary>
+    private const uint Smp4CpuCount = 4;
+    /// <summary>Ticks of CPU 0 the application processor tick cell waits across, at the 10 ms quantum: 300 ms, thirty of each CPU's own ticks.</summary>
+    private const uint ApTickWindowTicks = 30;
+    /// <summary>Polls of FlagPollIntervalMs the application processor tick cell makes for CPU 0's window to pass before it calls the clock stalled.</summary>
+    private const int ApTickWindowPolls = 40;
 
     /// <summary>Turns each side of the Thread.Yield ping-pong takes.</summary>
     private const int PingPongRounds = 20;
@@ -206,6 +214,11 @@ public class Kernel : Sys.Kernel
 
         TR.Start("Threading Tests", expectedTests: ExpectedTestCount);
 
+        // The smp4 cell boots the machine with four CPUs; the application
+        // processor cells read the blocks of the three the kernel started.
+        bool smp = TR.ProfileContains("smp4");
+        const string OneCpuCell = "one CPU on this cell";
+
         // SpinLock tests
         TR.Run("SpinLock_InitialState_IsUnlocked", TestSpinLockInitialState);
         TR.Run("SpinLock_Acquire_SetsLockedState", TestSpinLockAcquire);
@@ -244,6 +257,8 @@ public class Kernel : Sys.Kernel
         // identity, its boot stack and the running thread's exception chain through it
         TR.Run("PerCpuBlock_Layout_MatchesNativeTable", TestPerCpuBlockLayoutMatchesNative);
         TR.Run("PerCpuBlock_BootCpu_IsIndexZeroAndOnline", TestPerCpuBlockBootCpuIsIndexZero);
+        TR.RunIf(smp, "PerCpuBlock_ApplicationProcessors_OnlineWithOwnBlocks", TestPerCpuBlockApplicationProcessorsOnline, OneCpuCell);
+        TR.RunIf(smp, "PerCpuBlock_ApplicationProcessors_TickOnTheirOwn", TestPerCpuBlockApplicationProcessorsTick, OneCpuCell);
         TR.Run("PerCpuBlock_BootStackTop_BoundsMainThreadStack", TestPerCpuBlockBootStackTopBoundsMainStack);
         TR.Run("PerCpuBlock_ExInfoHead_FollowsCurrentThread", TestPerCpuBlockExInfoHeadFollowsCurrentThread);
         TR.Run("PerCpuBlock_ExInfoChain_EmptyAfterCatchAndRethrow", TestPerCpuBlockExInfoChainEmptyAfterCatch);
@@ -1535,6 +1550,7 @@ public class Kernel : Sys.Kernel
         Assert.Equal(PerCpuBootStackTopOffset, (int)((byte*)&block.BootStackTop - start), "BootStackTop");
         Assert.Equal(PerCpuOnlineOffset, (int)((byte*)&block.Online - start), "Online");
         Assert.Equal(PerCpuStoppedForGcOffset, (int)((byte*)&block.StoppedForGc - start), "StoppedForGc");
+        Assert.Equal(PerCpuGicRedistributorBaseOffset, (int)((byte*)&block.GicRedistributorBase - start), "GicRedistributorBase");
     }
 
     // Core's library initializer installs block 0 on the boot CPU, the first managed code the
@@ -1551,7 +1567,82 @@ public class Kernel : Sys.Kernel
         Assert.True(Unsafe.AreSame(ref block, ref PerCpuBlock.At(0)), "the running CPU's block is block 0 of the table");
         Assert.True(block.Online == 1, "the boot CPU is online");
         Assert.True(block.SwitchTargetSp == 0, "no context switch is staged while a thread runs");
-        Assert.True(PerCpuBlock.At(1).Online == 0 && PerCpuBlock.At(1).CpuIndex == 0, "block 1 is not installed: no application processor runs yet");
+
+        // Past the machine's CPUs the table is untouched: on the bare cell block 1 is the
+        // first such block, on the smp4 cell block 4.
+        uint cpuCount = SchedulerManager.CpuCount;
+        Assert.True(PerCpuBlock.At(cpuCount).Online == 0 && PerCpuBlock.At(cpuCount).CpuIndex == 0, "the block past the last CPU is not installed");
+    }
+
+    // The boot CPU started every application processor the bootloader listed before the
+    // drivers came up (SMP phase 2): each one's block carries its index, its own address, the
+    // ExInfo chain head of its idle thread and the top of the boot stack it runs on, and
+    // reports online. The scheduler has a state and an idle thread per CPU, the idle thread
+    // being each CPU's current thread while nothing is placed on it.
+    private static unsafe void TestPerCpuBlockApplicationProcessorsOnline()
+    {
+        uint cpuCount = SchedulerManager.CpuCount;
+        Assert.Equal(Smp4CpuCount, cpuCount, "the scheduler counts the CPUs the bootloader listed");
+
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            ref PerCpuBlock block = ref PerCpuBlock.At(cpu);
+            PerCpuState? state = SchedulerManager.GetCpuState(cpu);
+
+            Assert.True(block.Online == 1, "the application processor reported online");
+            Assert.Equal(cpu, (uint)block.CpuIndex, "the block carries the CPU's index");
+            Assert.True(block.Self == (nuint)Unsafe.AsPointer(ref block), "Self is the block's own address");
+            Assert.True(block.BootStackTop != 0, "the block carries the top of the CPU's boot stack");
+            Assert.True(block.BootStackTop != PerCpuBlock.At(0).BootStackTop, "each CPU boots on a stack of its own");
+            Assert.True(block.SwitchTargetSp == 0, "no context switch is staged on an idle CPU");
+            Assert.True(state is not null && state.IdleThread is not null, "the CPU has a state and an idle thread");
+            Assert.True(state!.CurrentThread == state.IdleThread, "nothing is placed on the CPU: its idle thread is current");
+            Assert.True(state.IdleThread!.CpuId == cpu && state.IdleThread.IsIdle, "the idle thread is the CPU's own");
+            Assert.True(block.CurrentExInfoHead == state.IdleThread.ExInfoHeadSlot, "the block points at the idle thread's ExInfo chain head");
+            Assert.True(block.HardwareId != PerCpuBlock.At(0).HardwareId, "the controller identity differs from the boot CPU's");
+        }
+    }
+
+    // Every application processor runs its own timer and takes the scheduler tick on it: its
+    // per-CPU count advances while CPU 0's does, and CPU 0's count, the thread clock, keeps
+    // the pace of one CPU.
+    private static void TestPerCpuBlockApplicationProcessorsTick()
+    {
+        uint cpuCount = SchedulerManager.CpuCount;
+        uint[] before = new uint[cpuCount];
+        for (uint cpu = 0; cpu < cpuCount; cpu++)
+        {
+            before[cpu] = SchedulerManager.GetCpuState(cpu)!.TickCount;
+        }
+
+        uint globalBefore = SchedulerManager.TickCount;
+        int polls = 0;
+        while (SchedulerManager.TickCount - globalBefore < ApTickWindowTicks && polls < ApTickWindowPolls)
+        {
+            SysThread.Sleep(FlagPollIntervalMs);
+            polls++;
+        }
+
+        uint globalTicks = SchedulerManager.TickCount - globalBefore;
+        Assert.True(globalTicks >= ApTickWindowTicks, "CPU 0's ticks passed the window");
+        Assert.Equal(globalTicks, SchedulerManager.GetCpuState(0)!.TickCount - before[0], "the thread clock is CPU 0's count");
+
+        for (uint cpu = 1; cpu < cpuCount; cpu++)
+        {
+            uint ticks = SchedulerManager.GetCpuState(cpu)!.TickCount - before[cpu];
+            Serial.WriteString("[Threading] CPU ");
+            Serial.WriteNumber(cpu);
+            Serial.WriteString(" ticked ");
+            Serial.WriteNumber(ticks);
+            Serial.WriteString(" times across ");
+            Serial.WriteNumber(globalTicks);
+            Serial.WriteString(" of CPU 0's\n");
+
+            // A lower bound only: the counters start at different instants and TCG runs the
+            // CPUs on host threads it schedules as it likes, so the two counts drift. Half the
+            // window separates a ticking CPU from a dead one.
+            Assert.True(ticks >= ApTickWindowTicks / 2, "the application processor's timer ticks on its own");
+        }
     }
 
     // BeforeRun runs on CPU 0's idle thread, the boot thread, on the bootloader stack whose top

@@ -196,7 +196,10 @@ internal class X64PlatformInitializer : IPlatformInitializer
 
     public uint GetCpuCount()
     {
-        return AcpiMadt.CpuCount;
+        // The bootloader's list, not the MADT's: it is what Limine could start, and the index
+        // the scheduler gives a CPU follows that list (SMP phase 2). The MADT keeps the I/O APIC
+        // and the overrides.
+        return Smp.CpuCount;
     }
 
     public void StartSchedulerTimer(uint quantumMs)
@@ -208,5 +211,13 @@ internal class X64PlatformInitializer : IPlatformInitializer
         // Start LAPIC timer for preemptive scheduling
         Serial.WriteString("[X64HAL] Starting LAPIC timer for scheduling...\n");
         LocalApic.StartPeriodicTimer(quantumMs);
+    }
+
+    /// <inheritdoc />
+    public void StartSchedulerTimerOnCurrentCpu()
+    {
+        // The handler is registered once, in the shared vector table; this CPU's own timer is
+        // what starts here, with the boot CPU's interval and calibration.
+        LocalApic.StartPeriodicTimerOnCurrentCpu();
     }
 }

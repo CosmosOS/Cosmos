@@ -154,6 +154,18 @@ internal class GenericTimer : TickSource
     }
 
     /// <summary>
+    /// Arms the calling CPU's banked timer registers for the period <see cref="SetPeriod"/> set
+    /// and enables them, as <see cref="Start"/> did on the boot CPU, without the log lines: an
+    /// application processor, from its managed entry (SMP phase 2). The counter is system
+    /// wide, so the period means the same on every CPU. Allocation-free.
+    /// </summary>
+    public void StartOnCurrentCpu()
+    {
+        GenericTimerNative.SetTval(_ticksPerPeriod > uint.MaxValue ? uint.MaxValue : (uint)_ticksPerPeriod);
+        GenericTimerNative.Enable();
+    }
+
+    /// <summary>
     /// Registers the IRQ handler for the timer.
     /// Should be called after GIC is initialized.
     /// </summary>
@@ -185,8 +197,6 @@ internal class GenericTimer : TickSource
             return;
         }
 
-        s_timerTickCount++;
-
         // Re-arm the timer for the next period
         if (Instance._ticksPerPeriod > uint.MaxValue)
         {
@@ -197,23 +207,34 @@ internal class GenericTimer : TickSource
             GenericTimerNative.SetTval((uint)Instance._ticksPerPeriod);
         }
 
-        // Advance software timers and invoke the OnTick handler
-        Instance.HandleTick(Instance._periodNs);
-
         // The index of this CPU, from its per-CPU block.
         uint cpuId = SchedulerManager.GetCurrentCpuId();
 
         // The saved context's SP, which the scheduler switches from.
         nuint currentSp = ARM64InterruptController.SavedContextStackPointer(ref ctx);
 
-        // Log first few ticks and then periodically
-        if (s_timerTickCount <= 5 || s_timerTickCount % 100 == 0)
+        // The boot CPU's ticks alone drive the software timers and the log:
+        // every CPU's banked timer takes this handler, and the ring's timers
+        // (TimerManager, the alarms) run on the boot CPU, where the drivers
+        // that registered them live. The log lines box their arguments, which
+        // an application processor must not do: the heap is the boot CPU's
+        // until phase 4.
+        if (cpuId == 0)
         {
-            Serial.Write("[GenericTimer] Tick ");
-            Serial.WriteNumber(s_timerTickCount);
-            Serial.Write(" SP=0x");
-            Serial.WriteHex((ulong)currentSp);
-            Serial.Write("\n");
+            s_timerTickCount++;
+
+            // Advance software timers and invoke the OnTick handler
+            Instance.HandleTick(Instance._periodNs);
+
+            // Log first few ticks and then periodically
+            if (s_timerTickCount <= 5 || s_timerTickCount % 100 == 0)
+            {
+                Serial.Write("[GenericTimer] Tick ");
+                Serial.WriteNumber(s_timerTickCount);
+                Serial.Write(" SP=0x");
+                Serial.WriteHex((ulong)currentSp);
+                Serial.Write("\n");
+            }
         }
 
         // Call scheduler with elapsed time

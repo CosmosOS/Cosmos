@@ -53,6 +53,17 @@ internal class X64InterruptController : IInterruptController
     }
 
     /// <inheritdoc/>
+    public void InitializeCurrentCpu()
+    {
+        // The table is shared, the IDTR is per CPU: this CPU has none loaded until here, so a
+        // fault before this triple-faults, as on the boot CPU between kmain and its load. The
+        // Local APIC is per CPU too; its MMIO window is the one the boot CPU found, and the
+        // base it reads is the same.
+        Idt.LoadOnCurrentCpu();
+        LocalApic.InitializeCurrentCpu();
+    }
+
+    /// <inheritdoc/>
     public bool TryRaiseReschedule()
     {
         if (!ApicManager.IsInitialized)

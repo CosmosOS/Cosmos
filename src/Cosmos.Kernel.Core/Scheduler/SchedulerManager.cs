@@ -1007,9 +1007,13 @@ public static class SchedulerManager
     private static ulong s_tickPeriodNs;
 
     /// <summary>
-    /// Timer interrupts handled since boot, counted before every early
+    /// Timer interrupts CPU 0 handled since boot, counted before every early
     /// return of <see cref="OnTimerInterrupt"/>, so a tick that schedules
-    /// nothing still counts. Wraps: compare differences. Any context.
+    /// nothing still counts. CPU 0's alone: every CPU's timer fires at the
+    /// same period, and a count every CPU advanced would run N times faster
+    /// than the clock the timed waits and the tick budgets are written
+    /// against. Each CPU's own count is <see cref="PerCpuState.TickCount"/>.
+    /// Wraps: compare differences. Any context.
     /// </summary>
     internal static uint TickCount => Volatile.Read(ref s_tickCount);
 
@@ -1038,37 +1042,46 @@ public static class SchedulerManager
     /// <param name="elapsedNs">Nanoseconds since last tick.</param>
     internal static void OnTimerInterrupt(uint cpuId, nuint currentRsp, ulong elapsedNs)
     {
-        // Atomic: one tick per CPU, and the counters are read from any thread.
-        uint tick = Interlocked.Increment(ref s_tickCount);
-
-        // Recorded before the early returns below, so the period is readable
-        // whether or not the scheduler is armed yet. The timer owns this
-        // number: the boot path asks for DefaultQuantumNs, but a driver can
-        // retune the device afterwards, and on ARM64 the scheduler tick and
-        // the ring's TimerManager are the same device.
-        s_tickPeriodNs = elapsedNs;
-
-        // Refresh the debug-live snapshot every 10 ticks (~100ms at 100Hz)
-        // so the host-side QMP poller sees fresh thread state without
-        // pausing the kernel.
-        if ((tick % SnapshotRefreshTickInterval) == 0)
+        // Every CPU takes its own timer here (phase 2), on its own stack and
+        // with its own saved context; the handler reads the state of the CPU
+        // it runs on and nothing else is shared yet, since no thread is
+        // placed on another CPU before phase 5. The pacing is CPU 0's: the
+        // snapshot refresh, the boot log and the thread clock follow its
+        // ticks, and every CPU counts its own in its state.
+        if (cpuId == 0)
         {
-            Runtime.DebugLiveSnapshot.Update();
-            Runtime.DebugLiveGCSnapshot.Update();
-            Runtime.DebugLiveMemorySnapshot.Update();
-        }
+            // Atomic: the counter is read from any thread.
+            uint tick = Interlocked.Increment(ref s_tickCount);
 
-        // Only the first ticks are logged, to show at boot that the tick is
-        // live. This runs in the timer ISR with interrupts masked, and a
-        // periodic line would stall every IRQ on polled UART bytes for the
-        // whole uptime.
-        if (tick <= InitialTickLogCount)
-        {
-            Serial.WriteString("[SCHED] Tick ");
-            Serial.WriteNumber(tick);
-            Serial.WriteString(" enabled=");
-            Serial.WriteString(s_enabled ? "1" : "0");
-            Serial.WriteString("\n");
+            // Recorded before the early returns below, so the period is readable
+            // whether or not the scheduler is armed yet. The timer owns this
+            // number: the boot path asks for DefaultQuantumNs, but a driver can
+            // retune the device afterwards, and on ARM64 the scheduler tick and
+            // the ring's TimerManager are the same device.
+            s_tickPeriodNs = elapsedNs;
+
+            // Refresh the debug-live snapshot every 10 ticks (~100ms at 100Hz)
+            // so the host-side QMP poller sees fresh thread state without
+            // pausing the kernel.
+            if ((tick % SnapshotRefreshTickInterval) == 0)
+            {
+                Runtime.DebugLiveSnapshot.Update();
+                Runtime.DebugLiveGCSnapshot.Update();
+                Runtime.DebugLiveMemorySnapshot.Update();
+            }
+
+            // Only the first ticks are logged, to show at boot that the tick is
+            // live. This runs in the timer ISR with interrupts masked, and a
+            // periodic line would stall every IRQ on polled UART bytes for the
+            // whole uptime.
+            if (tick <= InitialTickLogCount)
+            {
+                Serial.WriteString("[SCHED] Tick ");
+                Serial.WriteNumber(tick);
+                Serial.WriteString(" enabled=");
+                Serial.WriteString(s_enabled ? "1" : "0");
+                Serial.WriteString("\n");
+            }
         }
 
         if (!s_enabled || s_currentScheduler is null || s_cpuStates is null)
@@ -1082,13 +1095,20 @@ public static class SchedulerManager
         }
 
         PerCpuState state = s_cpuStates[cpuId];
+        state._tickCount++;
+
         if (state.CurrentThread is null)
         {
             return;
         }
 
-        // Check and wake up sleeping threads whose timeout has expired
-        CheckSleepingThreads(elapsedNs);
+        // Check and wake up sleeping threads whose timeout has expired. CPU
+        // 0's tick alone: every thread is placed on CPU 0 until phase 5, and
+        // the registry is not locked against a second CPU walking it.
+        if (cpuId == 0)
+        {
+            CheckSleepingThreads(elapsedNs);
+        }
 
         // Update timing and check if preemption needed
         bool needsReschedule = s_currentScheduler.OnTick(state, state.CurrentThread, elapsedNs);

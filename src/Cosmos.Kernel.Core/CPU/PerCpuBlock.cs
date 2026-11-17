@@ -14,8 +14,9 @@ namespace Cosmos.Kernel.Core.CPU;
 /// this struct is the layout's home: the native stubs reach the slots by offset
 /// (<c>CPU/CpuOps.s</c>, <c>CPU/Interrupts.s</c>, <c>CPU/ExceptionHandling.s</c> of each native
 /// package mirror the offsets they use). The boot CPU installs block zero in Core's library
-/// initializer, the first managed code the boot runs; the application processors install theirs
-/// when they come up (SMP phase 2). The interrupt stubs stage the context switch in the running
+/// initializer, the first managed code the boot runs; an application processor's is prepared
+/// by the boot CPU before it is released and loaded into the register by the trampoline
+/// (<see cref="Smp"/>). The interrupt stubs stage the context switch in the running
 /// CPU's block, the exception stubs find the running thread's ExInfo chain head through it, and
 /// <see cref="Scheduler.SchedulerManager.GetCurrentCpuId"/> reads its index from it.
 /// </summary>
@@ -65,17 +66,23 @@ internal struct PerCpuBlock
     /// <summary>Top (exclusive) of the bootloader stack this CPU booted on, recorded by <c>kmain</c>.</summary>
     public nuint BootStackTop;
 
-    /// <summary>1 once this CPU runs (its scheduler tick, from phase 2 on for the others).</summary>
+    /// <summary>1 once this CPU runs its scheduler tick: the boot CPU from its block's installation, an application processor once <see cref="Smp.ApMain"/> started its tick.</summary>
     public ulong Online;
 
     /// <summary>1 while a collection on another CPU holds this one (SMP phase 4).</summary>
     public ulong StoppedForGc;
 
+    /// <summary>
+    /// The RD_base of this CPU's GICv3 redistributor, found by the GICR_TYPER walk run on it;
+    /// 0 before the walk, and on x64. The SGI and PPI registers are banked per redistributor,
+    /// so the GICv3 code reaches the calling CPU's through its block.
+    /// </summary>
+    public ulong GicRedistributorBase;
+
     private ulong _reserved0;
     private ulong _reserved1;
     private ulong _reserved2;
     private ulong _reserved3;
-    private ulong _reserved4;
 
     /// <summary>
     /// The table: a static, so it is zeroed data at a fixed address outside the garbage

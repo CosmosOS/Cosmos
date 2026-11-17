@@ -29,6 +29,7 @@
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.PerCpuState.CpuId.get -> uint
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.PerCpuState.CurrentThread.get -> Cosmos.Kernel.Core.Scheduler.SchedulerThread?
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.PerCpuState.IdleThread.get -> Cosmos.Kernel.Core.Scheduler.SchedulerThread?
+[COSMOS0001]Cosmos.Kernel.Core.Scheduler.PerCpuState.TickCount.get -> uint
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerExtensible
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerExtensible.SchedulerData.get -> object?
 [COSMOS0001]Cosmos.Kernel.Core.Scheduler.SchedulerExtensible.SchedulerData.set -> void

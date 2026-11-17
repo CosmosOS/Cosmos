@@ -143,6 +143,8 @@ The scheduler does not own a timer; it exposes `OnTimerInterrupt` and lets the p
 
 In both cases the handler passes the *configured* interval as `elapsedNs`, not a measured elapsed time, and computes the saved-context address itself: the managed IRQ entry receives a pointer to the general-register block, and the handler subtracts the SIMD save area (256 bytes on x64, 512 on ARM64) to recover the `ThreadContext` base. That address is what a preempted thread's `StackPointer` will hold.
 
+Every CPU takes the tick of its own timer through the same `OnTimerInterrupt` (SMP phase 2): the handler reads the state of the CPU it runs on, counts the tick in that state's `TickCount`, and asks the policy about that CPU's current thread. CPU 0's ticks alone advance `SchedulerManager.TickCount`, the thread clock, so the timed waits and the suites' tick budgets keep the pace of one CPU whatever the machine has; CPU 0's tick alone walks the registry for expired sleepers, since every thread is placed there until a later phase and the registry is not locked against a second walker. An application processor's tick finds its idle thread current and an empty queue, and must not allocate: the heap is CPU 0's until the GC phase.
+
 ### The tick
 
 ```mermaid
@@ -370,7 +372,7 @@ The scheduler is gated by `CosmosEnableScheduler` in the kernel `.csproj`, surfa
 
 ## Limitations and evolution
 
-- **One CPU** ([CPU affinity and load balancing](sched-concepts/cpu-affinity.md)). Only the boot CPU runs: no application processor is started, and nothing ever calls `SelectCpu` or `Balance`. The structures are per-CPU-shaped (that is what `PerCpuState` is for), each CPU finds itself and its switch staging through its per-CPU block ([The tick](#the-tick)), but SMP still needs the bring-up, per-CPU locks on the queues, a remote wake, and a balancing call site (the epic is CosmosOS/Cosmos#3336).
+- **One CPU runs threads** ([CPU affinity and load balancing](sched-concepts/cpu-affinity.md)). The application processors are started (SMP phase 2, [#3339](https://github.com/CosmosOS/Cosmos/issues/3339)): each has its per-CPU block, its share of the interrupt hardware and its own tick, and halts on its idle thread, but every thread is still placed on CPU 0 and nothing ever calls `SelectCpu` or `Balance`. The structures are per-CPU-shaped (that is what `PerCpuState` is for), each CPU finds itself and its switch staging through its per-CPU block ([The tick](#the-tick)), but SMP still needs per-CPU locks on the queues and the registry, a heap shared across CPUs, a remote wake, and a balancing call site (the epic is CosmosOS/Cosmos#3336).
 - **No voluntary switch.** A thread that blocks raises the reschedule interrupt on its own CPU and switches on its exit, but `Thread.Yield` only sets `_needReschedule` and waits for the next interrupt, up to one quantum on an idle system. The fix is a synchronous save path symmetrical to the IRQ stub's.
 - **The registry caps at 256 threads and fails open.** Registration is dropped with a log line while the thread still runs; the GC then never scans its stack, which is a use-after-free generator, not a graceful degradation (issue [#444](https://github.com/valentinbreiz/nativeaot-patcher/issues/444)).
 - **No stack protection.** No guard page, and the saved context sits in the overflow path of the thread's own frames.
@@ -382,11 +384,11 @@ The scheduler is gated by `CosmosEnableScheduler` in the kernel `.csproj`, surfa
 
 ## Tests
 
-Two kernel test suites cover this article. [`Cosmos.Kernel.Tests.Threading`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Threading/Kernel.cs) runs 95 tests (`make test KERNEL=Threading`):
+Two kernel test suites cover this article. [`Cosmos.Kernel.Tests.Threading`](https://github.com/CosmosOS/Cosmos/blob/gen3/tests/Kernels/Cosmos.Kernel.Tests.Threading/Kernel.cs) runs 97 tests on the `bare` cell and again on `bare+smp4`, a four-CPU machine (`make test KERNEL=Threading`):
 
 - thread lifecycle and concurrency (`Thread_Start_ExecutesDelegate`, `Thread_Multiple_CanRunConcurrently`), and thread ids handed out from two creating threads at once (`Thread_Ids_UniqueAcrossConcurrentStarts`),
 - exception dispatch on several threads at once (`Thread_Throw_TwoThreadsUnhandled_BothJoin`, `Thread_Throw_ConcurrentCatchRethrow_OwnExceptions`),
-- the per-CPU block: its layout against the native table, the boot CPU's index and boot stack, the ExInfo chain head following the current thread and emptying after a catch and a rethrow, and `Thread.GetCurrentProcessorId` (`PerCpuBlock_*`, `Thread_GetCurrentProcessorId_IsBootCpu`),
+- the per-CPU block: its layout against the native table, the boot CPU's index and boot stack, the application processors online with blocks, idle threads and ticks of their own on the `smp4` cell, the ExInfo chain head following the current thread and emptying after a catch and a rethrow, and `Thread.GetCurrentProcessorId` (`PerCpuBlock_*`, `Thread_GetCurrentProcessorId_IsBootCpu`),
 - the reference form of `Interlocked.CompareExchange` (the runtime's `RhpCheckedLockCmpXchg`, assembly since it has to be atomic against a tick) raced from two threads (`Interlocked_ReferenceExchange_TwoThreads`),
 - stack sizing and the #433 floor (`Thread_MaxStackSize_IsHonored`, `Thread_MaxStackSize_TinyRequestIsFloored`, `Thread_EnsureSufficientExecutionStack_Passes`),
 - thread statics (`Thread_ThreadStatics`),

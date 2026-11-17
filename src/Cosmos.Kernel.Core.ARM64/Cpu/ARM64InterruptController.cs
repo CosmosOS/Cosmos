@@ -17,7 +17,6 @@ namespace Cosmos.Kernel.Core.ARM64.Cpu;
 internal class ARM64InterruptController : IInterruptController
 {
     private bool _initialized;
-    private uint _lastAckedIntId;
 
     // ARM64 LPIs (GICv3 ITS) live in INTID space starting at 8192 (see
     // GIC.LPI_START). The dense InterruptManager.s_irqHandlers[256] table
@@ -118,6 +117,27 @@ internal class ARM64InterruptController : IInterruptController
         Serial.Write("[ARM64InterruptController] ARM64 interrupt system ready\n");
 
         _initialized = true;
+    }
+
+    /// <inheritdoc/>
+    public void InitializeCurrentCpu()
+    {
+        if (!_initialized)
+        {
+            return;
+        }
+
+        // The vector table is loaded by the trampoline, before any managed code runs on this
+        // CPU. What is banked per CPU and so has to be done here: this CPU's identity, its GIC
+        // redistributor (found by its MPIDR) and CPU interface, and the enables and priorities
+        // of the two PPI/SGI lines the scheduler uses, which the redistributor keeps per CPU.
+        PerCpuBlock.Current.HardwareId = GICv3.ExtractAffinity(GICv3Native.ReadMpidr());
+
+        GIC.InitializeCurrentCpu();
+        GIC.SetPriority(GIC.TIMER_NONSEC_PHYS, TimerPriorityMedium);
+        GIC.EnableInterrupt(GIC.TIMER_NONSEC_PHYS);
+        GIC.SetPriority(RescheduleSgi, ReschedulePriority);
+        GIC.EnableInterrupt(RescheduleSgi);
     }
 
     /// <inheritdoc/>
@@ -231,8 +251,13 @@ internal class ARM64InterruptController : IInterruptController
         // ARM64 exception types: 0 = sync, 1 = IRQ (GIC), 2 = FIQ, 3 = SError.
         if (ctx.interrupt == ExceptionTypeIrq)
         {
+            // The acknowledged INTID stays on this CPU's stack: the controller
+            // is one object for every CPU, and a field written here by two
+            // CPUs at once (CPU 0's reschedule SGI between an application
+            // processor's acknowledge and its end of interrupt) made the
+            // second CPU end the first one's interrupt, so its own timer line
+            // stayed active and it never ticked again.
             uint intId = GIC.AcknowledgeInterrupt();
-            _lastAckedIntId = intId;
 
             // INTIDs 1020..1023 are GICv3-reserved (1023 = spurious); LPIs
             // start at 8192 and must NOT be treated as spurious.
@@ -266,7 +291,7 @@ internal class ARM64InterruptController : IInterruptController
                 handler(ref ctx);
             }
 
-            SendEOI();
+            SendEOI(intId);
 
             if (handler != null)
             {
@@ -324,7 +349,7 @@ internal class ARM64InterruptController : IInterruptController
         SchedulerManager.ReschedulePendingFromIrq(SchedulerManager.GetCurrentCpuId(), SavedContextStackPointer(ref ctx));
     }
 
-    private void SendEOI()
+    private static void SendEOI(uint intId)
     {
         // INTIDs 1020..1023 are GIC-reserved (1023 = spurious); writing those
         // to ICC_EOIR1_EL1 is UNPREDICTABLE per ARM IHI 0069G. Everything
@@ -332,9 +357,9 @@ internal class ARM64InterruptController : IInterruptController
         // delivered by the ITS — must be EOI'd or the CPU interface keeps
         // the priority active and silently drops every subsequent IRQ at
         // equal/lower priority.
-        if (_lastAckedIntId < SpecialIntIdBase || _lastAckedIntId >= SpecialIntIdLimit)
+        if (intId < SpecialIntIdBase || intId >= SpecialIntIdLimit)
         {
-            GIC.EndOfInterrupt(_lastAckedIntId);
+            GIC.EndOfInterrupt(intId);
         }
     }
 

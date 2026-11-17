@@ -7,6 +7,17 @@
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
 
+  <!--
+    The bare cell, and the same cell on four CPUs: the suite runs unchanged
+    on the four-CPU machine, where the three application processors the
+    kernel started (SMP phase 2) tick on their idle threads while every
+    thread is still placed on CPU 0. Definitions live in tests/profiles.json.
+  -->
+  <ItemGroup>
+    <CosmosTestProfile Include="bare" />
+    <CosmosTestModifier Include="smp4" />
+  </ItemGroup>
+
   <!-- Core kernel packages (using project references for development) -->
   <ItemGroup>
     <ProjectReference Include="../../../src/Cosmos.Kernel/Cosmos.Kernel.csproj" />
