@@ -23,7 +23,7 @@ kmain()           native C bootstrap (Cosmos.Kernel/Bootstrap/kmain.c)
     ├─ Phase 1    CPU: enable SIMD, initialize the serial port
     ├─ Phase 2    Platform: RSDP + HHDM from Limine, early ACPI parse (MADT, MCFG)
     ├─ Phase 3    Managed runtime: heap, GC, type system, library initializers
-    └─ Phase 4    User kernel: Main(argc, argv) → Kernel.Start()
+    └─ Phase 4    User kernel: the main thread starts, Main(argc, argv) → Kernel.Start()
 ```
 
 The [Limine](https://limine-bootloader.org/) bootloader loads the kernel ELF produced by the build pipeline, and jumps to `kmain()`, a small C bootstrap compiled into every kernel. From there:
@@ -31,7 +31,7 @@ The [Limine](https://limine-bootloader.org/) bootloader loads the kernel ELF pro
 - **Phase 1: CPU.** SIMD is enabled first (NativeAOT-generated code uses XMM registers from the very first instruction) and the serial port is initialized, so everything after this line is logged. On ARM64 the alignment check is disabled here too.
 - **Phase 2: Platform.** The bootstrap asks Limine for the ACPI RSDP and the higher-half direct-map offset, then does an early ACPI parse: the MADT (where the interrupt controllers and CPUs are) and the MCFG (where PCIe configuration space lives).
 - **Phase 3: Managed runtime.** The NativeAOT startup path runs. This is where the C# world comes alive, one package at a time (see the next section).
-- **Phase 4: User kernel.** The bootstrap builds `argv` from the kernel command line and calls the managed `Main`, which ends up in your kernel's `Start()`.
+- **Phase 4: User kernel.** The bootstrap builds `argv` from the kernel command line and hands it to the managed boot code, which starts the thread `Main` runs on ([The generated entry point](#the-generated-entry-point)); `Main` ends up in your kernel's `Start()`.
 
 ## Phase 3: how the managed kernel comes up
 
@@ -75,11 +75,13 @@ public static class CosmosEntryPoint
 
 `KernelEntry.Start` then registers that instance as `Kernel.Current` and calls its `Start()`. `KernelEntry` is boot plumbing for this generated code only, public because the code compiles into your kernel's assembly; your own code never calls it.
 
+With the scheduler compiled in, `Main` does not run on the stack the machine booted on. The boot code starts a thread for it, the main thread, with a 1 MiB stack, and the boot CPU goes idle. On a machine with several CPUs the main thread runs on the compute CPUs, every CPU but the first, which keeps the device interrupts ([CPU affinity and load balancing](../dev/sched-concepts/cpu-affinity.md)). So `BeforeRun`, `Run` and `AfterRun` run on a thread like the ones your kernel starts: they may block on a lock, sleep, and move from one CPU to another between two instructions. A kernel built with `CosmosEnableScheduler` off has no thread, and its `Main` runs on the boot stack. So does a kernel whose main thread cannot start, for want of memory or because its scheduler timer never ticks: the boot code says so on the serial log (`[KERNEL] Scheduler stopped, Main runs on the boot context.`) and goes on without the scheduler.
+
 ## Sys.Kernel.Start()
 
 `Cosmos.Kernel.System.Kernel` is the abstract base class of every user kernel. Its `Start()` drives the whole lifecycle:
 
-1. Enables hardware interrupts (everything before this point ran with interrupts off).
+1. Enables hardware interrupts on a kernel whose `Main` runs on the boot stack (one built without the scheduler, or one whose scheduler was stopped at boot), where everything before this point ran with interrupts off. With a running scheduler they are on already: `Start()` runs on the main thread, which only an interrupt could have started.
 2. Starts the finalizer thread when `CosmosEnableFinalizerThread` is on, which it is by default whenever the scheduler is: from here on, finalizers run on a thread of their own rather than on the thread that collected or allocated ([Finalization](../dev/garbage-collector.md#finalization)).
 3. Runs the driver stage: the kit logs its manifest, publishes the firmware framebuffer recorded in phase 3 as the firmware display (the display manager's primary until a display driver publishes one), and then the drivers listed in the kernel's manifest are offered every node the buses have published, the platform nodes seeded in phase 3 first (the 8042 driver publishes its two PS/2 port nodes from its probe, and the keyboard and mouse drivers bind them during the stage), then every PCI function the PCI host driver found and every one a root port driver found behind its hot-plug slot, then every virtio device a transport driver published beneath a function or a slot, and the step returns once each node, children included, has been offered; the AHCI, NVMe, virtio-blk and USB mass storage drivers publish the disks they find here (the host controller drivers enumerate their root ports inside their probes, so a stick present at boot is published during the stage too), and the storage manager registers and scans each one inside the publish, so `StorageManager.Partitions` is filled by the time the step returns. Each USB host controller driver's hot-plug thread, started inside its probe, follows the devices plugged in or pulled out from then on; it needs the scheduler. The root port driver's slot thread does the same for a device plugged into or pulled out of a PCI Express hot-plug slot, placing the registers of one that arrives; it needs the scheduler too.
 3. Calls `OnBoot()`, whose default implementation initializes the graphical `KernelConsole` on whatever display is primary by then, which is what makes `Console.WriteLine` work.
@@ -149,7 +151,7 @@ An uncaught exception inside `Run()` propagates out of the loop, so wrap the bod
 
 ## Customizing startup
 
-`OnBoot()` runs before the console exists, the right place for early setup of your own. Interrupts are already enabled and the driver stage has run, so a device a driver bound is usable from here on; code that must run with interrupts off belongs in an override of `Start()` itself:
+`OnBoot()` runs before the console exists, the right place for early setup of your own. Interrupts are already enabled and the driver stage has run, so a device a driver bound is usable from here on. Code that must run before the driver stage belongs in an override of `Start()` itself, which runs with interrupts off only on a kernel whose `Main` runs on the boot stack. An `OnBoot()` override looks like this:
 
 ```csharp
 protected override void OnBoot()
