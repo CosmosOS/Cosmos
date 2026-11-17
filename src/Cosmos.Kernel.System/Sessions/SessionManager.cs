@@ -89,6 +89,19 @@ public static class SessionManager
     /// <summary>The calling thread's session, or null while there is no console.</summary>
     public static ConsoleSession? Current => s_threadSession ?? Primary;
 
+    /// <summary>
+    /// Wakes the primary console's reader to look at the keyboard's queue
+    /// again, when the console exists: what the keyboard calls for a key it
+    /// queued while nothing routes it. Any context, an interrupt handler
+    /// included, on any CPU: one read of a reference and a signal, with no
+    /// allocation, so the console is not created here. A console created
+    /// later starts with a look at the queue, which finds the key.
+    /// </summary>
+    internal static void WakePrimaryReader()
+    {
+        s_primary?.WakeReader();
+    }
+
     /// <summary>The session on the display, which the local keyboard types into, or null while there is no console.</summary>
     public static ConsoleSession? Active => s_active ?? Primary;
 

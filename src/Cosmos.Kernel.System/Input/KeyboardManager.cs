@@ -242,6 +242,16 @@ public static class KeyboardManager
         {
             s_queuedKeys?.Push(keyEvent);
         }
+
+        // Nothing routes the keyboard, so the primary console takes its keys
+        // from this queue when its reader looks (VirtualConsole.PollInput),
+        // and a reader on a thread parks on the console's signal between two
+        // looks: the key has to wake it. The kernel's Main reads the console
+        // on a thread of its own (SMP phase 5b); while it ran on CPU 0's idle
+        // thread it halted between two looks and this interrupt ended the
+        // halt, so nothing was signalled. After the lock, so that no lock of
+        // the ring is held across a call into the scheduler.
+        SessionManager.WakePrimaryReader();
     }
 
     /// <summary>
@@ -493,8 +503,10 @@ public static class KeyboardManager
                 }
             }
 
-            // The halt waits for the interrupt, or the worker's tick, that
-            // fills the queue.
+            // The halt ends on the interrupt that fills the queue when that
+            // interrupt is this CPU's, and on this CPU's next tick otherwise:
+            // the keyboard's interrupt is taken on CPU 0, and the caller may
+            // run on another.
             PlatformHAL.CpuOps?.Halt();
         }
     }
