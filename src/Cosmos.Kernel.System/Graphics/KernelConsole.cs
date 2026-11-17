@@ -404,17 +404,34 @@ public class KernelConsole
     }
 
     /// <summary>
-    /// Resizes the grid, keeping the cells that fit. When the grid loses rows
-    /// the top ones go, so the cursor's line stays on screen, as a terminal
-    /// window does when it shrinks. Thread-safe.
+    /// Allocates the grid a <see cref="Resize"/> installs, <paramref name="cols"/>
+    /// by <paramref name="rows"/> empty cells in the current colours. Called
+    /// before any lock: nothing allocates under a spinlock.
     /// </summary>
     /// <param name="cols">New number of columns.</param>
     /// <param name="rows">New number of rows.</param>
-    internal void Resize(int cols, int rows)
+    /// <returns>The grid to hand to <see cref="Resize"/>.</returns>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="cols"/> or <paramref name="rows"/> is less than 1.</exception>
+    internal Cell[] NewGrid(int cols, int rows)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(cols, 1);
         ArgumentOutOfRangeException.ThrowIfLessThan(rows, 1);
 
+        Cell[] cells = new Cell[cols * rows];
+        Array.Fill(cells, Cell.Empty(_foregroundColor, _backgroundColor));
+        return cells;
+    }
+
+    /// <summary>
+    /// Resizes the grid, keeping the cells that fit. When the grid loses rows
+    /// the top ones go, so the cursor's line stays on screen, as a terminal
+    /// window does when it shrinks. Thread-safe.
+    /// </summary>
+    /// <param name="cells">The new grid, from <see cref="NewGrid"/>.</param>
+    /// <param name="cols">New number of columns, the grid's.</param>
+    /// <param name="rows">New number of rows, the grid's.</param>
+    internal void Resize(Cell[] cells, int cols, int rows)
+    {
         using (InternalCpu.DisableInterruptsScope())
         {
             _lock.Acquire();
@@ -423,12 +440,6 @@ public class KernelConsole
                 if (cols == Cols && rows == Rows)
                 {
                     return;
-                }
-
-                Cell[] cells = new Cell[cols * rows];
-                for (int i = 0; i < cells.Length; i++)
-                {
-                    cells[i] = Cell.Empty(_foregroundColor, _backgroundColor);
                 }
 
                 int dropped = Math.Max(0, _cursorY + 1 - rows);

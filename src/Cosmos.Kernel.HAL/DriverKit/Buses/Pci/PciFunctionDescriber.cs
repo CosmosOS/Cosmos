@@ -258,7 +258,7 @@ internal static class PciFunctionDescriber
     /// <paramref name="registerCount"/> to 5 are unassigned with length 0.
     /// Runs with interrupts disabled, the early framebuffer console paused
     /// and memory and I/O decoding off; Command is restored last. Thread
-    /// context.
+    /// context, the kit worker at probe time.
     /// </summary>
     private static PciBar[] SizeBars(PciConfigSpace configSpace, byte bus, byte device, byte function, int registerCount)
     {
@@ -268,6 +268,12 @@ internal static class PciFunctionDescriber
             bars[slot] = Unassigned(slot);
         }
 
+        // A mask, not a lock, on purpose (SMP phase 4b, CosmosOS/Cosmos#3347):
+        // the sequence runs at probe time, before the function has a handler
+        // on any CPU, so what it excludes is this CPU's own interrupts, whose
+        // handlers write the early console while its decoding is off; the
+        // config space under it takes its own lock, and EarlyGop.Enabled is
+        // the boot flow's alone at that stage.
         using (InternalCpu.DisableInterruptsScope())
         {
             bool consoleEnabled = EarlyGop.Enabled;
@@ -360,10 +366,11 @@ internal static class PciFunctionDescriber
     /// Memory decoding (and I/O decoding when a port range was placed) is
     /// turned on when Command is restored; bus mastering stays as it was.
     /// Runs with interrupts disabled, the early framebuffer console paused
-    /// and decoding off. Thread context.
+    /// and decoding off. Thread context, the kit worker at probe time.
     /// </summary>
     private static void AssignBars(PciConfigSpace configSpace, byte bus, byte device, byte function, PciBar[] bars, PciBridgeWindows windows)
     {
+        // A mask, not a lock, for the reason SizeBars gives.
         using (InternalCpu.DisableInterruptsScope())
         {
             bool consoleEnabled = EarlyGop.Enabled;

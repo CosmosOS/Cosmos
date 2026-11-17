@@ -1,6 +1,5 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.IO;
 using Cosmos.Kernel.HAL.DriverKit.Buses.Virtio;
 
@@ -9,8 +8,11 @@ namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 /// <summary>
 /// The kit's serial log: one fixed-format line per event, prefixed
 /// <c>[Drivers]</c>, the same facts the diagnostics view exposes. Lines are
-/// built in thread context, then written with interrupts masked so a
-/// preemption cannot cut one in half; never called from interrupt context.
+/// built in thread context and written piece by piece under the serial
+/// port's lock; never called from interrupt context. A line of another
+/// CPU's may land between two pieces, as anywhere else the kernel writes a
+/// line in pieces: the interrupt mask that once wrapped the three writes
+/// excluded this CPU's handlers alone (SMP phase 4b, CosmosOS/Cosmos#3347).
 /// </summary>
 internal static class DriverLog
 {
@@ -175,11 +177,8 @@ internal static class DriverLog
 
     private static void WriteLine(string line)
     {
-        using (InternalCpu.DisableInterruptsScope())
-        {
-            Serial.WriteString(Prefix);
-            Serial.WriteString(line);
-            Serial.WriteString("\n");
-        }
+        Serial.WriteString(Prefix);
+        Serial.WriteString(line);
+        Serial.WriteString("\n");
     }
 }

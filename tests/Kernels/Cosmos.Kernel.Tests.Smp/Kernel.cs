@@ -6,6 +6,7 @@ using System.Threading;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.System.Diagnostics;
+using Cosmos.Kernel.System.Input;
 using Cosmos.Kernel.System.Threading;
 using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
@@ -25,12 +26,14 @@ namespace Cosmos.Kernel.Tests.Smp;
 /// through statics, read on CPU 0 without a lock, and allocates there like anywhere else:
 /// the collector stops every CPU (SMP phase 4), and the spinners keep an object per round
 /// to prove it. A worker comes back to CPU 0 before it exits because the cells prove the
-/// move each way.
+/// move each way. Two cells share the ring's structures between CPUs (CosmosOS/Cosmos#3347,
+/// SMP phase 4b): the keyboard's queue filled on CPU 0 and drained on CPU 1, and the tick
+/// source's registry registered into from CPUs 1 to 3 while CPU 0 ticks.
 /// </summary>
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 30;
+    private const int ExpectedTestCount = 32;
 
     /// <summary>CPUs the smp4 cell's machine has: what the bootloader lists and the kernel starts there.</summary>
     private const uint Smp4CpuCount = 4;
@@ -61,6 +64,22 @@ public class Kernel : Sys.Kernel
     /// <summary>A CPU index the bare cell manages but does not have: what its offline-set cell pins to.</summary>
     private const uint OfflineCpu = 3;
 
+    /// <summary>Keys the typist presses on CPU 0 while the reader drains on CPU 1.</summary>
+    private const int KeyboardTypedKeys = 3_000;
+    /// <summary>Keys the typist lets pile up unread before it waits: under the queue's <see cref="KeyboardManager.QueueDepth"/>, past which the oldest is overwritten.</summary>
+    private const int KeyboardBacklog = KeyboardManager.QueueDepth * 3 / 4;
+    /// <summary>Set 1 make codes of A to J on the US layout, the keys the typist cycles through.</summary>
+    private static readonly byte[] s_keyboardScanCodes = [0x1E, 0x30, 0x2E, 0x20, 0x12, 0x21, 0x22, 0x23, 0x17, 0x24];
+    /// <summary>The keys those scan codes decode to, in the same order.</summary>
+    private static readonly Key[] s_keyboardKeys = [Key.A, Key.B, Key.C, Key.D, Key.E, Key.F, Key.G, Key.H, Key.I, Key.J];
+
+    /// <summary>One-shot timers each registrar schedules from its CPU.</summary>
+    private const int TimersPerRegistrar = 200;
+    /// <summary>Longest delay (ms) a registrar gives a timer; the delays cycle from 1 up to it.</summary>
+    private const int TimerMaxDelayMs = 20;
+    /// <summary>Maximum wait (ms) for every timer to fire once the registrars are done.</summary>
+    private const int TimerWaitMs = 5_000;
+
     // ===== What the workers report, statics only =====
     private static SchedulerThread? s_workerThread;
     private static volatile bool s_stop;
@@ -88,6 +107,15 @@ public class Kernel : Sys.Kernel
     private static ulong s_pingPongChecksum;
     private static volatile uint s_pingPongWrong;
     private static volatile bool s_pingPongDone;
+
+    private static volatile int s_keysTyped;
+    private static volatile int s_keysRead;
+    private static volatile int s_keysWrong;
+    private static int[]? s_timerFires;
+    private static SoftwareTimer?[]? s_timerHandles;
+    private static int s_timerRegistrarsNextCpu;
+    private static int s_timerRegistrationsRefused;
+    private static int s_timerWrongCpu;
 
     protected override void BeforeRun()
     {
@@ -138,6 +166,10 @@ public class Kernel : Sys.Kernel
         TR.RunIf(smp, "Balance_IdleCpuPullsQueuedThread", TestBalanceIdleCpuPullsQueuedThread, OneCpuCell);
         TR.RunIf(smp, "ThreadAffinity_SetIdealCpu_InsideSet_Updates", TestSetIdealCpuInsideSetUpdates, OneCpuCell);
         TR.RunIf(smp, "ThreadAffinity_SetIdealCpu_ExcludedCpu_Throws", TestSetIdealCpuExcludedCpuThrows, OneCpuCell);
+
+        // The ring's locks across CPUs (SMP phase 4b)
+        TR.RunIf(smp, "Keyboard_EnqueueFromCpu0_ReadFromComputeCpu", TestKeyboardEnqueueFromCpu0ReadFromComputeCpu, OneCpuCell);
+        TR.RunIf(smp, "Timer_RegisterFromComputeCpu_FiresOnCpu0", TestTimerRegisterFromComputeCpuFiresOnCpu0, OneCpuCell);
 
         TR.Finish();
 
@@ -1009,5 +1041,174 @@ public class Kernel : Sys.Kernel
 
         s_stop = true;
         Assert.True(worker.Join(JoinTimeoutMs), "the spinner exits");
+    }
+
+    // ===== The ring's locks across CPUs (SMP phase 4b, CosmosOS/Cosmos#3347) =====
+
+    // The keyboard's queue is filled from the sink caller's context on CPU 0 and drained by a
+    // reader on another CPU: the typist feeds scan codes to the decoder as the keyboard's
+    // handler does, pinned to CPU 0, while the reader, pinned to CPU 1, takes the keys and
+    // checks them against the sequence typed. The typist paces itself on the reader's count so
+    // the queue never overflows, and nothing is lost, doubled or reordered. Both workers stop
+    // on the flag once the cell gives up waiting, so a failed cell leaves no thread spinning.
+    private static void TestKeyboardEnqueueFromCpu0ReadFromComputeCpu()
+    {
+        Assert.True(KeyboardManager.IsEnabled, "the suite's kernel has the keyboard on");
+        while (KeyboardManager.TryReadKey(out _))
+        {
+        }
+
+        s_keysTyped = 0;
+        s_keysRead = 0;
+        s_keysWrong = 0;
+        s_stop = false;
+        SysThread reader = new(KeyboardReader);
+        SysThread typist = new(KeyboardTypist);
+        reader.Start();
+        typist.Start();
+
+        bool typistExited = typist.Join(JoinTimeoutMs);
+        bool readerExited = reader.Join(JoinTimeoutMs);
+        s_stop = true;
+        Assert.True(typistExited, "the typist pressed every key");
+        Assert.True(readerExited, "the reader took every key");
+        Assert.Equal(KeyboardTypedKeys, s_keysRead, "every key typed on CPU 0 was read on CPU 1");
+        Assert.Equal(0, s_keysWrong, "every key read is the one typed, in order");
+        Assert.False(KeyboardManager.TryReadKey(out _), "no key is left in the queue");
+    }
+
+    private static void KeyboardTypist()
+    {
+        ThreadAffinity.Current = CpuSet.Single(0);
+        for (int i = 0; i < KeyboardTypedKeys && !s_stop; i++)
+        {
+            while (s_keysTyped - s_keysRead >= KeyboardBacklog && !s_stop)
+            {
+                SysThread.Yield();
+            }
+
+            byte scanCode = s_keyboardScanCodes[i % s_keyboardScanCodes.Length];
+            KeyboardManager.HandleScanCode(scanCode, released: false);
+            KeyboardManager.HandleScanCode(scanCode, released: true);
+            s_keysTyped = i + 1;
+        }
+    }
+
+    private static void KeyboardReader()
+    {
+        ThreadAffinity.Current = CpuSet.Single(1);
+        int wrong = 0;
+        int read = 0;
+        while (read < KeyboardTypedKeys && !s_stop)
+        {
+            if (!KeyboardManager.TryReadKey(out KeyEvent? key))
+            {
+                SysThread.Yield();
+                continue;
+            }
+
+            if (key.Key != s_keyboardKeys[read % s_keyboardKeys.Length])
+            {
+                wrong++;
+            }
+
+            read++;
+            s_keysRead = read;
+        }
+
+        s_keysWrong = wrong;
+    }
+
+    // The tick source's registry is walked by CPU 0's tick while threads on the other CPUs
+    // register one-shot timers into it: each registrar, pinned to CPU 1, 2 or 3, schedules a
+    // batch of short timers whose callbacks count in its slot, and every one of them fires
+    // exactly once, on CPU 0; a fired timer is no longer cancellable.
+    private static void TestTimerRegisterFromComputeCpuFiresOnCpu0()
+    {
+        int registrars = (int)Smp4CpuCount - 1;
+        s_timerFires = new int[Smp4CpuCount];
+        s_timerHandles = new SoftwareTimer?[registrars * TimersPerRegistrar];
+        s_timerRegistrarsNextCpu = 0;
+        s_timerRegistrationsRefused = 0;
+        s_timerWrongCpu = 0;
+
+        SysThread[] workers = new SysThread[registrars];
+        for (int i = 0; i < workers.Length; i++)
+        {
+            workers[i] = new SysThread(TimerRegistrar);
+            workers[i].Start();
+        }
+
+        foreach (SysThread worker in workers)
+        {
+            Assert.True(worker.Join(JoinTimeoutMs), "a registrar scheduled its timers and exited");
+        }
+
+        Assert.Equal(0, s_timerRegistrationsRefused, "every registration returned a handle");
+
+        int expected = registrars * TimersPerRegistrar;
+        int fired = 0;
+        for (int waited = 0; waited < TimerWaitMs && fired < expected; waited += PollIntervalMs)
+        {
+            TimerManager.Wait(PollIntervalMs);
+            fired = 0;
+            for (int cpu = 1; cpu <= registrars; cpu++)
+            {
+                fired += Volatile.Read(ref s_timerFires[cpu]);
+            }
+        }
+
+        for (int cpu = 1; cpu <= registrars; cpu++)
+        {
+            Assert.Equal(TimersPerRegistrar, Volatile.Read(ref s_timerFires[cpu]), "every timer a registrar scheduled fired exactly once");
+        }
+
+        Assert.Equal(0, Volatile.Read(ref s_timerWrongCpu), "every callback ran on CPU 0, the tick's");
+
+        int stillActive = 0;
+        int cancellable = 0;
+        foreach (SoftwareTimer? handle in s_timerHandles)
+        {
+            if (handle is { IsActive: true })
+            {
+                stillActive++;
+            }
+
+            if (TimerManager.Cancel(handle))
+            {
+                cancellable++;
+            }
+        }
+
+        Assert.Equal(0, stillActive, "no timer is still pending");
+        Assert.Equal(0, cancellable, "a fired timer is no longer cancellable");
+    }
+
+    private static void TimerRegistrar()
+    {
+        int cpu = Interlocked.Increment(ref s_timerRegistrarsNextCpu);
+        ThreadAffinity.Current = CpuSet.Single((uint)cpu);
+        int[] fires = s_timerFires!;
+        SoftwareTimer?[] handles = s_timerHandles!;
+        for (int i = 0; i < TimersPerRegistrar; i++)
+        {
+            TimeSpan delay = TimeSpan.FromMilliseconds(1 + i % TimerMaxDelayMs);
+            SoftwareTimer? handle = TimerManager.Schedule(() =>
+            {
+                if (KernelCpus.Current != 0)
+                {
+                    Interlocked.Increment(ref s_timerWrongCpu);
+                }
+
+                Interlocked.Increment(ref fires[cpu]);
+            }, delay);
+            if (handle is null)
+            {
+                Interlocked.Increment(ref s_timerRegistrationsRefused);
+                continue;
+            }
+
+            handles[(cpu - 1) * TimersPerRegistrar + i] = handle;
+        }
     }
 }

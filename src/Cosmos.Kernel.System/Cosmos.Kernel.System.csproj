@@ -89,5 +89,12 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Cosmos.Kernel.Tests.Audio</_Parameter1>
     </AssemblyAttribute>
+    <!-- The Smp suite's keyboard cell feeds scan codes to the decoder the way
+         the keyboard's handler does (KeyboardManager.HandleScanCode), beside
+         the PS/2 keyboard bound on the cell rather than through it, and paces
+         itself on the queue's depth. -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Cosmos.Kernel.Tests.Smp</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 </Project>

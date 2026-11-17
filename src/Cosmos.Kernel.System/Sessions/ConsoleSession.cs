@@ -2,11 +2,11 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.HAL.Boot;
 using Cosmos.Kernel.System.Graphics;
 using Cosmos.Kernel.System.Input;
+using SchedSpinLock = Cosmos.Kernel.Core.Scheduler.SpinLock;
 
 namespace Cosmos.Kernel.System.Sessions;
 
@@ -23,15 +23,17 @@ namespace Cosmos.Kernel.System.Sessions;
 /// <para>Every session keeps its screen as a <see cref="KernelConsole"/>
 /// grid, on the display's canvas but hidden until the session is shown, so
 /// a session can be switched to at any time, a remote one included. Output
-/// runs with interrupts masked, so the screen and a remote terminal see one
-/// thread's changes in the order it made them.</para>
+/// runs under the session's lock, with interrupts masked, so the screen and
+/// a remote terminal see one thread's changes in the order it made them,
+/// whichever CPUs the threads run on.</para>
 /// <para>A library adds a remote session by deriving from this class: the
 /// <see cref="ConsoleSession(int, int)"/> constructor gives it a screen,
 /// <see cref="EnqueueInput"/> takes the keys its terminal sends, and the
 /// <c>On</c> hooks tell it every change to send there. The hooks that report
-/// a change run inside it, with interrupts masked: they record what changed
-/// and return, without blocking, waiting or doing I/O. Only
-/// <see cref="OnFlush"/> and <see cref="OnClosed"/> run unmasked.</para>
+/// a change run inside it, under the session's lock with interrupts masked:
+/// they record what changed and return, without allocating, blocking,
+/// waiting or doing I/O. Only <see cref="OnFlush"/> and
+/// <see cref="OnClosed"/> run outside the lock.</para>
 /// </remarks>
 public abstract class ConsoleSession
 {
@@ -39,14 +41,26 @@ public abstract class ConsoleSession
     private const int TabWidth = 4;
 
     /// <summary>
-    /// Keys the queue holds before it grows. The keyboard's interrupt handler
-    /// queues onto it, and growing allocates, so it is sized for a burst of
-    /// typing the reader has not caught up with rather than left to grow
-    /// from empty, as <see cref="InterruptEvent"/> pre-sizes its waiter list.
+    /// Keys the input ring holds: a burst of typing the reader has not
+    /// caught up with. A key queued onto a full ring is dropped, since the
+    /// keyboard's interrupt handler queues onto it under the session's lock
+    /// and nothing allocates under a spinlock.
     /// </summary>
     private const int InputQueueCapacity = 64;
 
-    private readonly Queue<KeyEvent> _input = new(InputQueueCapacity);
+    /// <summary>
+    /// The session's lock, IRQ-safe (SMP phase 4b, CosmosOS/Cosmos#3347):
+    /// around the screen, the colours and the cursor, which the thread
+    /// bound to the session writes while a switch repaints, and around the
+    /// input ring, which the keyboard's handler or a remote server's thread
+    /// fills while the session's reader drains it. Taken before the
+    /// screen's own lock, never after it.
+    /// </summary>
+    private SchedSpinLock _lock;
+
+    private readonly KeyEvent?[] _input = new KeyEvent?[InputQueueCapacity];
+    private int _inputHead;
+    private int _inputCount;
     private int _closed;
 
     /// <summary>
@@ -106,7 +120,7 @@ public abstract class ConsoleSession
         get => ExplicitForeground ?? ConsoleColor.White;
         set
         {
-            using (InternalCpu.DisableInterruptsScope())
+            using (_lock.AcquireIrqSafe())
             {
                 Screen.SetForegroundColor(value);
                 ExplicitForeground = value;
@@ -121,7 +135,7 @@ public abstract class ConsoleSession
         get => ExplicitBackground ?? ConsoleColor.Black;
         set
         {
-            using (InternalCpu.DisableInterruptsScope())
+            using (_lock.AcquireIrqSafe())
             {
                 Screen.SetBackgroundColor(value);
                 ExplicitBackground = value;
@@ -142,7 +156,7 @@ public abstract class ConsoleSession
         get => Screen.CursorVisible;
         set
         {
-            using (InternalCpu.DisableInterruptsScope())
+            using (_lock.AcquireIrqSafe())
             {
                 Screen.CursorVisible = value;
                 OnCursorVisibilityChanged(value);
@@ -166,9 +180,9 @@ public abstract class ConsoleSession
             }
 
             PollInput();
-            using (InternalCpu.DisableInterruptsScope())
+            using (_lock.AcquireIrqSafe())
             {
-                return _input.Count > 0 || IsClosed;
+                return _inputCount > 0 || IsClosed;
             }
         }
     }
@@ -222,7 +236,7 @@ public abstract class ConsoleSession
     /// <summary>Writes a character at the cursor.</summary>
     internal void Write(char value)
     {
-        using (InternalCpu.DisableInterruptsScope())
+        using (_lock.AcquireIrqSafe())
         {
             WriteCore(value);
         }
@@ -231,7 +245,7 @@ public abstract class ConsoleSession
     /// <summary>Writes characters at the cursor.</summary>
     internal void Write(ReadOnlySpan<char> text)
     {
-        using (InternalCpu.DisableInterruptsScope())
+        using (_lock.AcquireIrqSafe())
         {
             foreach (char c in text)
             {
@@ -243,7 +257,7 @@ public abstract class ConsoleSession
     /// <summary>Clears the screen and homes the cursor.</summary>
     internal void Clear()
     {
-        using (InternalCpu.DisableInterruptsScope())
+        using (_lock.AcquireIrqSafe())
         {
             Screen.Clear();
             OnCleared();
@@ -253,7 +267,7 @@ public abstract class ConsoleSession
     /// <summary>Puts back the default colours.</summary>
     internal void ResetColors()
     {
-        using (InternalCpu.DisableInterruptsScope())
+        using (_lock.AcquireIrqSafe())
         {
             Screen.ResetColors();
             ExplicitForeground = null;
@@ -265,7 +279,7 @@ public abstract class ConsoleSession
     /// <summary>Moves the cursor; a position off the screen is ignored.</summary>
     internal void SetCursorPosition(int left, int top)
     {
-        using (InternalCpu.DisableInterruptsScope())
+        using (_lock.AcquireIrqSafe())
         {
             Screen.SetCursorPosition(left, top);
             OnCursorMoved();
@@ -275,7 +289,7 @@ public abstract class ConsoleSession
     /// <summary>Moves the cursor one column left; a no-op in the first column.</summary>
     internal void MoveCursorLeft()
     {
-        using (InternalCpu.DisableInterruptsScope())
+        using (_lock.AcquireIrqSafe())
         {
             Screen.MoveCursorLeft();
             OnCursorMoved();
@@ -285,7 +299,7 @@ public abstract class ConsoleSession
     /// <summary>Moves the cursor one column right; a no-op in the last column.</summary>
     internal void MoveCursorRight()
     {
-        using (InternalCpu.DisableInterruptsScope())
+        using (_lock.AcquireIrqSafe())
         {
             Screen.MoveCursorRight();
             OnCursorMoved();
@@ -308,17 +322,38 @@ public abstract class ConsoleSession
 
     /// <summary>
     /// Queues a key for the session's reader and wakes it. Any context, the
-    /// keyboard's interrupt handler included: the queue only grows, and so
-    /// allocates, once <see cref="InputQueueCapacity"/> keys wait unread.
+    /// keyboard's interrupt handler included, on any CPU. The ring holds
+    /// <see cref="InputQueueCapacity"/> keys the reader has not taken; one
+    /// queued onto a full ring is dropped, and the reader is not woken for it.
     /// </summary>
     protected internal void EnqueueInput(KeyEvent key)
     {
-        using (InternalCpu.DisableInterruptsScope())
+        if (QueueInput(key))
         {
-            _input.Enqueue(key);
+            InputSignal.Signal();
         }
+    }
 
-        InputSignal.Signal();
+    /// <summary>
+    /// Queues a key without waking the reader: what the session manager's
+    /// drain does under its own lock, waking the reader once after it, so
+    /// that no lock of the ring is held across the wake, a call into the
+    /// scheduler.
+    /// </summary>
+    /// <returns>False when the ring was full and the key was dropped.</returns>
+    internal bool QueueInput(KeyEvent key)
+    {
+        using (_lock.AcquireIrqSafe())
+        {
+            if (_inputCount == _input.Length)
+            {
+                return false;
+            }
+
+            _input[(_inputHead + _inputCount) % _input.Length] = key;
+            _inputCount++;
+            return true;
+        }
     }
 
     /// <summary>Wakes the session's reader to look at its input again: the session was just shown, so it now polls the keyboards.</summary>
@@ -328,9 +363,19 @@ public abstract class ConsoleSession
     internal bool TryReadKey([NotNullWhen(true)] out KeyEvent? key)
     {
         PollInput();
-        using (InternalCpu.DisableInterruptsScope())
+        using (_lock.AcquireIrqSafe())
         {
-            return _input.TryDequeue(out key);
+            if (_inputCount == 0)
+            {
+                key = null;
+                return false;
+            }
+
+            key = _input[_inputHead]!;
+            _input[_inputHead] = null;
+            _inputHead = (_inputHead + 1) % _input.Length;
+            _inputCount--;
+            return true;
         }
     }
 
@@ -338,9 +383,10 @@ public abstract class ConsoleSession
     internal bool TryPeekKey([NotNullWhen(true)] out KeyEvent? key)
     {
         PollInput();
-        using (InternalCpu.DisableInterruptsScope())
+        using (_lock.AcquireIrqSafe())
         {
-            return _input.TryPeek(out key);
+            key = _inputCount == 0 ? null : _input[_inputHead];
+            return key is not null;
         }
     }
 
@@ -470,9 +516,12 @@ public abstract class ConsoleSession
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="cols"/> or <paramref name="rows"/> is less than 1.</exception>
     protected void Resize(int cols, int rows)
     {
-        using (InternalCpu.DisableInterruptsScope())
+        // The grid is allocated before the lock: nothing allocates under a
+        // spinlock.
+        Cell[] grid = Screen.NewGrid(cols, rows);
+        using (_lock.AcquireIrqSafe())
         {
-            Screen.Resize(cols, rows);
+            Screen.Resize(grid, cols, rows);
             OnCursorMoved();
         }
     }
@@ -482,40 +531,40 @@ public abstract class ConsoleSession
     {
     }
 
-    /// <summary>A character went to the screen: a printable one, a line feed, a carriage return or a backspace. Runs with interrupts masked.</summary>
+    /// <summary>A character went to the screen: a printable one, a line feed, a carriage return or a backspace. Runs under the session's lock, with interrupts masked: no allocation.</summary>
     /// <param name="value">The character.</param>
     /// <param name="wrapped">Whether writing a printable character filled the line, so the cursor went on to the next one.</param>
     protected virtual void OnWritten(char value, bool wrapped)
     {
     }
 
-    /// <summary>The screen was cleared and the cursor homed. Runs with interrupts masked.</summary>
+    /// <summary>The screen was cleared and the cursor homed. Runs under the session's lock, with interrupts masked: no allocation.</summary>
     protected virtual void OnCleared()
     {
     }
 
-    /// <summary>The cursor was moved without writing, or the screen was resized. Runs with interrupts masked.</summary>
+    /// <summary>The cursor was moved without writing, or the screen was resized. Runs under the session's lock, with interrupts masked: no allocation.</summary>
     protected virtual void OnCursorMoved()
     {
     }
 
-    /// <summary>The cursor was shown or hidden. Runs with interrupts masked.</summary>
+    /// <summary>The cursor was shown or hidden. Runs under the session's lock, with interrupts masked: no allocation.</summary>
     /// <param name="visible">Whether the cursor is now drawn.</param>
     protected virtual void OnCursorVisibilityChanged(bool visible)
     {
     }
 
-    /// <summary>The colours changed; <see cref="ExplicitForeground"/> and <see cref="ExplicitBackground"/> hold them. Runs with interrupts masked.</summary>
+    /// <summary>The colours changed; <see cref="ExplicitForeground"/> and <see cref="ExplicitBackground"/> hold them. Runs under the session's lock, with interrupts masked: no allocation.</summary>
     protected virtual void OnColorsChanged()
     {
     }
 
-    /// <summary>A write finished and should be shown. Runs unmasked, on the writing thread.</summary>
+    /// <summary>A write finished and should be shown. Runs outside the lock, on the writing thread.</summary>
     protected virtual void OnFlush()
     {
     }
 
-    /// <summary>The session was closed; releases what it holds. Runs once, unmasked, on the thread that closed it, which may be any.</summary>
+    /// <summary>The session was closed; releases what it holds. Runs once, outside the lock, on the thread that closed it, which may be any.</summary>
     protected virtual void OnClosed()
     {
     }
@@ -529,7 +578,7 @@ public abstract class ConsoleSession
         return new KernelConsole(console.Canvas, console.Font, cols, rows);
     }
 
-    /// <summary>Writes one character. The caller masks interrupts.</summary>
+    /// <summary>Writes one character. The caller holds the session's lock.</summary>
     private void WriteCore(char value)
     {
         if (value == '\t')
