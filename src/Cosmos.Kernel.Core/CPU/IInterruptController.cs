@@ -68,6 +68,25 @@ internal interface IInterruptController
     bool TryRaiseReschedule();
 
     /// <summary>
+    /// Raises the controller's reschedule interrupt on another CPU, named by the identity its
+    /// block carries (<see cref="PerCpuBlock.HardwareId"/>): a fixed-delivery IPI to that Local
+    /// APIC id on x64, the SGI to that affinity on ARM64. What a wake sends to the CPU it queued
+    /// a thread on, so the CPU's interrupt exit switches to it instead of waiting for its tick;
+    /// a target halted in its idle loop wakes on it. Allocation-free; any context, interrupts
+    /// masked by the caller (SMP phase 3a).
+    /// </summary>
+    /// <param name="hardwareId">The target CPU's controller identity.</param>
+    void SendReschedule(ulong hardwareId);
+
+    /// <summary>
+    /// Raises the stop interrupt on another CPU, named as for <see cref="SendReschedule"/>: its
+    /// handler holds the CPU, interrupts masked, until the sender releases it
+    /// (<see cref="CpuStop"/>). Allocation-free; any context, interrupts masked by the caller.
+    /// </summary>
+    /// <param name="hardwareId">The target CPU's controller identity.</param>
+    void SendStop(ulong hardwareId);
+
+    /// <summary>
     /// Dispatch an interrupt delivered by the arch's assembly stub. The
     /// implementation is responsible for acknowledging (where applicable),
     /// looking up and invoking the registered handler, signalling EOI, and

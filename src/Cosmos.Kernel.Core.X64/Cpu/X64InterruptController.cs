@@ -34,6 +34,13 @@ internal class X64InterruptController : IInterruptController
     private const byte RescheduleVector = 0xF0;
 
     /// <summary>
+    /// The vector of the stop IPI (<see cref="SendStop"/>), next to the reschedule vector and
+    /// above every vector a device can allocate: its handler holds the CPU until the sender
+    /// releases it (<see cref="CpuStop"/>).
+    /// </summary>
+    private const byte StopVector = 0xF1;
+
+    /// <summary>
     /// True once a hardware line can be routed, which on x64 takes the I/O
     /// APIC the MADT describes. The Local APIC alone, which a machine without
     /// ACPI still has, delivers the timer and MSI messages but no line, so
@@ -50,6 +57,7 @@ internal class X64InterruptController : IInterruptController
         // A handler, though it does nothing, is what takes the vector down
         // Dispatch's hardware-IRQ path: the EOI, then the pending reschedule.
         InterruptManager.SetHandler(RescheduleVector, HandleReschedule);
+        InterruptManager.SetHandler(StopVector, HandleStop);
     }
 
     /// <inheritdoc/>
@@ -73,6 +81,18 @@ internal class X64InterruptController : IInterruptController
 
         LocalApic.SendSelfIpi(RescheduleVector);
         return true;
+    }
+
+    /// <inheritdoc/>
+    public void SendReschedule(ulong hardwareId)
+    {
+        LocalApic.SendIpi(hardwareId, RescheduleVector);
+    }
+
+    /// <inheritdoc/>
+    public void SendStop(ulong hardwareId)
+    {
+        LocalApic.SendIpi(hardwareId, StopVector);
     }
 
     public void RouteIrq(byte irqNo, byte vector, bool startMasked)
@@ -156,6 +176,16 @@ internal class X64InterruptController : IInterruptController
     /// <summary>The reschedule self-IPI's handler: nothing to do, Dispatch runs the reschedule on its exit.</summary>
     private static void HandleReschedule(ref IRQContext ctx)
     {
+    }
+
+    /// <summary>
+    /// The stop IPI's handler: holds this CPU in the rendezvous until the sender releases it.
+    /// The EOI comes after, on Dispatch's exit, so no interrupt of equal or lower priority is
+    /// taken while the CPU is held; none could be, with interrupts masked here.
+    /// </summary>
+    private static void HandleStop(ref IRQContext ctx)
+    {
+        CpuStop.HandleStopInterrupt();
     }
 
     private static void SendEOI()

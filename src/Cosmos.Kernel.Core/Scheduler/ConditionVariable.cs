@@ -72,7 +72,7 @@ internal class ConditionVariable : IDisposable
             }
 
             mutex.Release();
-            SchedulerManager.BlockThread(currentThread.CpuId, currentThread);
+            SchedulerManager.BlockThread(currentThread);
         }
 
         // Give the CPU to the next thread until a Signal readies this one (same as Mutex.Acquire);
@@ -114,7 +114,7 @@ internal class ConditionVariable : IDisposable
             }
 
             mutex.Release();
-            SchedulerManager.MarkSleeping(currentThread.CpuId, currentThread, timeoutMs);
+            SchedulerManager.MarkSleeping(currentThread, timeoutMs);
         }
 
         SchedulerManager.Park(currentThread);
@@ -256,8 +256,9 @@ internal class ConditionVariable : IDisposable
                 SchedulerThread waitingThread = _waitingThreads[0];
                 _waitingThreads.RemoveAt(0);
 
-                // Wake the thread by marking it ready
-                SchedulerManager.ReadyThread(waitingThread.CpuId, waitingThread);
+                // Wake the thread by marking it ready, on whatever CPU it
+                // waits on (SMP phase 3a).
+                SchedulerManager.ReadyThread(waitingThread);
             }
         }
     }
@@ -271,8 +272,7 @@ internal class ConditionVariable : IDisposable
         {
             foreach (SchedulerThread thread in _waitingThreads)
             {
-                // Wake each thread by marking it ready
-                SchedulerManager.ReadyThread(thread.CpuId, thread);
+                SchedulerManager.ReadyThread(thread);
             }
 
             _waitingThreads.Clear();

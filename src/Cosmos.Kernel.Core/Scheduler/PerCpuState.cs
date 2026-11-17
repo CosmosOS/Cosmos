@@ -29,7 +29,8 @@ public sealed class PerCpuState : SchedulerExtensible
 
     /// <summary>
     /// Thread currently executing on this CPU, or <see langword="null"/>
-    /// before the scheduler has run.
+    /// before the scheduler has run. Written by the switch on this CPU under
+    /// its queue lock; a read from another CPU is a snapshot.
     /// </summary>
     public SchedulerThread? CurrentThread { get; internal set; }
 
@@ -57,9 +58,25 @@ public sealed class PerCpuState : SchedulerExtensible
     // InterruptEvent.Signal); consumed by ReschedulePendingFromIrq on
     // hardware-IRQ exit so the woken thread runs immediately instead of
     // sitting in the run queue until the next timer tick. BlockThread and
-    // YieldThread set it to give up the CPU on that same exit.
+    // YieldThread set it to give up the CPU on that same exit. Written on
+    // another CPU by a wake that queued a thread here (SMP phase 3a), read on
+    // this one by its interrupt exit: always through Volatile. A remote
+    // writer sets it under this CPU's queue lock and sends the reschedule
+    // interrupt after; this CPU's own request (YieldThread, Park, the swap
+    // with the world stopped) is a bare volatile store, since the exit that
+    // consumes it runs here, under the lock, and a store that lands after
+    // its read is served by the next exit.
     internal bool _needReschedule;
 
     // ===== Synchronization =====
+
+    // The queue lock: held around every policy hook that touches this CPU's
+    // run structure, around CurrentThread and around _needReschedule. The
+    // owning CPU takes it from its tick and its interrupt exits (interrupts
+    // already masked there, so the plain acquire); a remote CPU takes it, with
+    // its own interrupts masked, to wake a thread onto this CPU or to pull one
+    // off it (SchedulerManager.LockCpu). Two queue locks are held at once only
+    // by a migration, in ascending CPU index; the registry lock comes after
+    // either, the heap lock after that. Nothing allocates while it is held.
     internal SpinLock _lock;
 }

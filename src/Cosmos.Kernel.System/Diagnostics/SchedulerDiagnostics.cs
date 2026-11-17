@@ -145,7 +145,17 @@ public static class SchedulerDiagnostics
     {
         IScheduler? scheduler = SchedulerManager.Current;
         PerCpuState? state = cpuId < SchedulerManager.CpuCount ? SchedulerManager.GetCpuState(cpuId) : null;
-        return scheduler is not null && state is not null ? scheduler.GetRunQueueCount(state) : 0;
+        if (scheduler is null || state is null)
+        {
+            return 0;
+        }
+
+        // The hook runs under the CPU's queue lock, which the caller takes:
+        // the policy never takes it itself.
+        using (SchedulerManager.LockCpu(state))
+        {
+            return scheduler.GetRunQueueCount(state);
+        }
     }
 
     /// <summary>
@@ -165,7 +175,15 @@ public static class SchedulerDiagnostics
     {
         IScheduler? scheduler = SchedulerManager.Current;
         PerCpuState? state = cpuId < SchedulerManager.CpuCount ? SchedulerManager.GetCpuState(cpuId) : null;
-        SchedulerThread? thread = scheduler is not null && state is not null ? scheduler.GetRunQueueThread(state, index) : null;
+        SchedulerThread? thread = null;
+        if (scheduler is not null && state is not null)
+        {
+            using (SchedulerManager.LockCpu(state))
+            {
+                thread = scheduler.GetRunQueueThread(state, index);
+            }
+        }
+
         if (thread is null)
         {
             info = default;
@@ -229,20 +247,34 @@ public static class SchedulerDiagnostics
                 continue;
             }
 
-            if (ReferenceEquals(state.CurrentThread, target))
+            // The walk of one CPU's queue under that CPU's queue lock: the
+            // count and the reads are one snapshot, which a tick or a wake on
+            // that CPU cannot rotate in between. The kill itself takes the
+            // lock again, so it comes after the scope.
+            bool queued = false;
+            using (SchedulerManager.LockCpu(state))
             {
-                target.State = SchedulerThreadState.Dead;
-                return ThreadKillResult.MarkedForExit;
+                if (ReferenceEquals(state.CurrentThread, target))
+                {
+                    target.State = SchedulerThreadState.Dead;
+                    return ThreadKillResult.MarkedForExit;
+                }
+
+                int count = scheduler.GetRunQueueCount(state);
+                for (int i = 0; i < count; i++)
+                {
+                    if (ReferenceEquals(scheduler.GetRunQueueThread(state, i), target))
+                    {
+                        queued = true;
+                        break;
+                    }
+                }
             }
 
-            int count = scheduler.GetRunQueueCount(state);
-            for (int i = 0; i < count; i++)
+            if (queued)
             {
-                if (ReferenceEquals(scheduler.GetRunQueueThread(state, i), target))
-                {
-                    SchedulerManager.ExitThread(cpuId, target);
-                    return ThreadKillResult.Killed;
-                }
+                SchedulerManager.ExitThread(target);
+                return ThreadKillResult.Killed;
             }
         }
 
@@ -252,7 +284,9 @@ public static class SchedulerDiagnostics
     private static KernelThreadInfo Snapshot(SchedulerThread thread)
     {
         bool hasPriority = thread.SchedulerData is not null;
-        long priority = hasPriority ? SchedulerManager.Current?.GetPriority(thread) ?? 0 : 0;
+        // Through the manager, which takes the queue lock of the thread's CPU
+        // around the hook; the policy never takes it itself.
+        long priority = hasPriority && SchedulerManager.Current is not null ? SchedulerManager.GetPriority(thread) : 0;
         return new KernelThreadInfo(
             thread.Id,
             thread.CpuId,

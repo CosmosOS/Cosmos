@@ -46,8 +46,14 @@ internal class ARM64InterruptController : IInterruptController
     /// </summary>
     private const uint RescheduleSgi = 8;
 
-    /// <summary>GIC priority of the reschedule SGI: the timer's, so neither preempts the other.</summary>
-    private const byte ReschedulePriority = 0x80;
+    /// <summary>
+    /// The SGI of the stop interrupt (<see cref="SendStop"/>), next to the reschedule SGI: its
+    /// handler holds the CPU until the sender releases it (<see cref="CpuStop"/>).
+    /// </summary>
+    private const uint StopSgi = 9;
+
+    /// <summary>GIC priority of the reschedule and stop SGIs: the timer's, so none of the three preempts another.</summary>
+    private const byte SchedulerSgiPriority = 0x80;
 
     /// <summary>Size in bytes of the NEON save area the vector stub pushes below the IRQContext.</summary>
     private const int NeonSaveAreaBytes = 512;
@@ -111,8 +117,11 @@ internal class ARM64InterruptController : IInterruptController
         // A handler, though it does nothing, is what takes the SGI down
         // Dispatch's IRQ path: the EOI, then the pending reschedule.
         InterruptManager.SetHandler((byte)RescheduleSgi, HandleReschedule);
-        GIC.SetPriority(RescheduleSgi, ReschedulePriority);
+        GIC.SetPriority(RescheduleSgi, SchedulerSgiPriority);
         GIC.EnableInterrupt(RescheduleSgi);
+        InterruptManager.SetHandler((byte)StopSgi, HandleStop);
+        GIC.SetPriority(StopSgi, SchedulerSgiPriority);
+        GIC.EnableInterrupt(StopSgi);
 
         Serial.Write("[ARM64InterruptController] ARM64 interrupt system ready\n");
 
@@ -130,14 +139,16 @@ internal class ARM64InterruptController : IInterruptController
         // The vector table is loaded by the trampoline, before any managed code runs on this
         // CPU. What is banked per CPU and so has to be done here: this CPU's identity, its GIC
         // redistributor (found by its MPIDR) and CPU interface, and the enables and priorities
-        // of the two PPI/SGI lines the scheduler uses, which the redistributor keeps per CPU.
+        // of the three PPI/SGI lines the scheduler uses, which the redistributor keeps per CPU.
         PerCpuBlock.Current.HardwareId = GICv3.ExtractAffinity(GICv3Native.ReadMpidr());
 
         GIC.InitializeCurrentCpu();
         GIC.SetPriority(GIC.TIMER_NONSEC_PHYS, TimerPriorityMedium);
         GIC.EnableInterrupt(GIC.TIMER_NONSEC_PHYS);
-        GIC.SetPriority(RescheduleSgi, ReschedulePriority);
+        GIC.SetPriority(RescheduleSgi, SchedulerSgiPriority);
         GIC.EnableInterrupt(RescheduleSgi);
+        GIC.SetPriority(StopSgi, SchedulerSgiPriority);
+        GIC.EnableInterrupt(StopSgi);
     }
 
     /// <inheritdoc/>
@@ -150,6 +161,24 @@ internal class ARM64InterruptController : IInterruptController
 
         GIC.SendSgiToSelf(RescheduleSgi);
         return true;
+    }
+
+    /// <inheritdoc/>
+    public void SendReschedule(ulong hardwareId)
+    {
+        if (_initialized)
+        {
+            GIC.SendSgiTo(RescheduleSgi, hardwareId);
+        }
+    }
+
+    /// <inheritdoc/>
+    public void SendStop(ulong hardwareId)
+    {
+        if (_initialized)
+        {
+            GIC.SendSgiTo(StopSgi, hardwareId);
+        }
     }
 
     public void RouteIrq(byte irqNo, byte vector, bool startMasked)
@@ -342,6 +371,16 @@ internal class ARM64InterruptController : IInterruptController
     /// <summary>The reschedule SGI's handler: nothing to do, Dispatch runs the reschedule on its exit.</summary>
     private static void HandleReschedule(ref IRQContext ctx)
     {
+    }
+
+    /// <summary>
+    /// The stop SGI's handler: holds this CPU in the rendezvous until the sender releases it.
+    /// Dispatch ends the interrupt after it returns, so the CPU interface keeps the SGI active,
+    /// and so every other line masked, for as long as the CPU is held.
+    /// </summary>
+    private static void HandleStop(ref IRQContext ctx)
+    {
+        CpuStop.HandleStopInterrupt();
     }
 
     private static void RunPendingReschedule(ref IRQContext ctx)

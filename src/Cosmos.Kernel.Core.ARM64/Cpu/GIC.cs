@@ -379,6 +379,27 @@ public static class GIC
     }
 
     /// <summary>
+    /// Raises SGI <paramref name="sgiId"/> on the CPU whose MPIDR affinity is
+    /// <paramref name="affinity"/>, as its per-CPU block records it: through ICC_SGI1R_EL1 on
+    /// GICv3, through GICD_SGIR's target list on GICv2, where the interface number is the
+    /// affinity's Aff0 (the virt machine numbers them alike; a GICv2 cannot address a CPU with
+    /// a higher affinity level set at all). Allocation-free; any context.
+    /// </summary>
+    /// <param name="sgiId">SGI ID (0-15).</param>
+    /// <param name="affinity">The target CPU's affinity.</param>
+    internal static void SendSgiTo(uint sgiId, ulong affinity)
+    {
+        if (s_isV3)
+        {
+            GICv3.SendSgiTo(sgiId, affinity);
+        }
+        else
+        {
+            GICv2.SendSgiTo(sgiId, affinity);
+        }
+    }
+
+    /// <summary>
     /// Acknowledges an interrupt and returns its ID.
     /// </summary>
     public static uint AcknowledgeInterrupt()

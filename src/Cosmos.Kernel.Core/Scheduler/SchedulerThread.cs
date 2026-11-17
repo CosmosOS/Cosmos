@@ -33,19 +33,39 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     /// </summary>
     public uint Id { get; internal set; }
 
+    private uint _cpuId;
+    private SchedulerThreadState _state;
+
     /// <summary>
-    /// CPU this thread is assigned to.
+    /// CPU this thread is assigned to: the CPU whose run structure holds it
+    /// while it is <see cref="SchedulerThreadState.Ready"/>, the CPU it runs
+    /// on while <see cref="SchedulerThreadState.Running"/>. Rewritten by a
+    /// migration under both CPUs' queue locks, so a reader that needs the
+    /// value to stay true takes the CPU's queue lock and reads it again, as
+    /// the mechanism does; a bare read is a snapshot. Volatile: read on one
+    /// CPU, written on another.
     /// </summary>
-    public uint CpuId { get; internal set; }
+    public uint CpuId
+    {
+        get => Volatile.Read(ref _cpuId);
+        internal set => Volatile.Write(ref _cpuId, value);
+    }
 
     // ===== State =====
 
     /// <summary>
     /// Current lifecycle state. State transitions are performed by
     /// <see cref="SchedulerManager"/>; schedulers observe the state but do
-    /// not change it.
+    /// not change it. Volatile: a wake on one CPU writes it and the thread's
+    /// park loop on another reads it, and the pair is what carries the wake
+    /// across (the write after the policy queued the thread, the read before
+    /// the parked thread goes on).
     /// </summary>
-    public SchedulerThreadState State { get; internal set; }
+    public SchedulerThreadState State
+    {
+        get => (SchedulerThreadState)Volatile.Read(ref Unsafe.As<SchedulerThreadState, byte>(ref _state));
+        internal set => Volatile.Write(ref Unsafe.As<SchedulerThreadState, byte>(ref _state), (byte)value);
+    }
 
     /// <summary>
     /// Thread attribute flags.
@@ -195,6 +215,22 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
         StackPointer = contextAddr;
         InstructionPointer = entryPoint;
         State = SchedulerThreadState.Created;
+    }
+
+    /// <summary>
+    /// Frees the stack <see cref="InitializeStack"/> allocated, for a thread the registry
+    /// refused before it ever ran. Nothing of the thread lives on that stack yet.
+    /// </summary>
+    internal void ReleaseStack()
+    {
+        if (StackBase != 0)
+        {
+            Memory.MemoryOp.Free((void*)StackBase);
+        }
+
+        StackBase = 0;
+        StackSize = 0;
+        StackPointer = 0;
     }
 
     /// <summary>
