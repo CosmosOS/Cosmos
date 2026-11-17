@@ -7,6 +7,7 @@
         <!-- The audio tests build streams in AudioFormat and AudioBitDepth,
              the driver kit's experimental audio vocabulary (COSMOS0003). -->
         <NoWarn>$(NoWarn);COSMOS0003</NoWarn>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,5 +18,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\Cosmos.Kernel.System\Cosmos.Kernel.System.csproj" />
+      <ProjectReference Include="....\src\Cosmos.Kernel.Core\Cosmos.Kernel.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Memory\" />
     </ItemGroup>
 </Project>
