@@ -147,7 +147,7 @@ declares `Cosmos.Kernel.Core.Scheduler`. The build enforces it with IDE0130
 at error for every `src/Cosmos.Kernel*` project, the test kernels, the
 host-side unit tests in `tests/Cosmos.Kernel.Tests.System` and
 `examples/DevKernel`, so `dotnet build` fails on a file that drifts (the
-format CI checks the projects in `nativeaot-patcher.slnx`, which leaves out
+format CI checks the projects in `cosmos.slnx`, which leaves out
 the test kernels). Move the file or fix the namespace rather than adding an
 exemption. The exemptions, each with its reason, close `.editorconfig`:
 names ILC matches by full name (each `LibraryInitializer`,
