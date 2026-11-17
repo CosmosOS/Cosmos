@@ -25,7 +25,7 @@ Run the script from the root of the repository:
    - Architecture-specific HAL packages (`Cosmos.Kernel.HAL.X64`, `Cosmos.Kernel.HAL.ARM64`)
    - Multi-arch kernel packages built for both `linux-x64` and `linux-arm64` (`Cosmos.Kernel.Core`, `Cosmos.Kernel.HAL`, `Cosmos.Kernel.System`, `Cosmos.Kernel.Plugs`, `Cosmos.Kernel`)
    - SDK and templates (`Cosmos.Sdk`, `Cosmos.Build.Templates`)
-5. **Restores** the main solution (`nativeaot-patcher.slnx`).
+5. **Restores** the main solution (`cosmos.slnx`).
 6. **Installs global .NET tools**: `ilc`, `Cosmos.Patcher`, and `Cosmos.Tools`.
 
 ## Windows (`postCreateCommand.ps1`)

@@ -40,7 +40,7 @@
 			    "omnisharp.enableRoslynAnalyzers": true,
 			    "omnisharp.enableEditorConfigSupport": true,
 			    "omnisharp.enableAsyncCompletion": true,
-                "dotnet.defaultSolution": "${containerWorkspaceFolder}/nativeaot-patcher.slnx"
+                "dotnet.defaultSolution": "${containerWorkspaceFolder}/cosmos.slnx"
             }
         }
     }

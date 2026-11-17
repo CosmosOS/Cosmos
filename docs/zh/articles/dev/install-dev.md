@@ -1,5 +1,5 @@
 ---
-source_hash: e13b28e10d02259f3eddc1aeab6dbb7dd2d1a471
+source_hash: 30f5a4cc48d325f850feea5600325964c9b0fe05
 ---
 <a id="dev-container-setup"></a>
 
@@ -32,7 +32,7 @@ source_hash: e13b28e10d02259f3eddc1aeab6dbb7dd2d1a471
    - 特定于架构的 HAL 包（`Cosmos.Kernel.HAL.X64`、`Cosmos.Kernel.HAL.ARM64`）
    - 同时为 `linux-x64` 和 `linux-arm64` 构建的多架构内核包（`Cosmos.Kernel.Core`、`Cosmos.Kernel.HAL`、`Cosmos.Kernel.System`、`Cosmos.Kernel.Plugs`、`Cosmos.Kernel`）
    - SDK 和模板（`Cosmos.Sdk`、`Cosmos.Build.Templates`）
-5. **还原**主解决方案（`nativeaot-patcher.slnx`）。
+5. **还原**主解决方案（`cosmos.slnx`）。
 6. **安装全局 .NET 工具**：`ilc`、`Cosmos.Patcher` 和 `Cosmos.Tools`。
 
 ## Windows (`postCreateCommand.ps1`)
