@@ -1,7 +1,3 @@
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using Cosmos.Kernel.Core.CPU;
-
 namespace Cosmos.Kernel.Core.Scheduler;
 
 /// <summary>
@@ -9,8 +5,6 @@ namespace Cosmos.Kernel.Core.Scheduler;
 /// </summary>
 internal class ConditionVariable : IDisposable
 {
-    private const long MillisecondsPerSecond = 1000;
-
     /// <summary>
     /// Protects access to the condition variable internal state.
     /// </summary>
@@ -47,20 +41,19 @@ internal class ConditionVariable : IDisposable
     /// to a waiter and requests a reschedule, so the very next IRQ exit can run the new owner, whose
     /// Signal readies this still-Running thread; the subsequent BlockThread then buries the wakeup
     /// forever. Same shape as Mutex.Acquire / InterruptEvent.WaitCore (eab7e338).
+    /// <para>
+    /// Without a running scheduler there is one flow and no thread to signal, so the call returns
+    /// at once, as a wait that woke for no reason: the caller checks its condition again, which
+    /// only an interrupt handler can have changed. Code on a CPU's idle thread under a running
+    /// scheduler (boot code between the scheduler's start and <c>Main</c>'s) must not wait here:
+    /// the park stops the kernel, since nothing would wake an idle thread.
+    /// </para>
     /// </remarks>
     public void Wait(Mutex mutex)
     {
-        SchedulerThread? currentThread;
-
-        do
+        SchedulerThread? currentThread = SchedulerManager.CurrentThreadIfRunning;
+        if (currentThread is null)
         {
-            currentThread = SchedulerManager.CurrentThread;
-        }
-        while (currentThread is null);
-
-        if (currentThread.IsIdle)
-        {
-            WaitPolling(mutex, currentThread, deadline: 0);
             return;
         }
 
@@ -88,20 +81,13 @@ internal class ConditionVariable : IDisposable
     /// </summary>
     /// <param name="mutex">The mutex protecting the condition.</param>
     /// <param name="timeoutMs">Timeout in milliseconds.</param>
-    /// <returns>true if signaled, false if timeout occurred.</returns>
+    /// <returns>true if signaled, false if timeout occurred, or at once without a running scheduler.</returns>
     public bool WaitTimeout(Mutex mutex, uint timeoutMs)
     {
-        SchedulerThread? currentThread = SchedulerManager.CurrentThread;
+        SchedulerThread? currentThread = SchedulerManager.CurrentThreadIfRunning;
         if (currentThread is null)
         {
             return false;
-        }
-
-        if (currentThread.IsIdle)
-        {
-            // At least one Stopwatch tick, so a 0 ms wait still reads as timed.
-            long deadline = Stopwatch.GetTimestamp() + Math.Max(1, Stopwatch.Frequency / MillisecondsPerSecond * timeoutMs);
-            return WaitPolling(mutex, currentThread, deadline);
         }
 
         // Same atomic insert+release+park section as Wait: the old order (release, then
@@ -135,77 +121,6 @@ internal class ConditionVariable : IDisposable
         currentThread.WakeupTime = 0;
 
         // Reacquire the mutex before returning
-        mutex.Acquire();
-
-        return signaled;
-    }
-
-    /// <summary>
-    /// The wait of an idle-thread caller: it stays runnable and checks the waiter list between
-    /// halts instead of parking. The idle thread is the scheduler's fallback (PickNext ??
-    /// IdleThread), so it must never be Blocked or Sleeping: when the run queue empties the
-    /// fallback puts it back on the CPU as Running without a wake, so the ReadyThread that would
-    /// return its tickets never comes (a later Signal finds it Running and does nothing). Each
-    /// such wait then drops the idle thread's tickets from the stride total for good: the total,
-    /// a ulong, wraps below zero, so Stride1 / TotalTickets in UpdateGlobalPass rounds to 0 and
-    /// GlobalPass stops. The idle thread's pass then runs ahead of it while it runs alone, and
-    /// every thread created after that starts at the frozen GlobalPass and keeps the idle thread
-    /// off the CPU until its pass catches up. Signal still finds this thread in the waiter list,
-    /// and its ReadyThread does nothing on a thread that is already Running or Ready.
-    /// </summary>
-    /// <remarks>
-    /// Halting between two checks, unlike InterruptEvent's idle poll, cannot sleep past the
-    /// wake: a Signal comes from a thread, and a thread only runs on an interrupt exit, so the
-    /// halt that follows a missed check ends on the next tick at the latest, as it does for
-    /// every thread Park halts. Spinning instead, as Mutex.Acquire does for a hold that is
-    /// short by contract, would burn the CPU for the whole Thread.Sleep of a kernel pacing its
-    /// Run that way, with the idle thread's tickets still counted against the workers. The
-    /// scheduler's periodic tick is armed whenever the scheduler is, so the halt always ends;
-    /// a timed wait may then overshoot its deadline by up to one tick.
-    /// </remarks>
-    /// <param name="mutex">The mutex protecting the condition, held by the caller.</param>
-    /// <param name="currentThread">The calling idle thread.</param>
-    /// <param name="deadline">Stopwatch timestamp to give up at, or 0 to wait until signaled.</param>
-    /// <returns>true if signaled, false if the deadline passed first.</returns>
-    private bool WaitPolling(Mutex mutex, SchedulerThread currentThread, long deadline)
-    {
-        // Insert and release in one section, as in Wait: a Signal after the release
-        // must find this thread in the list.
-        using (_lockGuard.AcquireIrqSafe())
-        {
-            if (!ContainsWaiterLocked(currentThread))
-            {
-                _waitingThreads.Add(currentThread);
-            }
-
-            mutex.Release();
-        }
-
-        bool signaled;
-        while (true)
-        {
-            using (_lockGuard.AcquireIrqSafe())
-            {
-                if (!ContainsWaiterLocked(currentThread))
-                {
-                    signaled = true;
-                    break;
-                }
-
-                if (deadline != 0 && Stopwatch.GetTimestamp() >= deadline)
-                {
-                    RemoveWaiterLocked(currentThread);
-                    signaled = false;
-                    break;
-                }
-            }
-
-            // Interrupts are back on here: a Signal that lands before the halt readies nothing
-            // (this thread is Running), but the thread that signalled ran on an interrupt exit,
-            // and the next one, the tick at the latest, ends the halt for the re-check.
-            InternalCpu.Halt();
-        }
-
         mutex.Acquire();
 
         return signaled;

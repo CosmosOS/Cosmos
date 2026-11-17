@@ -47,50 +47,20 @@ internal class Mutex : IDisposable
 
     /// <summary>
     /// Acquires the mutex. Blocks if already held by another thread.
-    /// Without a scheduler thread context there is a single execution
-    /// context and nothing to contend with, so the call is a no-op.
+    /// Without a running scheduler there is a single execution context and
+    /// nothing to contend with, so the call is a no-op. An idle thread may
+    /// take a free mutex, as boot code does between the scheduler's start
+    /// and <c>Main</c>'s, but never waits for one: it has no one to wait for
+    /// there, and <see cref="SchedulerManager.BlockThread"/> stops the kernel
+    /// on an idle thread that tries.
     /// </summary>
     public void Acquire()
     {
-        SchedulerThread? currentThread = SchedulerManager.IsReady
-            ? SchedulerManager.CurrentThread
-            : null;
+        SchedulerThread? currentThread = SchedulerManager.CurrentThreadIfRunning;
 
         if (currentThread is null)
         {
             return;
-        }
-
-        // The idle thread is the scheduler's fallback (PickNext ?? IdleThread):
-        // blocking it only gets it resurrected on the next tick, which re-runs
-        // this loop: every pass calls OnThreadBlocked again and drifts
-        // TotalTickets (and Release's ReadyThread would insert the idle
-        // thread into the run queue it is supposed to back-stop). Unlike
-        // InterruptEvent the context can't be nulled (Release checks
-        // ownership), so an idle-thread caller spin-acquires instead:
-        // ownership stays real, it just never parks in _waitingThreads.
-        // Interrupts stay enabled between attempts, so the timer keeps
-        // preempting to the (runnable) holder until it releases.
-        if (currentThread.IsIdle)
-        {
-            while (true)
-            {
-                using (_lockGuard.AcquireIrqSafe())
-                {
-                    if (_ownerThread is null)
-                    {
-                        _ownerThread = currentThread;
-                        _recursionDepth = 1;
-                        return;
-                    }
-
-                    if (_ownerThread == currentThread)
-                    {
-                        _recursionDepth++;
-                        return;
-                    }
-                }
-            }
         }
 
         bool queued = false;
@@ -186,9 +156,7 @@ internal class Mutex : IDisposable
     /// <returns>true if acquired, false if held by another thread.</returns>
     public bool TryAcquire()
     {
-        SchedulerThread? currentThread = SchedulerManager.IsReady
-            ? SchedulerManager.CurrentThread
-            : null;
+        SchedulerThread? currentThread = SchedulerManager.CurrentThreadIfRunning;
 
         if (currentThread is null)
         {
@@ -222,9 +190,7 @@ internal class Mutex : IDisposable
     /// </remarks>
     public void Release()
     {
-        SchedulerThread? currentThread = SchedulerManager.IsReady
-            ? SchedulerManager.CurrentThread
-            : null;
+        SchedulerThread? currentThread = SchedulerManager.CurrentThreadIfRunning;
 
         if (currentThread is null)
         {

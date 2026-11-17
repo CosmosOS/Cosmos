@@ -11,8 +11,9 @@ namespace Cosmos.Kernel.Core.Scheduler;
 
 /// <summary>
 /// Starts the kernel's own service threads (the USB and PCI Express
-/// hot-plug threads, the collector's finalizer thread) and bounds how long
-/// the caller waits for one to begin.
+/// hot-plug threads, the collector's finalizer thread) and the thread
+/// <c>Main</c> runs on (<see cref="KernelMain"/>), and bounds how long the
+/// caller waits for one to begin.
 ///
 /// <para>CoreLib's <c>Thread.Start</c> does not return until the new thread
 /// has run, and only a scheduler switch runs it. A timer that never ticks
@@ -63,12 +64,13 @@ internal static unsafe partial class KernelThread
     /// <param name="entry">The thread's body; the thread exits when it returns.</param>
     /// <returns>
     /// True once the thread began. False when the scheduler is not running,
-    /// the thread registry is full, its timer went <see cref="NoTickTimeoutMs"/>
-    /// without a tick, or it handled <see cref="NoSwitchTicks"/> ticks without
-    /// switching any thread: that thread then never runs <paramref name="entry"/>. One that
-    /// never ran is taken off the run queue at once; one that ran but was
-    /// preempted before it looked at the handshake returns as soon as it
-    /// resumes.
+    /// there is no memory for the thread's stack, the thread registry is
+    /// full, the scheduler's timer went <see cref="NoTickTimeoutMs"/> without
+    /// a tick, or the scheduler handled <see cref="NoSwitchTicks"/> ticks
+    /// without switching any thread: that thread then never runs
+    /// <paramref name="entry"/>. One that never ran is taken off the run
+    /// queue at once; one that ran but was preempted before it looked at the
+    /// handshake returns as soon as it resumes.
     /// </returns>
     internal static bool TryStart(Action entry)
     {
@@ -83,6 +85,23 @@ internal static unsafe partial class KernelThread
     /// <param name="thread">The started thread, or null when the start failed.</param>
     /// <returns>True once the thread began; see <see cref="TryStart(Action)"/>.</returns>
     internal static bool TryStart(Action entry, [NotNullWhen(true)] out SchedulerThread? thread)
+    {
+        // The kernel's own threads are housekeeping: CPU 0, whatever the
+        // default set says and wherever the caller runs.
+        return TryStart(entry, SchedulerManager.HousekeepingCpus, SchedulerThread.DefaultStackSize, out thread);
+    }
+
+    /// <summary>
+    /// <see cref="TryStart(Action, out SchedulerThread?)"/> for a thread that
+    /// is not one of the kernel's service threads: the caller names the CPUs
+    /// it may run on and the size of its stack.
+    /// </summary>
+    /// <param name="entry">The thread's body; the thread exits when it returns.</param>
+    /// <param name="affinity">The CPUs the thread may run on.</param>
+    /// <param name="stackSize">The size of its stack, in bytes.</param>
+    /// <param name="thread">The started thread, or null when the start failed.</param>
+    /// <returns>True once the thread began; see <see cref="TryStart(Action)"/>.</returns>
+    internal static bool TryStart(Action entry, CpuSet affinity, nuint stackSize, [NotNullWhen(true)] out SchedulerThread? thread)
     {
         thread = null;
         if (!SchedulerManager.IsRunning)
@@ -105,20 +124,24 @@ internal static unsafe partial class KernelThread
         nuint entryPoint = (nuint)(delegate* unmanaged<IntPtr, void>)&ThreadNative.EntryPointStub;
 #if ARCH_ARM64
         // ARM64 has no code segment: the context ignores the selector.
-        started.InitializeStack(entryPoint, 0, parameter);
+        bool hasStack = started.InitializeStack(entryPoint, 0, parameter, stackSize);
 #else
-        started.InitializeStack(entryPoint, (ushort)GetCurrentCodeSelector(), parameter);
+        bool hasStack = started.InitializeStack(entryPoint, (ushort)GetCurrentCodeSelector(), parameter, stackSize);
 #endif
+        if (!hasStack)
+        {
+            // No memory for its stack: the thread never existed.
+            handle.Dispose();
+            return false;
+        }
 
         uint readiedAtTick;
         uint readiedAtSwitch;
         using (InternalCpu.DisableInterruptsScope())
         {
             // A full registry refuses the thread (#444): it never runs, its
-            // stack goes back, and the caller hears it did not start. The
-            // kernel's own threads are housekeeping: CPU 0, whatever the
-            // default set says and wherever the caller runs.
-            if (!SchedulerManager.CreateThread(started, SchedulerManager.HousekeepingCpus))
+            // stack goes back, and the caller hears it did not start.
+            if (!SchedulerManager.CreateThread(started, affinity))
             {
                 started.ReleaseStack();
                 handle.Dispose();
@@ -168,16 +191,18 @@ internal static unsafe partial class KernelThread
         // device interrupt would still switch to a thread left queued. It
         // would exit at once, but then halt until a timer tick moves the
         // CPU on, and with a timer that never ticks the caller would not
-        // run again. A thread that never ran holds nothing, so it goes now,
-        // with the handle InvokeCurrentThreadStart would have freed. The
+        // run again. A thread that never ran holds nothing but its stack, so
+        // it goes now, with that stack and the handle
+        // InvokeCurrentThreadStart would have freed. The
         // verdict is taken again under the thread's queue lock, the lock
-        // CPU 0's switch-in takes to start it: a mask here would exclude
-        // that switch only on CPU 0, and the caller may run elsewhere (SMP
-        // phase 3b). Began after the abandon, the thread frees the handle
-        // itself and runs nothing.
+        // its CPU's switch-in takes to start it: a mask here would exclude
+        // that switch only on the caller's CPU, and the thread may be
+        // queued on another (SMP phase 3b). Began after the abandon, the
+        // thread frees the handle itself and runs nothing.
         if (SchedulerManager.TryReapCreated(started))
         {
             handle.Dispose();
+            started.ReleaseStack();
         }
 
         return false;

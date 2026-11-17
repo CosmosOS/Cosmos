@@ -241,7 +241,14 @@ internal class GenericTimer : TickSource
         // EOI is sent by the interrupt handler after we return
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Blocks for the given number of milliseconds on this timer's counter.
+    /// Unlike the base, the caller is never parked: it halts between two
+    /// reads of the counter, a halt its own CPU's tick ends, so a thread
+    /// stays runnable for the whole wait and gives way only when a tick
+    /// preempts it.
+    /// </summary>
+    /// <param name="timeoutMs">Milliseconds to wait.</param>
     public override void Wait(uint timeoutMs)
     {
         ulong targetTicks = GenericTimerNative.GetCounter() + ((_timerFrequency * timeoutMs) / 1000);

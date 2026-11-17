@@ -225,7 +225,7 @@ public static class StorageManager
     /// gets its registered line written here, with the primary suffix when
     /// the order rule put it first at that moment; a hand-registered device
     /// logs nothing. Thread context: the publishing probe on the kit worker,
-    /// or the boot thread.
+    /// or a kernel's own thread.
     /// </summary>
     /// <param name="device">The block device to register.</param>
     /// <param name="nodePath">The path of the kit node whose driver published it, or null when hand-registered.</param>

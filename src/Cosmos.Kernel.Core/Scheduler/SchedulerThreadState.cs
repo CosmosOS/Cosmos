@@ -39,7 +39,7 @@ public enum SchedulerThreadFlags : ushort
     /// </summary>
     None = 0,
     /// <summary>
-    /// Per-CPU idle thread
+    /// Per-CPU idle thread: the mechanism's fallback, which no policy is handed.
     /// </summary>
     IdleThread = 1 << 1,
     // 1 << 2 was Pinned: a thread that must not migrate is one whose

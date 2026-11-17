@@ -356,7 +356,7 @@ public abstract class ConsoleSession
         }
     }
 
-    /// <summary>Wakes the session's reader to look at its input again: the session was just shown, so it now polls the keyboards.</summary>
+    /// <summary>Wakes the session's reader to look at its input again: the session was just shown, so it now polls the keyboards, or a key landed in the keyboard's own queue, which the primary console reads while nothing routes the keyboard.</summary>
     internal void WakeReader() => InputSignal.Signal();
 
     /// <summary>Takes the next key if one is waiting.</summary>
@@ -603,9 +603,10 @@ public abstract class ConsoleSession
 
     /// <summary>
     /// Waits for input to arrive. A thread the scheduler may block sleeps on
-    /// the session's signal until a key is queued. The boot thread, which is
-    /// the scheduler's idle thread and must stay runnable, and a kernel
-    /// without the scheduler wait for the next interrupt instead, as
+    /// the session's signal until a key is queued. Code on a CPU's idle
+    /// thread, which must stay runnable (a kernel whose scheduler was stopped
+    /// at boot runs wholly there), and a kernel without the scheduler wait
+    /// for the next interrupt instead, as
     /// <see cref="KeyboardManager.ReadKey"/> does.
     /// </summary>
     private void WaitForInput()

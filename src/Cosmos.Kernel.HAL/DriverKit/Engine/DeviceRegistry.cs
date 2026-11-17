@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.HAL.DriverKit.Engine;
 /// for them. Drivers publish through their binding, which calls
 /// <see cref="Add"/>, <see cref="Notify"/> and <see cref="Withdraw"/> on the worker; the engine
 /// publishes the firmware display through <see cref="PublishFirmware"/> on
-/// the boot thread before any worker exists; sinks read the consumer slot on
+/// the main thread before any worker exists; sinks read the consumer slot on
 /// every report. A consumer installed after a device
 /// was published is not told about it: managers install theirs before the
 /// driver stage runs. Publishing is two steps, <see cref="Add"/> then
@@ -49,7 +49,7 @@ internal static class DeviceRegistry
 
     /// <summary>
     /// Lists a device as published, without telling anyone yet. Worker only,
-    /// or the boot thread from <see cref="PublishFirmware"/> before the
+    /// or the main thread from <see cref="PublishFirmware"/> before the
     /// engine started.
     /// </summary>
     internal static PublishedDevice Add(DeviceKind kind, string name, object device, DeviceBinding? binding, DeviceProvenance provenance)
@@ -69,7 +69,7 @@ internal static class DeviceRegistry
     /// <summary>
     /// Tells the consumer of the device's kind, if one is installed, and
     /// marks the device consumed once the consumer accepted it. Worker only,
-    /// or the boot thread from <see cref="PublishFirmware"/> before the
+    /// or the main thread from <see cref="PublishFirmware"/> before the
     /// engine started; a consumer that throws leaves the device unconsumed
     /// and the exception is the caller's.
     /// </summary>
@@ -89,7 +89,7 @@ internal static class DeviceRegistry
     /// Publishes a device of firmware provenance, with no binding behind it:
     /// listed, then the consumer told. A consumer that throws leaves nothing
     /// published (the device is withdrawn) and the exception is the
-    /// caller's. Boot thread, before the engine started, so no worker exists
+    /// caller's. Main thread, before the engine started, so no worker exists
     /// yet and nothing else touches the registry.
     /// </summary>
     /// <param name="kind">The kind of device.</param>
@@ -168,7 +168,7 @@ internal static class DeviceRegistry
 
     /// <summary>
     /// Withdraws a device: sinks go quiet, the consumer that had it is told.
-    /// Worker only, or the boot thread from <see cref="PublishFirmware"/>
+    /// Worker only, or the main thread from <see cref="PublishFirmware"/>
     /// before the engine started.
     /// </summary>
     internal static void Withdraw(PublishedDevice device)

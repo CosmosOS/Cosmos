@@ -73,10 +73,12 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     public SchedulerThreadFlags Flags { get; internal set; }
 
     /// <summary>
-    /// Whether this is a CPU's idle thread: the boot thread itself on the boot CPU, the
-    /// scheduler's fallback when <see cref="IScheduler.PickNext"/> returns null. The blocking
-    /// primitives make it spin or poll instead of parking, since a parked idle thread comes
-    /// back through that fallback as Running without the wake that returns its tickets.
+    /// Whether this is a CPU's idle thread: what the mechanism runs when the CPU has nothing
+    /// else (<see cref="IScheduler.PickNext"/> returned null and the thread that ran cannot go
+    /// on), the boot context of that CPU, which ends in a halt loop. It is in no run structure
+    /// and no policy is handed it, so it never blocks or sleeps: nothing would wake it. The
+    /// kernel's <c>Main</c> runs on a thread of its own, not on one of these; only a kernel
+    /// whose scheduler was stopped at boot runs it on CPU 0's, the one flow it has left.
     /// </summary>
     public bool IsIdle => (Flags & SchedulerThreadFlags.IdleThread) != 0;
 
@@ -84,10 +86,10 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
 
     /// <summary>
     /// The CPUs this thread may run on. Never empty: a new thread takes its creator's set,
-    /// or the kernel's default when the creator is an idle thread, and a kernel changes it
-    /// through the ring. Written under the queue lock of the thread's CPU and read under it
-    /// wherever it decides a move (the switch-out, a set change, the creation); a bare read
-    /// is a snapshot. A set that names no online CPU is treated as every online CPU.
+    /// or the kernel's default when the creator is the main thread or boot code, and a kernel
+    /// changes it through the ring. Written under the queue lock of the thread's CPU and read
+    /// under it wherever it decides a move (the switch-out, a set change, the creation); a
+    /// bare read is a snapshot. A set that names no online CPU is treated as every online CPU.
     /// </summary>
     public CpuSet Affinity { get; internal set; } = CpuSet.Single(0);
 
@@ -174,7 +176,8 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     /// <summary>
     /// Accumulated CPU time in nanoseconds. The active scheduler charges
     /// elapsed time to the current thread from its
-    /// <see cref="IScheduler.OnTick"/> hook.
+    /// <see cref="IScheduler.OnTick"/> hook; an idle thread's is charged by
+    /// the mechanism, which calls no hook for it.
     /// </summary>
     public ulong TotalRuntime { get; set; }
 
@@ -198,11 +201,13 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     /// <summary>
     /// Strong handle to the <see cref="System.Threading.Thread"/> this
     /// control block runs, taken when the thread is created and released
-    /// by <see cref="SchedulerManager.ExitThread"/>. CoreLib frees its own
+    /// when the registry lets go of the thread. CoreLib frees its own
     /// handle as soon as the thread reports itself started, so this is the
     /// only reference the mechanism keeps: it is what lets a thread that is
     /// killed while queued be stopped on the managed side too. Unallocated
-    /// on a thread that runs a free delegate.
+    /// on a thread that runs a free delegate, the main thread apart, which
+    /// takes its own before it calls <c>Main</c>
+    /// (<see cref="SchedulerManager.RegisterMainThread"/>).
     /// </summary>
     internal GCHandle<System.Threading.Thread> _managedThread;
 
@@ -239,17 +244,34 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
 
     /// <summary>
     /// Allocates and initializes the thread stack with initial context.
-    /// After this call, the thread is ready to be scheduled.
+    /// When it returns true, the thread is ready to be scheduled.
     /// </summary>
     /// <param name="entryPoint">Thread entry point function address.</param>
     /// <param name="codeSegment">Code segment selector (CS).</param>
     /// <param name="arg">Optional argument passed to entry point.</param>
     /// <param name="stackSize">Stack size in bytes.</param>
-    internal void InitializeStack(nuint entryPoint, ushort codeSegment, nuint arg = 0, nuint stackSize = DefaultStackSize)
+    /// <returns>False when there is no memory for the stack, even after a collection: the thread has none and must not be started.</returns>
+    internal bool InitializeStack(nuint entryPoint, ushort codeSegment, nuint arg = 0, nuint stackSize = DefaultStackSize)
     {
-        // Allocate stack memory
+        // The collector runs only when its own heap cannot grow, so by the
+        // time a stack is asked for, the pages may all be held by segments
+        // full of dead objects. A collection returns the empty ones, and the
+        // allocation is tried once more. Without the check the context below
+        // was written at address 0.
+        nuint stackBase = (nuint)Memory.MemoryOp.Alloc((uint)stackSize);
+        if (stackBase == 0 && GarbageCollector.IsEnabled)
+        {
+            GarbageCollector.Collect();
+            stackBase = (nuint)Memory.MemoryOp.Alloc((uint)stackSize);
+        }
+
+        if (stackBase == 0)
+        {
+            return false;
+        }
+
         StackSize = stackSize;
-        StackBase = (nuint)Memory.MemoryOp.Alloc((uint)stackSize);
+        StackBase = stackBase;
 
         // Stack layout (growing downward from top):
         // [StackBase + stackSize] = Top of usable stack
@@ -279,6 +301,7 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
         StackPointer = contextAddr;
         InstructionPointer = entryPoint;
         State = SchedulerThreadState.Created;
+        return true;
     }
 
     /// <summary>

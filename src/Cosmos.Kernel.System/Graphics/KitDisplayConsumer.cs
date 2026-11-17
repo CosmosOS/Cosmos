@@ -19,7 +19,7 @@ namespace Cosmos.Kernel.System.Graphics;
 /// driver stage runs.
 /// <para>
 /// Contexts: <see cref="OnPublished"/> and <see cref="OnWithdrawn"/> run in
-/// thread context, on the boot thread before the engine started for the
+/// thread context, on the main thread before the engine started for the
 /// firmware display or on the kit worker for a driver's display, never
 /// concurrently, which is what makes the copy-on-write array and the
 /// primary recomputation safe without a lock; <see cref="Primary"/> and

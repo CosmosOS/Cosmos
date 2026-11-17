@@ -153,8 +153,8 @@ public sealed class RoundRobinScheduler : IScheduler
 
         if (cpuData.RunQueue.Count == 0)
         {
-            // Sole runnable thread: grant a fresh slice in place instead of
-            // bouncing through the idle thread and back.
+            // Sole runnable thread: grant a fresh slice in place. A pick
+            // would find nothing and leave the thread on the CPU anyway.
             threadData.RemainingNs = QuantumNs;
             return false;
         }
@@ -231,11 +231,10 @@ public sealed class RoundRobinScheduler : IScheduler
 
     // ========== Private Helpers ==========
 
-    // Read the slots with 'as', never a cast: a policy installed on a live
-    // kernel is handed threads still carrying the previous policy's
-    // bookkeeping (the boot main thread keeps its StrideThreadData across
-    // the swap), and a cast would throw on them in interrupt context.
-    // Foreign data degrades to "absent", which every hook already tolerates.
+    // Read the slots with 'as', never a cast. The seam asks every hook to
+    // tolerate an empty slot, since OnThreadExit clears it, and 'as' gives
+    // the same "absent" for a slot that holds anything but this policy's
+    // record, where a cast would throw in interrupt context.
     private static RoundRobinCpuData? CpuDataOf(PerCpuState cpuState)
     {
         return cpuState.SchedulerData as RoundRobinCpuData;
@@ -261,9 +260,9 @@ public sealed class RoundRobinScheduler : IScheduler
 
     private static void EnqueueTail(RoundRobinCpuData cpuData, SchedulerThread thread)
     {
-        // Presence guard: ReadyThread can fire for a thread the interrupt
-        // exit will also re-queue (the idle thread's block/resurrect churn in
-        // Mutex.Acquire), and a double entry would grant double turns.
+        // Presence guard: OnThreadReady arrives twice for a thread that is
+        // readied again before its first run, since it stays Created until
+        // then, and a double entry would grant double turns.
         if (!QueueHolds(cpuData, thread))
         {
             cpuData.RunQueue.Add(thread);

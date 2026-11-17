@@ -267,11 +267,11 @@ public sealed class AudioPlayer
 
     /// <summary>
     /// Waits out one pass. A thread the scheduler owns gives the CPU up, so
-    /// the rest of the kernel runs while the codec plays what it has; the
-    /// boot thread, which is the scheduler's idle thread, and a kernel built
-    /// without the scheduler wait on the timer device instead, since putting
-    /// the idle thread to sleep would take the scheduler's fallback off its
-    /// own run queue.
+    /// the rest of the kernel runs while the codec plays what it has;
+    /// code on a CPU's idle thread (a kernel whose scheduler was stopped at
+    /// boot runs wholly there) and a kernel built without the scheduler wait
+    /// on the timer device instead, since an idle thread is its CPU's
+    /// fallback and nothing would wake it.
     /// </summary>
     /// <param name="milliseconds">How long to wait.</param>
     private static void Pause(uint milliseconds)

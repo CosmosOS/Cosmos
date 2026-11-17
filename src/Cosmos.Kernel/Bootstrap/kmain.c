@@ -96,10 +96,14 @@ void kmain()
     char **argv;
 
     argv = __build_argv(__get_limine_cmd_line(), &argc);
-    __managed__Main(argc, argv);
+
+    // Main runs on a thread of its own: the managed side starts it and turns this context,
+    // the boot CPU's, into the halt loop every application processor ends in. A kernel
+    // without the scheduler gets its Main called from there, on this stack. Never returns.
+    __managed__boot_main(argc, argv);
 
     // Should never reach here
-    __cosmos_serial_write("[KMAIN] ERROR: Main() returned unexpectedly!\n");
+    __cosmos_serial_write("[KMAIN] ERROR: the boot CPU's managed entry returned!\n");
     while(1) {}
 }
 

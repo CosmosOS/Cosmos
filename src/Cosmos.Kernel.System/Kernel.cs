@@ -47,18 +47,24 @@ public abstract partial class Kernel
     }
 
     /// <summary>
-    /// Starts the kernel lifecycle. Called by the generated entry point.
-    /// Interrupts are enabled, the finalizer thread is started when its
-    /// switch is on, and the driver stage runs first, returning
-    /// once every node, the children a bus driver published from its probe
-    /// included, has been offered, so <see cref="OnBoot"/> and everything
-    /// after it see the devices the kernel's drivers bound; a kernel that
-    /// overrides this method owns that whole sequence.
+    /// Starts the kernel lifecycle. Called by the generated entry point, on
+    /// the main thread: a thread of its own, on the compute CPUs by default,
+    /// which the boot code started with interrupts enabled. A kernel without
+    /// the scheduler runs it on the boot context, and its interrupts are
+    /// enabled here. The finalizer thread is started when its switch is on,
+    /// and the driver stage runs first, returning once every node, the
+    /// children a bus driver published from its probe included, has been
+    /// offered, so <see cref="OnBoot"/> and everything after it see the
+    /// devices the kernel's drivers bound; a kernel that overrides this
+    /// method owns that whole sequence.
     /// </summary>
     public virtual void Start()
     {
         Serial.WriteString("[Kernel] Starting kernel...\n");
 
+        // Already on when this runs on the main thread, which only an
+        // interrupt exit could have started. A kernel without the scheduler
+        // comes here on the boot context, masked.
         if (InterruptManager.IsEnabled)
         {
             Serial.WriteString("[Kernel] Enabling interrupts...\n");

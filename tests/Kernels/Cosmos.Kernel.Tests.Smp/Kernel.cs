@@ -5,10 +5,12 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Threading;
+using Cosmos.Kernel.Core.Bridge;
 using Cosmos.Kernel.Core.CPU;
 using Cosmos.Kernel.Core.Scheduler;
 using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Input;
+using Cosmos.Kernel.System.Sessions;
 using Cosmos.Kernel.System.Threading;
 using Cosmos.Kernel.System.Timers;
 using Cosmos.TestRunner.Framework;
@@ -36,12 +38,20 @@ namespace Cosmos.Kernel.Tests.Smp;
 /// from a busy one, a sleeper wakes on its own CPU's tick, the thread pool sizes itself for
 /// the compute CPUs, and the kernel's own threads stay on CPU 0. Since that phase a worker
 /// started from Main no longer begins on CPU 0, so the cells that move a worker away from
-/// CPU 0 start it under a housekeeping default (<see cref="StartOnHousekeeping"/>).
+/// CPU 0 start it under a housekeeping default (<see cref="StartOnHousekeeping"/>). Main
+/// itself runs on a thread of its own (CosmosOS/Cosmos#3344, SMP phase 5b), created with
+/// the default set: on the four-CPU cell it is on a compute CPU, which Main_RunsOnComputeCpu
+/// checks. The cells that pin a worker to a CPU by its index and read what that CPU runs
+/// were written with Main on CPU 0, and Main moves there for them, so that the only
+/// threads on CPUs 1 to 3 are the cell's own; the threads it starts from there still take
+/// the default set. Two cells watch what the phase changed around Main: in the balance, a
+/// CPU that runs a thread is not out of work, and pulls nothing; and on the primary console,
+/// a reader on a thread parks, so a key in the keyboard's queue wakes it.
 /// </summary>
 public class Kernel : Sys.Kernel
 {
     /// <summary>Total number of tests announced to the test runner for this suite.</summary>
-    private const int ExpectedTestCount = 39;
+    private const int ExpectedTestCount = 41;
 
     /// <summary>CPUs the smp4 cell's machine has: what the bootloader lists and the kernel starts there.</summary>
     private const uint Smp4CpuCount = 4;
@@ -73,6 +83,14 @@ public class Kernel : Sys.Kernel
     /// a host that deschedules a virtual CPU for a while stretches one attempt, not all three.
     /// </summary>
     private const int ParallelAttempts = 3;
+    /// <summary>
+    /// How many times one spinner's time the four may take. On one CPU they take four times;
+    /// on three compute CPUs that each have a host core, one and a half times. The host
+    /// decides the rest: when the three compute CPUs share two cores, four hardware threads,
+    /// which is what a CI runner has, the four take a little over twice (2.0 to 2.4 measured),
+    /// whatever the kernel does. The bound sits between that and one CPU's four.
+    /// </summary>
+    private const int ParallelBound = 3;
     /// <summary>Work items the pool cell queues: several rounds for a pool sized to the compute CPUs.</summary>
     private const int PoolWorkItems = 12;
     /// <summary>How long (ms) each of those work items spins, noting the CPUs it runs on.</summary>
@@ -80,10 +98,20 @@ public class Kernel : Sys.Kernel
     /// <summary>Delay (ms) of the alarm the housekeeping cell schedules to bring the alarm thread up.</summary>
     private const int AlarmDelayMs = 20;
     /// <summary>
-    /// Looks for a thread among what a CPU holds; a tick between two looks swaps the current
-    /// thread and the queue, so a handful of looks is enough.
+    /// Looks for a thread among what a CPU holds; a switch between two looks can move a
+    /// thread from the queue to the CPU, so a handful of looks is enough.
     /// </summary>
     private const int FindAttempts = 100;
+    /// <summary>
+    /// Scheduler ticks the busy-CPU cell watches its spinners across: about two periodic
+    /// balances on each CPU, which asks once in a hundred of its own ticks, and a pick at every
+    /// tick between.
+    /// </summary>
+    private const uint BusyBalanceTicks = 250;
+    /// <summary>Spinners the busy-CPU cell runs on two CPUs: one CPU runs one, the other runs one and queues one.</summary>
+    private const int BusyBalanceSpinners = 3;
+    /// <summary>How long the console cell's reader must stay parked before the cell types its key.</summary>
+    private const uint ParkSettleMs = 100;
 
     /// <summary>Rounds of the ping-pong between CPU 1 and CPU 2.</summary>
     private const uint PingPongRounds = 200;
@@ -133,6 +161,11 @@ public class Kernel : Sys.Kernel
     private static KernelThreadInfo s_info;
     private static volatile bool s_infoReported;
     private static volatile bool s_maskedThrew;
+    private static SysThread? s_mainManaged;
+    private static CpuSet s_mainSeenSet;
+    private static volatile bool s_mainResolved;
+    private static volatile int s_consoleKey;
+    private static volatile bool s_consoleKeyRead;
     private static volatile uint s_selfSeenAway;
     private static volatile uint s_selfSeenHome;
     private static ulong s_pingPongChecksum;
@@ -144,6 +177,8 @@ public class Kernel : Sys.Kernel
     private static volatile uint s_infoCpu;
     private static volatile int s_wakeCount;
     private static volatile int s_wakeCpuChanges;
+    private static int s_roamStarted;
+    private static int s_roamCpuChanges;
     private static volatile int s_sleepsDone;
     private static volatile int s_sleepWrongCpu;
     private static long s_workIterations;
@@ -183,7 +218,7 @@ public class Kernel : Sys.Kernel
 
         // The CPUs the kernel reports, and the default set
         TR.Run("KernelCpus_ReportsCountOnlineHousekeepingCompute", () => TestKernelCpusReports(smp));
-        TR.Run("KernelCpus_Current_IsBootCpuFromMain", TestKernelCpusCurrentFromMain);
+        TR.Run("Main_RunsOnComputeCpu", TestMainRunsOnComputeCpu);
         TR.Run("KernelCpus_DefaultAffinity_IsCompute", TestDefaultAffinityIsCompute);
         TR.Run("KernelCpus_DefaultAffinity_Set_RefusesEmptyAndUnmanaged", TestDefaultAffinitySetRefuses);
         TR.Run("Environment_ProcessorCount_CountsDefaultAffinity", TestProcessorCountCountsDefaultAffinity);
@@ -197,11 +232,21 @@ public class Kernel : Sys.Kernel
         TR.Run("KernelThreadInfo_CarriesAffinityAndIdealCpu", TestKernelThreadInfoCarriesAffinity);
         TR.Run("ThreadAffinity_UnstartedThread_ReturnsFalse", TestUnstartedThreadReturnsFalse);
         TR.Run("ThreadAffinity_ExitedThread_ReturnsFalse", TestExitedThreadReturnsFalse);
-        TR.Run("ThreadAffinity_Current_Set_FromMain_Throws", TestCurrentSetFromMainThrows);
+        TR.Run("ThreadAffinity_Current_Set_FromMain_Moves", TestCurrentSetFromMainMoves);
         TR.Run("ThreadAffinity_Current_Set_InterruptsMasked_Throws", TestCurrentSetInterruptsMaskedThrows);
         TR.Run("ThreadAffinity_SetIdealCpu_OutOfRange_Throws", TestSetIdealCpuOutOfRangeThrows);
         TR.Run("ThreadAffinity_Set_RefusesEmptyAndUnmanaged", TestSetRefusesEmptyAndUnmanaged);
         TR.RunIf(!smp, "Affinity_OfflineOnlySet_StaysOnOnlineCpu", TestOfflineOnlySetStaysOnOnlineCpu, "every CPU this cell manages is online");
+
+        // The primary console read from a thread, which is what Main is (SMP phase 5b)
+        TR.RunIf(SessionManager.Primary is not null, "PrimaryConsole_ReaderOnThread_WakesOnKeyboardKey", TestPrimaryConsoleReaderWakesOnKey, "no console on this cell");
+
+        // Main runs on a thread of its own, on the compute CPUs (CosmosOS/Cosmos#3344, SMP
+        // phase 5b). The cells below pin workers to CPUs 1 to 3 by index and read what those
+        // CPUs run, so Main moves to CPU 0 for them: it ran there when they were written, and
+        // the threads on the other CPUs are then the cell's own.
+        CpuSet mainSet = ThreadAffinity.Current;
+        ThreadAffinity.Current = KernelCpus.Housekeeping;
 
         // The mechanism across CPUs
         TR.RunIf(smp, "Affinity_PinnedThread_RunsOnThatCpu", TestPinnedThreadRunsOnThatCpu, OneCpuCell);
@@ -223,8 +268,10 @@ public class Kernel : Sys.Kernel
         TR.RunIf(smp, "Placement_WokenThread_StaysOnItsCpuWhileIdle", TestWokenThreadStaysOnItsCpuWhileIdle, OneCpuCell);
         TR.RunIf(smp, "Sleep_OnComputeCpu_WakesOnItsOwnTick", TestSleepOnComputeCpuWakesOnItsOwnTick, OneCpuCell);
         TR.RunIf(smp, "Balance_IdleCpuPullsRunnable", TestBalanceIdleCpuPullsRunnable, OneCpuCell);
-        TR.RunIf(smp, "Parallel_FourSpinnersFinishInUnderTwiceOneSpinnersTime", TestFourSpinnersFinishInUnderTwiceOneSpinnersTime, OneCpuCell);
+        TR.RunIf(smp, "Balance_BusyCpu_DoesNotPull", TestBalanceBusyCpuDoesNotPull, OneCpuCell);
+        TR.RunIf(smp, "Parallel_FourSpinnersFinishInUnderThreeTimesOneSpinnersTime", TestFourSpinnersFinishInUnderThreeTimesOneSpinnersTime, OneCpuCell);
         TR.RunIf(smp, "ThreadPool_WorkersSpreadAcrossCpus", TestThreadPoolWorkersSpreadAcrossCpus, OneCpuCell);
+        ThreadAffinity.Current = mainSet;
         TR.Run("DriverKit_ThreadsStayOnHousekeepingCpu", TestKernelThreadsStayOnHousekeepingCpu);
 
         TR.Finish();
@@ -386,10 +433,39 @@ public class Kernel : Sys.Kernel
         Assert.Equal((uint)SchedulerDiagnostics.CpuCount, (uint)KernelCpus.Count, "the diagnostics and the ring agree on the count");
     }
 
-    private static void TestKernelCpusCurrentFromMain()
+    // Main runs on a thread of its own (SMP phase 5b, CosmosOS/Cosmos#3344): not a CPU's idle
+    // thread, on a stack of its own, created with the default set, so on the compute CPUs. On
+    // four CPUs that is never CPU 0, which keeps the boot context as its idle thread; on one
+    // CPU it is CPU 0, the only one.
+    private static void TestMainRunsOnComputeCpu()
     {
-        Assert.Equal(0u, KernelCpus.Current, "Main runs on the boot CPU");
-        Assert.Equal(0u, (uint)SysThread.GetCurrentProcessorId());
+        SchedulerThread? main = SchedulerManager.CurrentThread;
+        Assert.True(main is not null && !main.IsIdle, "Main runs on a thread, not on a CPU's idle thread");
+        Assert.True(ReferenceEquals(main, SchedulerManager.MainThread), "the one the scheduler knows as the main thread");
+        Assert.Equal((ulong)KernelMain.StackSize, (ulong)main!.StackSize, "on a stack of its own, as large as the boot stack it used to run on");
+
+        nuint sp = ContextSwitchNative.GetSp();
+        Assert.True(sp >= main.StackBase && sp < main.StackBase + main.StackSize, "the live stack pointer lies in that stack");
+        Assert.Equal(KernelCpus.Compute, ThreadAffinity.Current, "Main was created with the default set, the compute CPUs");
+
+        // Masked: Main may move between two compute CPUs at any interrupt exit. The first
+        // call is made unmasked, since it runs CoreLib's one-time speed check of the call.
+        SysThread.GetCurrentProcessorId();
+        uint cpu;
+        uint processorId;
+        using (InternalCpu.DisableInterruptsScope())
+        {
+            cpu = KernelCpus.Current;
+            processorId = (uint)SysThread.GetCurrentProcessorId();
+        }
+
+        Assert.True(KernelCpus.Compute.Contains(cpu), "Main runs on a compute CPU");
+        Assert.True(KernelCpus.Count == 1 || cpu != 0, "which is not CPU 0 when there is another");
+        Assert.Equal(cpu, processorId, "Thread.GetCurrentProcessorId reports the CPU Main runs on");
+
+        SchedulerThread? bootIdle = SchedulerManager.GetCpuState(0)?.IdleThread;
+        Assert.True(bootIdle is not null && bootIdle.IsIdle && !ReferenceEquals(bootIdle, main), "CPU 0 keeps the boot context as its idle thread");
+        Assert.True(bootIdle!.SchedulerData is null, "an idle thread is handed to no policy");
     }
 
     private static void TestDefaultAffinityIsCompute()
@@ -475,7 +551,7 @@ public class Kernel : Sys.Kernel
         s_inheritedReported = true;
     }
 
-    // A thread created from Main, which runs on the boot CPU's idle thread, takes the default set.
+    // A thread created from Main takes the default set, whatever set Main itself carries.
     private static void TestThreadInheritsDefaultAffinity()
     {
         s_inheritedReported = false;
@@ -554,7 +630,7 @@ public class Kernel : Sys.Kernel
         Assert.True(worker.Join(JoinTimeoutMs), "the worker exits");
         Assert.True(s_infoReported, "the worker snapshotted itself");
         Assert.Equal(WidenedSet, s_info.Affinity, "the snapshot carries the set");
-        Assert.Equal(0u, s_info.IdealCpu, "the snapshot carries the ideal CPU, the CPU the worker was created on");
+        Assert.Equal(0u, s_info.IdealCpu, "the snapshot carries the ideal CPU, the one CPU of the set the worker was created with");
         Assert.Equal(s_infoCpu, s_info.CpuId, "and the CPU the worker runs on");
         Assert.False(s_info.IsIdle);
         Assert.True(s_info.IsManaged);
@@ -597,21 +673,92 @@ public class Kernel : Sys.Kernel
         Assert.False(ThreadAffinity.Set(worker, CpuSet.Single(0)), "and cannot be given a set");
     }
 
-    private static void TestCurrentSetFromMainThrows()
+    private static void MainResolver()
     {
-        Assert.Equal(KernelCpus.Housekeeping, ThreadAffinity.Current, "the boot thread reads CPU 0's idle set");
+        s_mainResolved = ThreadAffinity.TryGet(s_mainManaged!, out CpuSet set);
+        s_mainSeenSet = set;
+    }
 
-        bool threw = false;
+    // Main is a thread like any other for the ring (SMP phase 5b): it reads its own set,
+    // another thread resolves it through its managed Thread, and it moves when it changes
+    // its set, to CPU 0 and back. While Main ran on CPU 0's idle thread the setter threw.
+    private static void TestCurrentSetFromMainMoves()
+    {
+        CpuSet home = ThreadAffinity.Current;
+        Assert.Equal(KernelCpus.Compute, home, "Main carries the compute CPUs");
+        Assert.True(ThreadAffinity.TryGet(SysThread.CurrentThread, out CpuSet own) && own == home, "and resolves through its managed thread");
+
+        s_mainManaged = SysThread.CurrentThread;
+        s_mainResolved = false;
+        SysThread worker = new(MainResolver);
+        worker.Start();
+        Assert.True(worker.Join(JoinTimeoutMs), "the worker exits");
+        Assert.True(s_mainResolved, "another thread resolves the main thread too");
+        Assert.Equal(home, s_mainSeenSet, "and reads the same set");
+
+        ThreadAffinity.Current = KernelCpus.Housekeeping;
         try
         {
-            ThreadAffinity.Current = CpuSet.Single(0);
+            Assert.Equal(KernelCpus.Housekeeping, ThreadAffinity.Current, "Main took the set it gave itself");
+            Assert.Equal(0u, KernelCpus.Current, "and runs on CPU 0 once the setter returns");
         }
-        catch (InvalidOperationException)
+        finally
         {
-            threw = true;
+            ThreadAffinity.Current = home;
         }
 
-        Assert.True(threw, "Main runs on CPU 0's idle thread, which cannot move");
+        Assert.Equal(home, ThreadAffinity.Current, "the compute set is back");
+        Assert.True(home.Contains(KernelCpus.Current), "and Main runs on one of its CPUs again");
+    }
+
+    private static void PrimaryConsoleReader()
+    {
+        s_workerThread = SchedulerManager.CurrentThread;
+        s_consoleKey = (int)Console.ReadKey(intercept: true).Key;
+        s_consoleKeyRead = true;
+    }
+
+    // While nothing routes the keyboard, the primary console takes its keys from the keyboard's
+    // queue when its reader looks. A reader on a thread parks on the console's signal between
+    // two looks, so a key that lands in that queue has to wake it. Main reads the console on a
+    // thread of its own (SMP phase 5b, CosmosOS/Cosmos#3344): while it ran on CPU 0's idle
+    // thread it halted between two looks and the keyboard's interrupt ended the halt, so
+    // nothing was signalled, and a read from a thread never returned. The reader here is a
+    // worker, which reads the primary console as Main does (a thread started on no session
+    // has the primary one), so that a reader nothing wakes fails the cell instead of hanging
+    // the suite. The key is fed to the decoder as the keyboard's handler feeds it.
+    private static void TestPrimaryConsoleReaderWakesOnKey()
+    {
+        while (KeyboardManager.TryReadKey(out _))
+        {
+        }
+
+        s_workerThread = null;
+        s_consoleKey = 0;
+        s_consoleKeyRead = false;
+        SysThread reader = new(PrimaryConsoleReader);
+        reader.Start();
+        WaitForFlag(() => s_workerThread is { State: SchedulerThreadState.Blocked }, "the reader parks on the primary console while no key is waiting");
+
+        // Still parked a moment later: a reader caught blocked on its way in, on something else
+        // than the console's signal, would be running again by now, and its own look would
+        // then find the key without any wake.
+        TimerManager.Wait(ParkSettleMs);
+        Assert.True(s_workerThread is { State: SchedulerThreadState.Blocked }, "and stays parked there");
+
+        KeyboardManager.HandleScanCode(s_keyboardScanCodes[0], released: false);
+        KeyboardManager.HandleScanCode(s_keyboardScanCodes[0], released: true);
+        WaitForFlag(() => s_consoleKeyRead, "the key that landed in the keyboard's queue woke the reader");
+        Assert.Equal((int)ConsoleKey.A, s_consoleKey, "and the reader took that key");
+
+        // A reader nothing woke is not left parked on the primary console: the key is in the
+        // keyboard's queue, where its next look finds it.
+        if (!s_consoleKeyRead)
+        {
+            SessionManager.Primary!.WakeReader();
+        }
+
+        Assert.True(reader.Join(JoinTimeoutMs), "the reader exits");
     }
 
     private static void MaskedSetter()
@@ -799,10 +946,11 @@ public class Kernel : Sys.Kernel
         Assert.True(idle, "the CPU is back on its idle thread");
     }
 
-    // The thread a CPU holds beside its idle thread, current or queued. The idle thread holds
-    // tickets like any other and is queued again at every switch-out, so a pinned thread
-    // shares its CPU with it tick for tick and the current thread alone is a coin toss. A tick
-    // between the two looks swaps them, so the look is retried.
+    // The thread a CPU holds beside its idle thread, current or queued. A thread alone on its
+    // CPU keeps it, since the idle thread no longer takes turns with it (SMP phase 5b), and
+    // is the current one at every look; a thread that just arrived may still wait in the queue
+    // for the interrupt exit that runs it. A switch between the two looks moves it from one to
+    // the other, so the look is retried.
     private static bool TryFindWorkerOn(uint cpu, out KernelThreadInfo info)
     {
         for (int attempt = 0; attempt < FindAttempts; attempt++)
@@ -1440,6 +1588,77 @@ public class Kernel : Sys.Kernel
         StopSpinners(first, second);
     }
 
+    // The two application processors the busy-CPU cell gives its spinners.
+    private static CpuSet BusyPair => CpuSet.Single(1).With(2);
+
+    // Spins on the CPUs of its set, counting the times it finds itself on another CPU than the
+    // round before. No allocation: a collection would stop every CPU for nothing here.
+    private static void RoamCounter()
+    {
+        uint last = KernelCpus.Current;
+        Interlocked.Increment(ref s_roamStarted);
+        while (!s_stop)
+        {
+            uint cpu = KernelCpus.Current;
+            if (cpu != last)
+            {
+                Interlocked.Increment(ref s_roamCpuChanges);
+                last = cpu;
+            }
+        }
+    }
+
+    // Three spinners allowed on CPU 1 and CPU 2: one CPU runs one, the other runs one and
+    // queues the third. Neither is out of work, so neither pulls, and every spinner stays on
+    // the CPU placement gave it across two periodic balances and a pick at every tick. A CPU
+    // asks its neighbours for a thread when it is about to run its idle thread, not when the
+    // thread it runs ends a quantum with nothing queued behind it. Since the idle threads
+    // left the run queues (SMP phase 5b, CosmosOS/Cosmos#3344) an empty queue no longer means
+    // an idle CPU, and a CPU that pulled on an empty queue alone would trade the third
+    // spinner with its neighbour at every tick.
+    private static void TestBalanceBusyCpuDoesNotPull()
+    {
+        ResetWorkers();
+        s_roamStarted = 0;
+        s_roamCpuChanges = 0;
+
+        SysThread[] workers = new SysThread[BusyBalanceSpinners];
+        CpuSet previous = KernelCpus.DefaultAffinity;
+        KernelCpus.DefaultAffinity = BusyPair;
+        try
+        {
+            for (int i = 0; i < workers.Length; i++)
+            {
+                workers[i] = new SysThread(RoamCounter);
+                workers[i].Start();
+            }
+        }
+        finally
+        {
+            KernelCpus.DefaultAffinity = previous;
+        }
+
+        WaitForFlag(() => Volatile.Read(ref s_roamStarted) == BusyBalanceSpinners, "the three spinners run");
+        Assert.True(TryFindWorkerOn(1, out _) && TryFindWorkerOn(2, out _), "both CPUs of the set hold a spinner");
+        Assert.Equal(1, SchedulerDiagnostics.GetRunQueueCount(1) + SchedulerDiagnostics.GetRunQueueCount(2), "and one of the two queues the third");
+
+        uint start = SchedulerManager.TickCount;
+        while (SchedulerManager.TickCount - start < BusyBalanceTicks)
+        {
+            TimerManager.Wait(PollIntervalMs);
+        }
+
+        int changes = Volatile.Read(ref s_roamCpuChanges);
+        Log.WriteString($"[Smp] Three spinners on two CPUs changed CPU {changes} times in {BusyBalanceTicks} ticks\n");
+        Assert.Equal(0, changes, "no spinner left the CPU it was placed on: a CPU that runs a thread pulls nothing");
+
+        s_stop = true;
+        foreach (SysThread worker in workers)
+        {
+            Assert.True(worker.Join(JoinTimeoutMs), "a spinner exits once stopped");
+        }
+    }
+
     private static void Calibrator()
     {
         long deadline = Stopwatch.GetTimestamp() + Stopwatch.Frequency * ParallelCalibrationMs / 1000;
@@ -1509,8 +1728,10 @@ public class Kernel : Sys.Kernel
 
     // One spinner does a fixed amount of work; then four do that amount each, at once. On one
     // CPU the four would take four times as long. Spread over the three compute CPUs, with the
-    // CPU that holds two relieved by the first one that goes idle, they take well under twice.
-    private static void TestFourSpinnersFinishInUnderTwiceOneSpinnersTime()
+    // CPU that holds two relieved by the first one that goes idle, they take one and a half
+    // times as long when each compute CPU has a host core, and a little over twice when the
+    // three share two (ParallelBound).
+    private static void TestFourSpinnersFinishInUnderThreeTimesOneSpinnersTime()
     {
         s_workIterations = 0;
         SysThread calibrator = new(Calibrator);
@@ -1525,12 +1746,12 @@ public class Kernel : Sys.Kernel
         {
             one = TimeFixedWork(1);
             four = TimeFixedWork(ParallelSpinners);
-            under = four < 2 * one;
+            under = four < ParallelBound * one;
         }
 
         long frequency = Stopwatch.Frequency;
         Log.WriteString($"[Smp] One spinner: {one * 1000 / frequency} ms, four at once: {four * 1000 / frequency} ms\n");
-        Assert.True(under, "four spinners finish in under twice the time one takes: they ran on several CPUs at once");
+        Assert.True(under, "four spinners finish in under three times the time one takes: they ran on several CPUs at once");
     }
 
     private static void PoolWork(object? state)
@@ -1583,11 +1804,14 @@ public class Kernel : Sys.Kernel
         WaitForFlag(() => s_alarmCpu != uint.MaxValue, "the alarm fired");
         Assert.Equal(0u, s_alarmCpu, "an alarm's callback runs on the housekeeping CPU");
 
+        // The main thread is not one of them: the kernel started it, but for the kernel's
+        // Main, on the default set.
+        uint mainId = SchedulerManager.MainThread!.Id;
         int kernelThreads = 0;
         int away = 0;
         for (int slot = 0; slot < SchedulerDiagnostics.ThreadSlotCount; slot++)
         {
-            if (!SchedulerDiagnostics.TryGetThreadInSlot(slot, out KernelThreadInfo info) || info.IsIdle || info.IsManaged)
+            if (!SchedulerDiagnostics.TryGetThreadInSlot(slot, out KernelThreadInfo info) || info.IsIdle || info.IsManaged || info.Id == mainId)
             {
                 continue;
             }

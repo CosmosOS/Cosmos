@@ -92,7 +92,9 @@
     <!-- The Smp suite's keyboard cell feeds scan codes to the decoder the way
          the keyboard's handler does (KeyboardManager.HandleScanCode), beside
          the PS/2 keyboard bound on the cell rather than through it, and paces
-         itself on the queue's depth. -->
+         itself on the queue's depth. Its console cell feeds a key the same
+         way to a reader parked on the primary console, and wakes that reader
+         itself (ConsoleSession.WakeReader) when the key did not. -->
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
       <_Parameter1>Cosmos.Kernel.Tests.Smp</_Parameter1>
     </AssemblyAttribute>

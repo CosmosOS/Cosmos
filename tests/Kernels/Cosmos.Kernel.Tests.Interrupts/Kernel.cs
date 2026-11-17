@@ -163,9 +163,16 @@ public class Kernel : Sys.Kernel
         TR.Run("Lapic_TimerCalibrated", TestLapicTimerCalibrated);
         TR.Run("Msi_RoutingAvailable", TestMsiRoutingAvailableX64);
         TR.Run("IrqExit_ReschedulesSignaledWaiter", TestIrqExitReschedulesSignaledWaiter);
+        // Main runs on a thread of its own, on a compute CPU when the machine has several
+        // (CosmosOS/Cosmos#3344, SMP phase 5b). The two cells that compare block 0 and a
+        // message aimed at CPU 0 with the Local APIC the caller reads run on CPU 0; the timer
+        // vector cell registered between them reads nothing per CPU and rides along.
+        Sys.Threading.CpuSet mainSet = Sys.Threading.ThreadAffinity.Current;
+        Sys.Threading.ThreadAffinity.Current = Sys.Threading.KernelCpus.Housekeeping;
         TR.Run("Msi_AddressTargetsRunningLapic", TestMsiAddressTargetsRunningLapic);
         TR.Run("TimerVector_OutsideDynamicWindow", TestTimerVectorOutsideDynamicWindow);
         TR.Run("PerCpuBlock_HardwareId_IsRunningLapicId", TestPerCpuBlockHardwareIdIsLapicId);
+        Sys.Threading.ThreadAffinity.Current = mainSet;
         TR.RunIf(smp, "PerCpuBlock_ApplicationProcessors_DistinctLapicIds", TestPerCpuBlockApplicationProcessorsDistinctLapicIds, OneCpuCell);
 #else
         // ==================== arm64 (GIC, per cell's gic-version) ====================
@@ -197,7 +204,14 @@ public class Kernel : Sys.Kernel
         TR.Skip("IrqExit_ReschedulesSignaledWaiter", "self-IPI harness is x64-only");
         TR.Skip("Msi_AddressTargetsRunningLapic", "LAPIC MSI address contract is x64-only");
         TR.Skip("TimerVector_OutsideDynamicWindow", "LAPIC timer vector is x64-only");
+
+        // Main runs on a thread of its own, on a compute CPU when the machine has several
+        // (CosmosOS/Cosmos#3344, SMP phase 5b). The cell that compares block 0 with the
+        // affinity register the caller reads runs on CPU 0.
+        Sys.Threading.CpuSet mainSet = Sys.Threading.ThreadAffinity.Current;
+        Sys.Threading.ThreadAffinity.Current = Sys.Threading.KernelCpus.Housekeeping;
         TR.Run("PerCpuBlock_HardwareId_IsMpidrAffinity", TestPerCpuBlockHardwareIdIsMpidrAffinity);
+        Sys.Threading.ThreadAffinity.Current = mainSet;
         TR.RunIf(smp, "PerCpuBlock_ApplicationProcessors_DistinctAffinities", TestPerCpuBlockApplicationProcessorsDistinctAffinities, OneCpuCell);
 #endif
 

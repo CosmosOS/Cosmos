@@ -113,7 +113,11 @@ internal static unsafe partial class GarbageCollector
             }
             else
             {
-                // Boot/idle thread on the bootloader stack — no StackBase/StackSize.
+                // No thread with a stack of its own. An idle thread, on the bootloader stack
+                // of its CPU, has no StackBase or StackSize: boot code that collects between the
+                // scheduler's start and Main's, or Main itself on a kernel whose scheduler was
+                // stopped at boot. So has boot code that collects before this CPU has a current
+                // thread at all.
                 stackEnd = GetCurrentStackEndForBootStack();
             }
 
@@ -229,11 +233,11 @@ internal static unsafe partial class GarbageCollector
         }
         else if (stackStart != 0 && thread.IsIdle)
         {
-            // An idle thread (the kernel's main thread on CPU 0, the halt loop of an
-            // application processor) has no StackBase/StackSize: it runs on the bootloader stack
+            // An idle thread (the halt loop of a CPU, and on the boot CPU the frames the boot
+            // code left under it) has no StackBase/StackSize: it runs on the bootloader stack
             // of its CPU, where the IRQ stub that switched it out, or the stop interrupt that
-            // held it, saved its context, at StackPointer. Skipping it lost every main-thread
-            // stack root whenever another thread collected. On ARM64 the frame is on that stack
+            // held it, saved its context, at StackPointer. A handler the stop caught on that
+            // stack holds roots there like any thread's. On ARM64 the frame is on that stack
             // too: every CPU runs EL1h from its first instruction in the kernel (kmain, the
             // trampoline), so an exception stacks its frame below the interrupted sp.
             stackEnd = PerCpuBlock.At(thread.CpuId).BootStackTop;

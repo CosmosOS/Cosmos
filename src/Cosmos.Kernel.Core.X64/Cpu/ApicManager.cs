@@ -173,7 +173,9 @@ public static class ApicManager
     }
 
     /// <summary>
-    /// Blocks for the specified number of milliseconds using the LAPIC timer.
+    /// Blocks for the specified number of milliseconds using the LAPIC timer
+    /// of the calling CPU, with interrupts masked for the whole wait
+    /// (<see cref="LocalApic.Wait"/>).
     /// </summary>
     /// <param name="ms">Number of milliseconds to wait.</param>
     public static void Wait(uint ms)
