@@ -26,6 +26,11 @@ env:
   # CPython embedded in gdb for scripting (pretty-printers, kernel debug
   # helpers). macOS bundling paths are keyed on this exact version.
   PYTHON_VERSION: "3.13"
+  # The CPython of that series the Linux gdb carries, a standalone build from
+  # astral-sh/python-build-standalone (see build-gdb).
+  PYTHON_STANDALONE_VERSION: "3.13.18"
+  PYTHON_STANDALONE_RELEASE: "20261110"
+  PYTHON_STANDALONE_SHA256: "f2d2199eb25880e07863b391cf7124e7ffa1338b0d65600dfcec117c4223a7fb"
 
 jobs:
   # ═══════════════════════════════════════════════════════════════════════
@@ -559,6 +564,11 @@ jobs:
   build-gdb:
     name: GDB ${{ matrix.target }}
     runs-on: ${{ matrix.os }}
+    # Linux only (see the matrix): macOS and Windows build on the runner itself
+    container: ${{ matrix.container }}
+    env:
+      # Linux: where gdb is configured to live and where its Python is unpacked
+      GDB_PREFIX: /opt/gdb
     timeout-minutes: 60
     strategy:
       fail-fast: false
@@ -566,17 +576,35 @@ jobs:
         include:
           - os: ubuntu-latest
             target: linux-x64
+            container: ubuntu:22.04
           - os: macos-latest
             target: darwin-arm64
           - os: windows-latest
             target: win-x64
     steps:
+      # The image is bare: everything the build uses is named here.
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential texinfo \
-            libgmp-dev libmpfr-dev libexpat1-dev libxml2-dev
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            build-essential ca-certificates curl xz-utils texinfo pkg-config patchelf \
+            libgmp-dev libmpfr-dev libexpat1-dev libzstd-dev libncurses-dev
+
+      # gdb embeds CPython, and a gdb linked against the distribution's
+      # libpython starts on that one release: 3.10, 3.12 and 3.14 on the last
+      # three LTS. The Linux package carries its own instead, as the macOS and
+      # Windows ones do: a standalone build that needs the C library alone,
+      # unpacked under the prefix gdb is configured with, so that gdb finds the
+      # standard library from its own location wherever the package lands.
+      - name: Install the Python gdb embeds (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          curl -fL -o python.tar.gz \
+            "https://github.com/astral-sh/python-build-standalone/releases/download/${PYTHON_STANDALONE_RELEASE}/cpython-${PYTHON_STANDALONE_VERSION}+${PYTHON_STANDALONE_RELEASE}-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
+          echo "${PYTHON_STANDALONE_SHA256}  python.tar.gz" | sha256sum -c -
+          mkdir -p "${GDB_PREFIX}"
+          tar xzf python.tar.gz -C "${GDB_PREFIX}" --strip-components=1
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
@@ -632,6 +660,7 @@ jobs:
         shell: bash
         run: |
           NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+          PLATFORM_FLAGS=()
           # Apple Silicon brew lives at /opt/homebrew, not on the default
           # compiler search path — configure won't find gmp/mpfr/expat
           # headers without the explicit -I/-L. Linux apt installs to
@@ -644,8 +673,11 @@ jobs:
             # fails configure's libpython link test; use brew's.
             PYTHON_BIN="$(brew --prefix python@${PYTHON_VERSION})/bin/python${PYTHON_VERSION}"
           else
-            # Links the distro libpython3.x; ubuntu-latest ships dev files.
-            PYTHON_BIN=/usr/bin/python3
+            # The standalone CPython, under gdb's own prefix. The C++ runtime
+            # is linked in, so that the package does not have to carry it.
+            PYTHON_BIN="${GDB_PREFIX}/bin/python3"
+            export LDFLAGS="-L${GDB_PREFIX}/lib"
+            PLATFORM_FLAGS=(--prefix="${GDB_PREFIX}" --with-static-standard-libraries)
           fi
           cd gdb-${GDB_VERSION}
           # --target=x86_64-pc-linux-gnu builds gdb as a cross-debugger.
@@ -673,7 +705,8 @@ jobs:
             --disable-sim \
             --disable-gdbserver \
             --with-python="${PYTHON_BIN}" \
-            --without-guile
+            --without-guile \
+            "${PLATFORM_FLAGS[@]}"
           make -j$NPROC
           strip gdb/gdb gdb/gdb-unsigned 2>/dev/null || true
 
@@ -731,6 +764,39 @@ jobs:
               cp -R "gdb-${GDB_VERSION}/gdb/data-directory/$d" pkg/gdb/share/gdb/
             fi
           done
+          # The parts of the standard library a debugger has no use for
+          trim_python_stdlib() {
+            rm -rf "pkg/gdb/lib/python${PYTHON_VERSION}/test" \
+                   "pkg/gdb/lib/python${PYTHON_VERSION}/idlelib" \
+                   "pkg/gdb/lib/python${PYTHON_VERSION}/tkinter" \
+                   "pkg/gdb/lib/python${PYTHON_VERSION}/turtledemo" \
+                   "pkg/gdb/lib/python${PYTHON_VERSION}/ensurepip" \
+                   "pkg/gdb/lib/python${PYTHON_VERSION}/site-packages"
+            find pkg/gdb/lib -name __pycache__ -type d -prune -exec rm -rf {} +
+          }
+          if [ "$(uname)" = "Linux" ]; then
+            # The Python runtime gdb is linked against and its standard
+            # library, then every other library gdb needs, the C library
+            # excepted. gdb looks for them in ../lib, and finds the standard
+            # library there by itself (it sits under the prefix it was
+            # configured with).
+            mkdir -p pkg/gdb/lib
+            cp -L "${GDB_PREFIX}/lib/libpython${PYTHON_VERSION}.so.1.0" pkg/gdb/lib/
+            cp -R "${GDB_PREFIX}/lib/python${PYTHON_VERSION}" pkg/gdb/lib/
+            # Also out: what serves to build extension modules, and the Tk
+            # binding, whose libraries the package does not carry.
+            rm -rf "pkg/gdb/lib/python${PYTHON_VERSION}"/config-* \
+                   "pkg/gdb/lib/python${PYTHON_VERSION}"/lib-dynload/_tkinter*
+            trim_python_stdlib
+            patchelf --set-rpath '$ORIGIN/../lib' pkg/gdb/bin/gdb-multiarch
+            ldd pkg/gdb/bin/gdb-multiarch | awk '/=> \//{print $3}' | while read -r lib; do
+              case "$(basename "$lib")" in
+                libc.so.*|libm.so.*|libdl.so.*|libpthread.so.*|librt.so.*|libutil.so.*) ;;
+                *) [ -e "pkg/gdb/lib/$(basename "$lib")" ] || cp -L "$lib" pkg/gdb/lib/ ;;
+              esac
+            done
+            ls -la pkg/gdb/lib/
+          fi
           if [ "$(uname)" = "Darwin" ]; then
             # Bundle the brew CPython runtime so the artifact runs on machines
             # without Homebrew: relink gdb against a copied libpython, ship the
@@ -754,13 +820,7 @@ jobs:
             # macOS refuses to run unsigned binaries, so re-sign.
             codesign --force -s - "pkg/gdb/lib/libpython${PYTHON_VERSION}.dylib" pkg/gdb/bin/gdb-multiarch-bin
             cp -R "${PYPREFIX}/lib/python${PYTHON_VERSION}" pkg/gdb/lib/
-            rm -rf "pkg/gdb/lib/python${PYTHON_VERSION}/test" \
-                   "pkg/gdb/lib/python${PYTHON_VERSION}/idlelib" \
-                   "pkg/gdb/lib/python${PYTHON_VERSION}/tkinter" \
-                   "pkg/gdb/lib/python${PYTHON_VERSION}/turtledemo" \
-                   "pkg/gdb/lib/python${PYTHON_VERSION}/ensurepip" \
-                   "pkg/gdb/lib/python${PYTHON_VERSION}/site-packages"
-            find pkg/gdb/lib -name __pycache__ -type d -prune -exec rm -rf {} +
+            trim_python_stdlib
             printf '%s\n' \
               '#!/bin/sh' \
               'here="$(cd "$(dirname "$0")" && pwd)"' \
