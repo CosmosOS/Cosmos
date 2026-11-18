@@ -60,10 +60,13 @@ public abstract partial class Kernel
         if (KernelFeatures.VerboseSerial) {
             Serial.WriteString("[Kernel] Starting kernel...\n");
         }
-        
+
         if (InterruptManager.IsEnabled)
         {
-            Serial.WriteString("[Kernel] Enabling interrupts...\n");
+            if(KernelFeatures.VerboseSerial)
+            {
+                Serial.WriteString("[Kernel] Enabling interrupts...\n");
+            }
             InternalCpu.EnableInterrupts();
         }
 
@@ -75,14 +78,21 @@ public abstract partial class Kernel
         // without a scheduler.
         if (Core.CosmosFeatures.FinalizerThreadEnabled)
         {
-            Serial.WriteString("[Kernel] Starting the finalizer thread...\n");
+            if(KernelFeatures.VerboseSerial)
+            {
+                Serial.WriteString("[Kernel] Starting the finalizer thread...\n");
+            }
+            
             CoreGC.ThreadedFinalizer = true;
         }
 
         // The driver stage: offers every node published so far to the
         // drivers in the manifest, children included, and returns once
         // every one of them has been offered.
-        Serial.WriteString("[Kernel] Starting drivers...\n");
+        if(KernelFeatures.VerboseSerial)
+        {
+            Serial.WriteString("[Kernel] Starting drivers...\n");
+        }
         DriverEngine.Start();
 
         Serial.WriteString("[Kernel] Calling OnBoot()...\n");
@@ -125,11 +135,14 @@ public abstract partial class Kernel
     /// </summary>
     protected virtual void OnBoot()
     {
-        Serial.WriteString("[Kernel] OnBoot() called\n");
-
+        if(KernelFeatures.VerboseSerial) {
+            Serial.WriteString("[Kernel] OnBoot() called\n");
+        }
         if (Core.CosmosFeatures.GraphicsEnabled)
         {
-            Serial.WriteString("[Kernel] Initializing KernelConsole...\n");
+            if(KernelFeatures.VerboseSerial) {
+                Serial.WriteString("[Kernel] Initializing KernelConsole...\n");
+            }
             if (KernelConsole.Initialize())
             {
                 Serial.WriteString("[Kernel] KernelConsole initialized: ");
@@ -140,12 +153,16 @@ public abstract partial class Kernel
             }
             else
             {
-                Serial.WriteString("[Kernel] WARNING: KernelConsole initialization failed!\n");
+                if(KernelFeatures.VerboseSerial) {
+                    Serial.WriteString("[Kernel] WARNING: KernelConsole initialization failed!\n");
+                }
             }
         }
         else
         {
-            Serial.WriteString("[Kernel] Graphics disabled via feature switch.\n");
+            if(KernelFeatures.VerboseSerial) {
+                Serial.WriteString("[Kernel] Graphics disabled via feature switch.\n");
+            }
         }
     }
 
