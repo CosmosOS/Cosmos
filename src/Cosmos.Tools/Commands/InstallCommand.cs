@@ -145,8 +145,9 @@ public class InstallCommand : AsyncCommand<InstallSettings>
 
             // Find the matching asset BEFORE checking system tools — its filename
             // is the source of truth for "what version cosmos.tools wants".
+            string assetTarget = GetAssetTarget(releaseAsset, platform);
             string pattern = $"{releaseAsset}-";
-            string suffix = $"-{platform}.{ext}";
+            string suffix = $"-{assetTarget}.{ext}";
             var asset = assets.FirstOrDefault(a =>
                 a.Name.StartsWith(pattern, StringComparison.OrdinalIgnoreCase) &&
                 a.Name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase));
@@ -186,13 +187,23 @@ public class InstallCommand : AsyncCommand<InstallSettings>
                 AnsiConsole.MarkupLine($"  [dim]{tool.DisplayName} (v{status.Version}) found at {status.Path}[/]");
             }
 
-            if (allFoundAndMatching)
+            // A bundle of the right version built for another architecture is
+            // replaced too: the x64 tools a Windows on ARM machine got before
+            // the win-arm64 archives existed report the wanted versions.
+            string bundleDir = Path.Combine(toolsPath, releaseAsset);
+            bool otherTarget = BundleTargetDiffers(bundleDir, assetTarget);
+            if (allFoundAndMatching && !otherTarget)
             {
                 continue;
             }
 
+            if (otherTarget)
+            {
+                AnsiConsole.MarkupLine($"  [yellow]{releaseAsset}[/] bundle is not a [green]{assetTarget}[/] build, replacing it.");
+            }
+
             AnsiConsole.Markup($"  Downloading {releaseAsset} ({wantedVersion}) ... ");
-            bool ok = await DownloadAndExtractAsync(asset.DownloadUrl, toolsPath, ext);
+            bool ok = await DownloadAndExtractAsync(asset.DownloadUrl, toolsPath, ext, otherTarget ? bundleDir : null);
             AnsiConsole.MarkupLine(ok ? "[green]OK[/]" : "[red]FAILED[/]");
             if (ok)
             {
@@ -244,15 +255,54 @@ public class InstallCommand : AsyncCommand<InstallSettings>
 
     internal static string GetPlatformTarget()
     {
-        if (OperatingSystem.IsWindows())
+        return GetPlatformTarget(PlatformInfo.CurrentOS, PlatformInfo.IsArm64);
+    }
+
+    /// <summary>The <c>target</c> build-tools.yml names the archives of a machine after.</summary>
+    internal static string GetPlatformTarget(OSPlatform os, bool arm64)
+    {
+        return os switch
         {
-            return "win-x64";
-        }
-        if (OperatingSystem.IsMacOS())
+            OSPlatform.Windows => arm64 ? "win-arm64" : "win-x64",
+            OSPlatform.MacOS => "darwin-arm64",
+            _ => "linux-x64"
+        };
+    }
+
+    // xorriso runs on the MSYS2 runtime, which exists for x64 only: Windows on
+    // ARM takes the win-x64 archive and runs it under its x64 emulation.
+    private static readonly string[] s_x64OnlyOnWindows = ["xorriso"];
+
+    /// <summary>The target whose archive holds <paramref name="releaseAsset"/> for a machine of <paramref name="platform"/>.</summary>
+    internal static string GetAssetTarget(string releaseAsset, string platform)
+    {
+        return platform == "win-arm64" && s_x64OnlyOnWindows.Contains(releaseAsset) ? "win-x64" : platform;
+    }
+
+    /// <summary>
+    /// True when the bundle in <paramref name="bundleDir"/> was built for another target than
+    /// <paramref name="wantedTarget"/>, going by the TARGET stamp build-tools.yml writes beside VERSION.
+    /// A bundle without the stamp predates the win-arm64 archives, so that target is the only one it can differ from.
+    /// </summary>
+    internal static bool BundleTargetDiffers(string bundleDir, string wantedTarget)
+    {
+        if (!Directory.Exists(bundleDir))
         {
-            return "darwin-arm64";
+            return false;
         }
-        return "linux-x64";
+        string stamp = Path.Combine(bundleDir, "TARGET");
+        if (!File.Exists(stamp))
+        {
+            return wantedTarget == "win-arm64";
+        }
+        try
+        {
+            return !string.Equals(File.ReadAllText(stamp).Trim(), wantedTarget, StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -288,15 +338,17 @@ public class InstallCommand : AsyncCommand<InstallSettings>
     //  Download & extract helpers — tar.gz for Unix, zip for Windows
     // ═══════════════════════════════════════════════════════════════════════
 
-    private static async Task<bool> DownloadAndExtractAsync(string url, string targetDir, string ext)
+    // replaceDir: a bundle of another architecture to remove once the archive is
+    // downloaded, so that none of its files stays beside the new ones.
+    private static async Task<bool> DownloadAndExtractAsync(string url, string targetDir, string ext, string? replaceDir = null)
     {
         try
         {
             Directory.CreateDirectory(targetDir);
             return ext switch
             {
-                "zip" => await DownloadAndExtractZipAsync(url, targetDir),
-                "tar.gz" => await DownloadAndExtractTarGzAsync(url, targetDir),
+                "zip" => await DownloadAndExtractZipAsync(url, targetDir, replaceDir),
+                "tar.gz" => await DownloadAndExtractTarGzAsync(url, targetDir, replaceDir),
                 _ => false
             };
         }
@@ -307,13 +359,14 @@ public class InstallCommand : AsyncCommand<InstallSettings>
         }
     }
 
-    private static async Task<bool> DownloadAndExtractZipAsync(string url, string targetDir)
+    private static async Task<bool> DownloadAndExtractZipAsync(string url, string targetDir, string? replaceDir)
     {
         using var http = CreateHttpClient();
         string tempFile = Path.Combine(Path.GetTempPath(), $"cosmos-{Guid.NewGuid():N}.zip");
         try
         {
             await File.WriteAllBytesAsync(tempFile, await http.GetByteArrayAsync(url));
+            RemoveReplacedBundle(replaceDir);
             ZipFile.ExtractToDirectory(tempFile, targetDir, overwriteFiles: true);
             return true;
         }
@@ -326,13 +379,14 @@ public class InstallCommand : AsyncCommand<InstallSettings>
         }
     }
 
-    private static async Task<bool> DownloadAndExtractTarGzAsync(string url, string targetDir)
+    private static async Task<bool> DownloadAndExtractTarGzAsync(string url, string targetDir, string? replaceDir)
     {
         using var http = CreateHttpClient();
         string tempFile = Path.Combine(Path.GetTempPath(), $"cosmos-{Guid.NewGuid():N}.tar.gz");
         try
         {
             await File.WriteAllBytesAsync(tempFile, await http.GetByteArrayAsync(url));
+            RemoveReplacedBundle(replaceDir);
 
             using var proc = Process.Start(new ProcessStartInfo
             {
@@ -356,6 +410,22 @@ public class InstallCommand : AsyncCommand<InstallSettings>
             {
                 File.Delete(tempFile);
             }
+        }
+    }
+
+    private static void RemoveReplacedBundle(string? replaceDir)
+    {
+        if (replaceDir is null || !Directory.Exists(replaceDir))
+        {
+            return;
+        }
+        try
+        {
+            Directory.Delete(replaceDir, recursive: true);
+        }
+        catch
+        {
+            // A file in use stays; the extraction overwrites the rest.
         }
     }
 

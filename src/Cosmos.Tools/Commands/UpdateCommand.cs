@@ -213,8 +213,9 @@ public class UpdateCommand : AsyncCommand<UpdateSettings>
 
         foreach (string releaseAsset in releaseAssets)
         {
+            string assetTarget = InstallCommand.GetAssetTarget(releaseAsset, platform);
             string pattern = $"{releaseAsset}-";
-            string suffix = $"-{platform}.{ext}";
+            string suffix = $"-{assetTarget}.{ext}";
             InstallCommand.ReleaseAsset? asset = assets.FirstOrDefault(a =>
                 a.Name.StartsWith(pattern, StringComparison.OrdinalIgnoreCase) &&
                 a.Name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase));
@@ -227,11 +228,15 @@ public class UpdateCommand : AsyncCommand<UpdateSettings>
 
             if (wanted == null)
             {
-                AnsiConsole.MarkupLine($"  {releaseAsset}: [yellow]no usable {platform} asset in '{InstallCommand.ToolsReleaseTag}'[/]");
+                AnsiConsole.MarkupLine($"  {releaseAsset}: [yellow]no usable {assetTarget} asset in '{InstallCommand.ToolsReleaseTag}'[/]");
             }
             else if (installed == null)
             {
                 AnsiConsole.MarkupLine($"  {releaseAsset}: [dim]no bundle (a matching system tool may be in use)[/] (available: {Markup.Escape(wanted)})");
+            }
+            else if (InstallCommand.BundleTargetDiffers(Path.Combine(toolsPath, releaseAsset), assetTarget))
+            {
+                AnsiConsole.MarkupLine($"  {releaseAsset}: [yellow]{Markup.Escape(installed)}, not a {assetTarget} build[/] -> [green]{Markup.Escape(wanted)}[/]");
             }
             else if (ToolResolver.VersionsMatch(wanted, installed))
             {
