@@ -36,6 +36,7 @@
   <PropertyGroup>
     <CosmosEnableInterrupts Condition="'$(CosmosEnableInterrupts)' == ''">true</CosmosEnableInterrupts>
     <CosmosEnableUART Condition="'$(CosmosEnableUART)' == ''">true</CosmosEnableUART>
+    <CosmosVerboseSerial Condition="'$(CosmosEnableUART)' == ''">true </CosmosVerboseSerial> 
     <CosmosEnablePCI Condition="'$(CosmosEnablePCI)' == ''">true</CosmosEnablePCI>
     <CosmosEnableTimer Condition="'$(CosmosEnableTimer)' == ''">true</CosmosEnableTimer>
     <CosmosEnableKeyboard Condition="'$(CosmosEnableKeyboard)' == ''">true</CosmosEnableKeyboard>

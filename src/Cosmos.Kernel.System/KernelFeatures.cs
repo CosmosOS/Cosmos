@@ -13,6 +13,12 @@ namespace Cosmos.Kernel.System;
 public static class KernelFeatures
 {
     /// <summary>
+    /// Whether serial is outputed as verbose on boot
+    /// (<c>CosmosVerboseSerial</c>).
+    /// </summary>
+    public static bool VerboseSerial => CosmosFeatures.VerboseSerial;
+
+    /// <summary>
     /// Whether interrupt support (IDT/IRQ) is enabled
     /// (<c>CosmosEnableInterrupts</c>). Disabling it also disables Timer,
     /// Keyboard, Mouse, Network, Scheduler, and Graphics.

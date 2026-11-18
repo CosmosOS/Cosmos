@@ -57,8 +57,10 @@ public abstract partial class Kernel
     /// </summary>
     public virtual void Start()
     {
-        Serial.WriteString("[Kernel] Starting kernel...\n");
-
+        if (KernelFeatures.VerboseSerial) {
+            Serial.WriteString("[Kernel] Starting kernel...\n");
+        }
+        
         if (InterruptManager.IsEnabled)
         {
             Serial.WriteString("[Kernel] Enabling interrupts...\n");
