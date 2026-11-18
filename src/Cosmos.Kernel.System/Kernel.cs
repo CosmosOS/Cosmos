@@ -95,21 +95,31 @@ public abstract partial class Kernel
             Serial.WriteString("[Kernel] Starting drivers...\n");
         }
         DriverEngine.Start();
-
-        Serial.WriteString("[Kernel] Calling OnBoot()...\n");
+        if(KernelFeatures.VerboseSerial) {
+            Serial.WriteString("[Kernel] Calling OnBoot()...\n");
+        }
         OnBoot();
 
         EarlyGop.Enabled = false;
 
-        Serial.WriteString("[Kernel] Calling BeforeRun()...\n");
+        if(KernelFeatures.VerboseSerial)
+        {
+            Serial.WriteString("[Kernel] Calling BeforeRun()...\n");
+        }
         BeforeRun();
 
         Started = true;
 
-        Serial.WriteString("[Kernel] Entering main loop...\n");
+        if(KernelFeatures.VerboseSerial)
+        {
+            Serial.WriteString("[Kernel] Entering main loop...\n");
+        }
         while (!Stopped)
         {
-            Serial.WriteString("[Kernel] Calling Run()...\n");
+            if(KernelFeatures.VerboseSerial)
+            {
+                Serial.WriteString("[Kernel] Calling Run()...\n");
+            }
             Run();
             Serial.WriteString("[Kernel] Run() returned\n");
         }
