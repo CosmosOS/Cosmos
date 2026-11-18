@@ -69,6 +69,8 @@ jobs:
           - target: linux-x64
           - target: darwin-arm64
           - target: win-x64
+          - target: win-arm64
+          - target: linux-arm64
     steps:
       - name: Install dependencies
         run: |
@@ -83,6 +85,8 @@ jobs:
             linux-x64)    ARCHIVE="LLVM-${LLVM_VERSION}-Linux-X64.tar.xz" ; EXT="" ;;
             darwin-arm64) ARCHIVE="LLVM-${LLVM_VERSION}-macOS-ARM64.tar.xz" ; EXT="" ;;
             win-x64)      ARCHIVE="clang+llvm-${LLVM_VERSION}-x86_64-pc-windows-msvc.tar.xz" ; EXT=".exe" ;;
+            win-arm64)    ARCHIVE="clang+llbm-${LLVM_VERSION}-aarch64-pc-windows-msvc.tart.xz" ; EXT = ".exe" ;;
+            linux-arm64)  ARCHIVE="LLVM-${LLVM_VERSION}-Linux-ARM64.tar.xz" ; EXT="" ;;
           esac
 
           echo "Downloading ${ARCHIVE}..."
@@ -303,6 +307,10 @@ jobs:
             target: darwin-arm64
           - os: windows-latest
             target: win-x64
+          - os: windows-latest
+            target: win-arm64
+          - os: ubuntu-latest
+            target: linux-arm64
     steps:
       # The image is bare: everything the build uses is named here. The second
       # group is what SDL can drive (X11, Wayland, the sound servers). It is
@@ -613,6 +621,10 @@ jobs:
             target: darwin-arm64
           - os: windows-latest
             target: win-x64
+          - os: windows-latest
+            target: windows-arm64
+          - os: ubuntu-latest
+            target: linux-arm64
     steps:
       # The image is bare: everything the build uses is named here.
       - name: Install dependencies (Linux)
@@ -1078,8 +1090,10 @@ jobs:
 
             ## Platforms
             - `linux-x64` — .tar.gz archives
+            - `linux-arm64` - .tar.gz archives
             - `darwin-arm64` — .tar.gz archives
             - `win-x64` — .zip archives
+            - `win-arm64` - .zip archives
           files: artifacts/*
           draft: false
           prerelease: false
