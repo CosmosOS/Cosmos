@@ -75,7 +75,7 @@ internal static unsafe class GC
             data->_index = info.CollectionIndex;
             data->_generation = info.CondemnedGeneration;
 
-            data->_finalizationPendingCount = GarbageCollector.GetFinalizationPendingCount();
+            data->_finalizationPendingCount = GetFinalizationPendingCount();
 
             // not tracked currently
             data->_pauseTimePercentage = 0;
@@ -143,21 +143,21 @@ internal static unsafe class GC
     [RuntimeExport("RhSuppressFinalize")]
     internal static void RhSuppressFinalize(GCObject* obj)
     {
-        GarbageCollector.SuppressFinalize(obj);
+        SuppressFinalize(obj);
     }
 
     // CoreLib throws OutOfMemoryException when this returns false
     [RuntimeExport("RhReRegisterForFinalize")]
     internal static bool RhReRegisterForFinalize(GCObject* obj)
     {
-        return GarbageCollector.TryRegisterForFinalize(obj);
+        return TryRegisterForFinalize(obj);
     }
 
     [RuntimeExport("RhWaitForPendingFinalizers")]
     internal static void RhWaitForPendingFinalizers(int allowReentrantWait)
     {
         // Waits for the finalizer thread when it is on, runs what is pending otherwise
-        GarbageCollector.WaitPendingFinalizers();
+        WaitPendingFinalizers();
     }
 
     [RuntimeExport("RhGetMaxGcGeneration")]
