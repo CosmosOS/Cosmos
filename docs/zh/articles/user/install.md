@@ -1,5 +1,5 @@
 ---
-source_hash: 000f713f72c347fdc379e62b514e071c4c79b378
+source_hash: 27da10e54747e6c32261d3dcf35a2f37c38aef2c
 ---
 <a id="installation-guide"></a>
 
@@ -133,4 +133,4 @@ cosmos run -a arm64
 
 ## 快速入门
 
-安装完成后，请参阅[内核启动](startup.md)，创建你的第一个内核并了解启动流程。
+安装完成后，请参阅[内核启动](startup.md)，创建你的第一个内核并了解启动流程。如果想用 Visual Basic 编写内核，请参阅 [Visual Basic 内核](visual-basic.md)。

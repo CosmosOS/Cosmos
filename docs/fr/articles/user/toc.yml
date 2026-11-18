@@ -1,8 +1,10 @@
-# source_hash: e905e44e3f709c0700bf2c6f40e4fb4374eb361d
+# source_hash: b180fc5564fb6fde1bc3bbe4ee829e66cbae0809
 - name: Guide d'installation
   href: install.md
 - name: Démarrage du noyau
   href: startup.md
+- name: Noyaux en Visual Basic
+  href: visual-basic.md
 - name: Système de fichiers
   href: filesystem.md
 - name: Réseau

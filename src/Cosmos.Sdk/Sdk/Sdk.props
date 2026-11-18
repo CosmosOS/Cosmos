@@ -14,6 +14,11 @@
          which drivers the build registered. A project that sets the property
          itself keeps its value. -->
     <EmitCompilerGeneratedFiles Condition="'$(EmitCompilerGeneratedFiles)' == ''">true</EmitCompilerGeneratedFiles>
+    <!-- A Visual Basic kernel: late binding finds members through reflection at
+         run time, which a NativeAOT kernel cannot count on, so Option Strict
+         makes it a build error. Set here, before the Visual Basic props default
+         it to Off; C# ignores it. -->
+    <OptionStrict Condition="'$(OptionStrict)' == ''">On</OptionStrict>
 
     <!-- We require Microsoft.NET.Sdk for building propertly -->
     <_ImportMicrosoftNETSdkFromCosmosSdk Condition=" '$(UsingMicrosoftNETSdk)' == '' ">true</_ImportMicrosoftNETSdkFromCosmosSdk>

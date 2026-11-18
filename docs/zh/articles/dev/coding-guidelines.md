@@ -1,5 +1,5 @@
 ---
-source_hash: 3d6ca8c1e4ec7573ec9b1b87b3e5cee879b2e2f5
+source_hash: 58faad776dc2851c0a242283fccfa46542d02f05
 ---
 <a id="coding-guidelines"></a>
 
@@ -163,7 +163,7 @@ Scheduler/
 
 ### 命名空间与文件夹一致
 
-文件的命名空间是其项目名称加上项目与文件之间的各级文件夹：`Cosmos.Kernel.Core/Scheduler/SchedulerThread.cs` 声明的是 `Cosmos.Kernel.Core.Scheduler`。构建通过错误级别的 IDE0130 对所有 `src/Cosmos.Kernel*` 项目、测试内核、`tests/Cosmos.Kernel.Tests.System` 中的主机端单元测试以及 `examples/DevKernel` 强制执行这一点，因此偏离规则的文件会让 `dotnet build` 失败（格式检查 CI 检查的是 `cosmos.slnx` 中的项目，其中不包含测试内核）。请移动文件或修正命名空间，而不是添加豁免。各项豁免及其理由列在 `.editorconfig` 的末尾：ILC 按完整名称匹配的名称（每个 `LibraryInitializer`、`EagerStaticClassConstructionAttribute`、`Core/Runtime/Stdllib.cs`），源代码生成器的 `IsExternalInit`（C# 编译器的 init 访问器标识，必须位于 `System.Runtime.CompilerServices` 中），`Bridge/Import` 和 `Bridge/Export` 文件夹（其中的文件共用项目的 `Bridge` 命名空间），`Cosmos.Kernel.System/ThirdParty/` 下引入的第三方代码，以及 `Cosmos.Kernel.Core/Runtime/Internal/` 下的 dotnet/runtime 镜像代码。IDE0130 不检查包含跨文件分部类型的命名空间（每个 `[LibraryImport]` 类都属于这种情况），也不检查嵌套命名空间；这些命名空间同样遵循该规则，只是不受检查。
+文件的命名空间是其项目名称加上项目与文件之间的各级文件夹：`Cosmos.Kernel.Core/Scheduler/SchedulerThread.cs` 声明的是 `Cosmos.Kernel.Core.Scheduler`。构建通过错误级别的 IDE0130 对所有 `src/Cosmos.Kernel*` 项目、测试内核、`tests/Cosmos.Kernel.Tests.System` 中的主机端单元测试以及 `examples` 下的 C# 内核强制执行这一点，因此偏离规则的文件会让 `dotnet build` 失败（格式检查 CI 检查的是 `cosmos.slnx` 中的项目，其中不包含测试内核）。请移动文件或修正命名空间，而不是添加豁免。各项豁免及其理由列在 `.editorconfig` 的末尾：ILC 按完整名称匹配的名称（每个 `LibraryInitializer`、`EagerStaticClassConstructionAttribute`、`Core/Runtime/Stdllib.cs`），源代码生成器的 `IsExternalInit`（C# 编译器的 init 访问器标识，必须位于 `System.Runtime.CompilerServices` 中），`Bridge/Import` 和 `Bridge/Export` 文件夹（其中的文件共用项目的 `Bridge` 命名空间），`Cosmos.Kernel.System/ThirdParty/` 下引入的第三方代码，以及 `Cosmos.Kernel.Core/Runtime/Internal/` 下的 dotnet/runtime 镜像代码。IDE0130 不检查包含跨文件分部类型的命名空间（每个 `[LibraryImport]` 类都属于这种情况），也不检查嵌套命名空间；这些命名空间同样遵循该规则，只是不受检查。
 
 <a id="driver-folders"></a>
 

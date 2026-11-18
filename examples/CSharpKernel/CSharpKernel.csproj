@@ -1,0 +1,15 @@
+<Project Sdk="Cosmos.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <!-- Core kernel packages (resolved from local-packages NuGet source set up by `make setup`).
+       Versions are managed centrally in Directory.Packages.props. -->
+  <ItemGroup>
+    <PackageReference Include="Cosmos.Kernel" />
+    <PackageReference Include="Cosmos.Kernel.System" />
+  </ItemGroup>
+
+</Project>

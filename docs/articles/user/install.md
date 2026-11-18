@@ -118,4 +118,4 @@ Each extension creates, builds, runs and debugs a kernel from the IDE, and can c
 
 ## Quick Start
 
-Once installed, see [Kernel Startup](startup.md) to create your first kernel and learn the boot flow.
+Once installed, see [Kernel Startup](startup.md) to create your first kernel and learn the boot flow. To write it in Visual Basic, see [Visual Basic kernels](visual-basic.md).

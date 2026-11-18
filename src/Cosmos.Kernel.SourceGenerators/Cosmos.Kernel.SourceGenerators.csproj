@@ -35,7 +35,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+    <!-- The generators read symbols and options alone, so they reference no
+         language's compiler and run in C# and Visual Basic kernels alike. -->
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" PrivateAssets="all" />
   </ItemGroup>
   
   <ItemGroup>
@@ -52,7 +54,7 @@
   <Target Name="_AddAnalyzersToOutput">
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(OutputPath)/*.dll" PackagePath="analyzers/dotnet/cs" />
-
+      <TfmSpecificPackageFile Include="$(OutputPath)/*.dll" PackagePath="analyzers/dotnet/vb" />
     </ItemGroup>
   </Target>
 </Project>

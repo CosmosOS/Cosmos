@@ -1,5 +1,5 @@
 ---
-source_hash: 2bad57cfc5819f387da608190853fc35b52a1fd8
+source_hash: f55e8cd55cc32270cb4fd4711a588f54b32cb173
 ---
 <a id="gen2gen3-feature-comparison"></a>
 
@@ -25,6 +25,7 @@ source_hash: 2bad57cfc5819f387da608190853fc35b52a1fd8
 | 键盘输入 | ✅ | ✅ | PS/2（x64）、virtio 和 USB 键盘，均以驱动工具包驱动程序的形式实现 |
 | 鼠标输入 | ✅ | ✅ | PS/2（x64）、virtio 和 USB 鼠标，均以驱动工具包驱动程序的形式实现 |
 | 音频接口 | 🟡 | ✅ | Intel HD Audio：WAV 播放、生成的音频流和 `Console.Beep`。仅支持播放，每个输出一个流。 |
+| Visual Basic 内核 | ✅ | ✅ | `cosmos new -l vb` 以及三个 IDE 扩展。声明了 span 的类需要写在 C# 类库中（[Visual Basic 内核](articles/user/visual-basic.md)）。 |
 
 <a id="additional-gen3-features"></a>
 

@@ -399,7 +399,10 @@ jobs:
       - name: 🔍 Verify Tools Installation
         run: cosmos check
 
-      - name: Build ISO for ${{ matrix.arch }}
+      # The same minimal kernel in each language (examples/CSharpKernel and
+      # examples/VisualBasicKernel), one step each so a red step names the
+      # language, each published to a folder of its own.
+      - name: Build C# ISO for ${{ matrix.arch }}
         shell: pwsh
         run: |
           if ("${{ matrix.arch }}" -eq "arm64") {
@@ -407,23 +410,41 @@ jobs:
           } else {
             $ARCH_DEFINE = "ARCH_X64"
           }
-          dotnet publish -c Debug -r ${{ matrix.rid }} -p:DefineConstants=$ARCH_DEFINE -p:CosmosArch=${{ matrix.arch }} --verbosity detailed ./examples/DevKernel/DevKernel.csproj -o ./output-${{ matrix.arch }}
+          dotnet publish -c Debug -r ${{ matrix.rid }} -p:DefineConstants=$ARCH_DEFINE -p:CosmosArch=${{ matrix.arch }} --verbosity detailed ./examples/CSharpKernel/CSharpKernel.csproj -o ./output-${{ matrix.arch }}/CSharpKernel
+
+      - name: Build Visual Basic ISO for ${{ matrix.arch }}
+        shell: pwsh
+        run: |
+          if ("${{ matrix.arch }}" -eq "arm64") {
+            $ARCH_DEFINE = "ARCH_ARM64"
+          } else {
+            $ARCH_DEFINE = "ARCH_X64"
+          }
+          dotnet publish -c Debug -r ${{ matrix.rid }} -p:DefineConstants=$ARCH_DEFINE -p:CosmosArch=${{ matrix.arch }} --verbosity detailed ./examples/VisualBasicKernel/VisualBasicKernel.vbproj -o ./output-${{ matrix.arch }}/VisualBasicKernel
 
       - name: 🕵️‍♂️ Verify Output
         shell: pwsh
         run: |
-          if (Test-Path "./output-${{ matrix.arch }}/DevKernel.iso") {
-              Write-Host "ISO exists for ${{ matrix.arch }}"
-          } else {
-              Write-Error "ISO missing for ${{ matrix.arch }}"
-              exit 1
-           }
+          foreach ($kernel in "CSharpKernel", "VisualBasicKernel") {
+              if (Test-Path "./output-${{ matrix.arch }}/$kernel/$kernel.iso") {
+                  Write-Host "$kernel ISO exists for ${{ matrix.arch }}"
+              } else {
+                  Write-Error "$kernel ISO missing for ${{ matrix.arch }}"
+                  exit 1
+              }
+          }
 
-      - name: 📤 Upload ISO
+      - name: 📤 Upload C# ISO
         uses: actions/upload-artifact@v4
         with:
-          name: DevKernel-ISO-${{ github.job }}-${{ matrix.os }}-${{ matrix.arch }}-${{ github.run_number }}
-          path: ./output-${{ matrix.arch }}/DevKernel.iso
+          name: CSharpKernel-ISO-${{ github.job }}-${{ matrix.os }}-${{ matrix.arch }}-${{ github.run_number }}
+          path: ./output-${{ matrix.arch }}/CSharpKernel/CSharpKernel.iso
+
+      - name: 📤 Upload Visual Basic ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: VisualBasicKernel-ISO-${{ github.job }}-${{ matrix.os }}-${{ matrix.arch }}-${{ github.run_number }}
+          path: ./output-${{ matrix.arch }}/VisualBasicKernel/VisualBasicKernel.iso
 
   macos-iso-tests:
     name: Run ISO Build Tests - macOS (${{ matrix.arch }})
@@ -463,21 +484,46 @@ jobs:
       - name: 🔍 Verify Tools Installation
         run: cosmos check
 
-      - name: Build ISO for ${{ matrix.arch }}
+      # The same minimal kernel in each language (examples/CSharpKernel and
+      # examples/VisualBasicKernel), one step each so a red step names the
+      # language, each published to a folder of its own.
+      - name: Build C# ISO for ${{ matrix.arch }}
         run: |
           if [ "${{ matrix.arch }}" = "arm64" ]; then
             ARCH_DEFINE="ARCH_ARM64"
           else
             ARCH_DEFINE="ARCH_X64"
           fi
-          dotnet publish -c Debug -r ${{ matrix.rid }} -p:DefineConstants="$ARCH_DEFINE" -p:CosmosArch=${{ matrix.arch }} --verbosity detailed ./examples/DevKernel/DevKernel.csproj -o ./output-${{ matrix.arch }}
+          dotnet publish -c Debug -r ${{ matrix.rid }} -p:DefineConstants="$ARCH_DEFINE" -p:CosmosArch=${{ matrix.arch }} --verbosity detailed ./examples/CSharpKernel/CSharpKernel.csproj -o ./output-${{ matrix.arch }}/CSharpKernel
+
+      - name: Build Visual Basic ISO for ${{ matrix.arch }}
+        run: |
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
+            ARCH_DEFINE="ARCH_ARM64"
+          else
+            ARCH_DEFINE="ARCH_X64"
+          fi
+          dotnet publish -c Debug -r ${{ matrix.rid }} -p:DefineConstants="$ARCH_DEFINE" -p:CosmosArch=${{ matrix.arch }} --verbosity detailed ./examples/VisualBasicKernel/VisualBasicKernel.vbproj -o ./output-${{ matrix.arch }}/VisualBasicKernel
 
       - name: 🕵️‍♂️ Verify Output
         run: |
-          [ -f ./output-${{ matrix.arch }}/DevKernel.iso ] && echo "ISO exists for ${{ matrix.arch }}" || (echo "ISO missing for ${{ matrix.arch }}" && exit 1)
+          for kernel in CSharpKernel VisualBasicKernel; do
+            if [ -f "./output-${{ matrix.arch }}/$kernel/$kernel.iso" ]; then
+              echo "$kernel ISO exists for ${{ matrix.arch }}"
+            else
+              echo "$kernel ISO missing for ${{ matrix.arch }}"
+              exit 1
+            fi
+          done
 
-      - name: 📤 Upload ISO
+      - name: 📤 Upload C# ISO
         uses: actions/upload-artifact@v4
         with:
-          name: DevKernel-ISO-macOS-${{ matrix.arch }}-${{ github.run_number }}
-          path: ./output-${{ matrix.arch }}/DevKernel.iso
+          name: CSharpKernel-ISO-macOS-${{ matrix.arch }}-${{ github.run_number }}
+          path: ./output-${{ matrix.arch }}/CSharpKernel/CSharpKernel.iso
+
+      - name: 📤 Upload Visual Basic ISO
+        uses: actions/upload-artifact@v4
+        with:
+          name: VisualBasicKernel-ISO-macOS-${{ matrix.arch }}-${{ github.run_number }}
+          path: ./output-${{ matrix.arch }}/VisualBasicKernel/VisualBasicKernel.iso

@@ -1,6 +1,6 @@
 ---
 _layout: landing
-source_hash: 7277f6b5f33ef20c90622f8945755ecf24727d45
+source_hash: 5bb13135b097a90a65aaa94f2e04f2ea0e6a18b8
 ---
 
 欢迎来到 Cosmos gen3 wiki！
@@ -20,6 +20,7 @@ source_hash: 7277f6b5f33ef20c90622f8945755ecf24727d45
 
  - [安装指南](articles/user/install.md)：配置工具链，并在 VS Code 中创建你的第一个内核。
  - [内核启动](articles/user/startup.md)：启动链以及 `BeforeRun`/`Run`/`AfterRun` 生命周期。
+ - [Visual Basic 内核](articles/user/visual-basic.md)：用 Visual Basic 编写内核，并用一个 C# 类库存放少数需要声明 span 的类。
  - [文件系统](articles/user/filesystem.md)：挂载磁盘，并使用标准 .NET `System.IO` API（`File`、`Directory`、流）。
  - [网络](articles/user/network.md)：通过标准 .NET `System.Net.Sockets` API 使用 DHCP、UDP 和 TCP，以及 DNS。
  - [定时器与闹钟](articles/user/timers.md)：阻塞一段时间，或稍后从定时器中断（`TimerManager`）或内核线程（`AlarmManager`）中运行回调。

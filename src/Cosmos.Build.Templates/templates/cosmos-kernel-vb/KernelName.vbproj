@@ -1,0 +1,14 @@
+<Project Sdk="Cosmos.Sdk/@CosmosPackageVersion@">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <!-- Core kernel packages -->
+  <ItemGroup>
+    <PackageReference Include="Cosmos.Kernel" Version="@CosmosPackageVersion@" />
+    <PackageReference Include="Cosmos.Kernel.System" Version="@CosmosPackageVersion@" />
+  </ItemGroup>
+
+</Project>

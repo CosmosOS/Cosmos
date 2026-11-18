@@ -1,16 +1,16 @@
 // This code is licensed under the BSD 3-Clause license (see LICENSE for details)
 
-using System.Text;
 using Microsoft.CodeAnalysis;
 
 namespace Cosmos.Kernel.SourceGenerators;
 
 /// <summary>
 /// Turns the discovered driver candidates and the kernel's policy into the
-/// text of <c>DriverManifest.g.cs</c>, reporting what was left out and why.
-/// The kernel's own drivers come first, in declaration order (file path,
-/// then position), then the referenced assemblies' drivers as
-/// <see cref="DriverDiscovery.FromReferences"/> sorted them.
+/// drivers the manifest registers, reporting what was left out and why; the
+/// kernel's <see cref="SourceWriter"/> spells them. The kernel's own drivers
+/// come first, in declaration order (file path, then position), then the
+/// referenced assemblies' drivers as <see cref="DriverDiscovery.FromReferences"/>
+/// sorted them.
 /// </summary>
 internal static class DriverManifestBuilder
 {
@@ -23,50 +23,29 @@ internal static class DriverManifestBuilder
     private static readonly char[] s_listSeparators = [',', ';'];
     private const string ExcludeItemName = "CosmosDriverExclude";
     private const string IncludeItemName = "CosmosDriverInclude";
-    private const string RegistryType = "global::Cosmos.Kernel.HAL.DriverKit.DriverRegistry";
 
     /// <summary>
-    /// The registry is on the experimental driver kit seam, and the drivers
-    /// the kernel carries by default arrive with the aggregator package, so
-    /// every kernel's manifest names it. The kernel author did not write this
-    /// file, so it acknowledges the seam for itself alone: a driver the
-    /// kernel declares still meets the diagnostic in the author's own code.
-    /// </summary>
-    private const string SeamAcknowledgement =
-        "// The driver registry is on the experimental driver kit seam (COSMOS0003).\n"
-        + "// This file is generated, so it acknowledges the seam for itself alone;\n"
-        + "// a driver this kernel declares still meets the diagnostic in its own code.\n"
-        + "#pragma warning disable COSMOS0003\n";
-    private const string FeaturesType = "global::Cosmos.Kernel.System.KernelFeatures";
-
-    /// <summary>
-    /// Builds the manifest source. Policy is applied first, so a driver the
-    /// kernel excludes or does not opt into is never inspected; a driver that
-    /// would be registered but cannot be is reported and dropped.
+    /// Selects the drivers the manifest registers, in manifest order. Policy
+    /// is applied first, so a driver the kernel excludes or does not opt into
+    /// is never inspected; a driver that would be registered but cannot be is
+    /// reported and dropped.
     /// </summary>
     /// <param name="context">Receives the diagnostics.</param>
     /// <param name="options">The kernel's policy lists.</param>
     /// <param name="sourceDrivers">Candidates from the kernel's own source, in any order.</param>
     /// <param name="referencedDrivers">Candidates from referenced assemblies, already sorted.</param>
-    /// <param name="generatedCodeAttribute">The attribute line stamped on the generated class.</param>
-    public static string Build(
+    public static List<DriverCandidate> Build(
         SourceProductionContext context,
         GeneratorOptions options,
         EquatableArray<DriverCandidate> sourceDrivers,
-        EquatableArray<DriverCandidate> referencedDrivers,
-        string generatedCodeAttribute)
+        EquatableArray<DriverCandidate> referencedDrivers)
     {
         List<DriverCandidate> ordered = new(sourceDrivers.Count + referencedDrivers.Count);
         ordered.AddRange(sourceDrivers);
         ordered.Sort(CompareSource);
         ordered.AddRange(referencedDrivers);
 
-        HashSet<string> known = new(StringComparer.Ordinal);
-        foreach (DriverCandidate candidate in ordered)
-        {
-            known.Add(candidate.FullName);
-        }
-
+        HashSet<string> known = new(ordered.Select(static candidate => candidate.FullName), StringComparer.Ordinal);
         HashSet<string> excluded = ParseList(options.ExcludeList);
         HashSet<string> included = ParseList(options.IncludeList);
         ReportUnknown(context, known, excluded, ExcludeItemName);
@@ -109,7 +88,7 @@ internal static class DriverManifestBuilder
             registered.Add(candidate);
         }
 
-        return Write(registered, generatedCodeAttribute);
+        return registered;
     }
 
     private static int CompareSource(DriverCandidate left, DriverCandidate right)
@@ -120,33 +99,15 @@ internal static class DriverManifestBuilder
 
     private static HashSet<string> ParseList(string list)
     {
-        HashSet<string> names = new(StringComparer.Ordinal);
-        foreach (string part in list.Split(s_listSeparators))
-        {
-            string name = part.Trim();
-            if (name.Length != 0)
-            {
-                names.Add(name);
-            }
-        }
-
-        return names;
+        return new HashSet<string>(
+            list.Split(s_listSeparators).Select(static part => part.Trim()).Where(static name => name.Length != 0),
+            StringComparer.Ordinal);
     }
 
     private static void ReportUnknown(SourceProductionContext context, HashSet<string> known, HashSet<string> names, string itemName)
     {
-        List<string> unknown = new();
-        foreach (string name in names)
-        {
-            if (!known.Contains(name))
-            {
-                unknown.Add(name);
-            }
-        }
-
         // Sorted so the order of the warnings does not depend on hashing.
-        unknown.Sort(string.CompareOrdinal);
-        foreach (string name in unknown)
+        foreach (string name in names.Where(name => !known.Contains(name)).OrderBy(static name => name, StringComparer.Ordinal))
         {
             context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.PolicyNameUnknown, Location.None, itemName, name));
         }
@@ -162,32 +123,4 @@ internal static class DriverManifestBuilder
         DriverSkipReason.Inaccessible => "the class is not accessible from the kernel assembly",
         _ => "the class cannot be constructed by the manifest",
     };
-
-    private static string Write(List<DriverCandidate> registered, string generatedCodeAttribute)
-    {
-        StringBuilder builder = new();
-        builder.Append("// <auto-generated/>\n");
-        builder.Append(SeamAcknowledgement);
-        builder.Append("namespace Cosmos.Kernel.System.Internal;\n\n");
-        builder.Append("/// <summary>The drivers this kernel carries, registered in manifest order before the kernel starts.</summary>\n");
-        builder.Append(generatedCodeAttribute).Append('\n');
-        builder.Append("internal static class DriverManifest\n{\n");
-        builder.Append("    /// <summary>Registers every driver the manifest lists with the driver registry.</summary>\n");
-        builder.Append("    public static void Register()\n    {\n");
-        foreach (DriverCandidate candidate in registered)
-        {
-            if (candidate.FeatureGuard is null)
-            {
-                builder.Append("        ").Append(RegistryType).Append(".Register(new global::").Append(candidate.FullName).Append("());\n");
-                continue;
-            }
-
-            builder.Append("        if (").Append(FeaturesType).Append('.').Append(candidate.FeatureGuard).Append(")\n        {\n");
-            builder.Append("            ").Append(RegistryType).Append(".Register(new global::").Append(candidate.FullName).Append("());\n");
-            builder.Append("        }\n");
-        }
-
-        builder.Append("    }\n}\n");
-        return builder.ToString();
-    }
 }

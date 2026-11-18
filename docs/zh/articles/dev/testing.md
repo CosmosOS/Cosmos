@@ -1,5 +1,5 @@
 ---
-source_hash: b9cbb8aeb98722a2ae3c92e34ff6ccc51a282da8
+source_hash: dbd89e6da371d74a2a6150940aa76a326c1c2c29
 ---
 <a id="testing"></a>
 
@@ -43,7 +43,7 @@ dotnet test tests/Cosmos.Kernel.Tests.System      # the kernel library tests
   - `LoadPlugs_ShouldIgnoreClassesWithoutPlugAttribute`
   - `LoadPlugs_ShouldHandleOptionalPlugs`
   - `FindPluggedAssemblies_ShouldReturnMatchingAssemblies`
-- **Cosmos.Tests.SourceGenerators**：在内存中的编译上运行 `CosmosEntryPointGenerator` 和 `DriverManifestGenerator`，并精确检查生成的入口点、驱动程序清单和 `COSMOSGEN` 诊断；`FeatureParityTests` 使 `DriverFeature`、`KernelFeatures` 和测试桩保持一致，`ReferencedDriverTests` 覆盖来自被引用程序集的驱动程序，包括公共驱动程序和通过 `InternalsVisibleTo` 授权访问的驱动程序，`CachingTests` 检查添加驱动程序后入口点仍保持缓存。
+- **Cosmos.Tests.SourceGenerators**：在内存中的编译上运行 `CosmosEntryPointGenerator` 和 `DriverManifestGenerator`，并精确检查生成的入口点、驱动程序清单和 `COSMOSGEN` 诊断；`FeatureParityTests` 使 `DriverFeature`、`KernelFeatures` 和测试桩保持一致，`ReferencedDriverTests` 覆盖来自被引用程序集的驱动程序，包括公共驱动程序和通过 `InternalsVisibleTo` 授权访问的驱动程序，`VisualBasicTests` 检查 Visual Basic 内核得到的 Visual Basic 文件，`CachingTests` 检查添加驱动程序后入口点仍保持缓存。
 - **Cosmos.Tests.Patcher**：确保 plug 被成功应用到目标方法和类型上。
   - `PatchAssembly_ShouldSkipWhenNoMatchingPlugs`
   - `PatchObjectWithAThis_ShouldPlugInstanceCorrectly`
