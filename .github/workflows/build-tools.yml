@@ -84,7 +84,7 @@ jobs:
             linux-x64)    ARCHIVE="LLVM-${LLVM_VERSION}-Linux-X64.tar.xz" ; EXT="" ;;
             darwin-arm64) ARCHIVE="LLVM-${LLVM_VERSION}-macOS-ARM64.tar.xz" ; EXT="" ;;
             win-x64)      ARCHIVE="clang+llvm-${LLVM_VERSION}-x86_64-pc-windows-msvc.tar.xz" ; EXT=".exe" ;;
-            win-arm64)    ARCHIVE="clang+llbm-${LLVM_VERSION}-aarch64-pc-windows-msvc.tart.xz" ; EXT = ".exe" ;;
+            win-arm64)    ARCHIVE="clang+llvm-${LLVM_VERSION}-aarch64-pc-windows-msvc.tar.xz" ; EXT=".exe" ;;
           esac
 
           echo "Downloading ${ARCHIVE}..."
@@ -159,11 +159,10 @@ jobs:
 
       - name: Package
         run: |
-          if [ "${{ matrix.target }}" = "win-x64" ]; then
-            cd pkg && zip -r ../llvm-tools-${LLVM_VERSION}-${{ matrix.target }}.zip llvm-tools
-          else
-            tar czf llvm-tools-${LLVM_VERSION}-${{ matrix.target }}.tar.gz -C pkg llvm-tools
-          fi
+          case "${{ matrix.target }}" in
+            win-*) cd pkg && zip -r ../llvm-tools-${LLVM_VERSION}-${{ matrix.target }}.zip llvm-tools ;;
+            *)     tar czf llvm-tools-${LLVM_VERSION}-${{ matrix.target }}.tar.gz -C pkg llvm-tools ;;
+          esac
 
       - uses: actions/upload-artifact@v4
         with:
@@ -305,8 +304,16 @@ jobs:
             target: darwin-arm64
           - os: windows-latest
             target: win-x64
-          - os: windows-latest
+            msystem: UCRT64
+            mingw: mingw-w64-ucrt-x86_64
+            cc: gcc
+          # Windows on ARM: an ARM64 runner and CLANGARM64, the one MSYS2
+          # environment with ARM64 packages. Its compiler is clang.
+          - os: windows-11-arm
             target: win-arm64
+            msystem: CLANGARM64
+            mingw: mingw-w64-clang-aarch64
+            cc: clang
     steps:
       # The image is bare: everything the build uses is named here. The second
       # group is what SDL can drive (X11, Wayland, the sound servers). It is
@@ -348,24 +355,25 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install glib pixman ninja python pkg-config libslirp sdl2 dtc
 
-      # UCRT64 is the environment MSYS2 builds for: MINGW64 is deprecated and
-      # has started to lose packages (libslirp is gone from it).
+      # UCRT64 is the environment MSYS2 builds for on x64: MINGW64 is deprecated
+      # and has started to lose packages (libslirp is gone from it). The
+      # matrix names the environment, its package prefix and its compiler.
       - name: Setup MSYS2 (Windows)
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
         with:
-          msystem: UCRT64
+          msystem: ${{ matrix.msystem }}
           install: >-
-            mingw-w64-ucrt-x86_64-gcc
-            mingw-w64-ucrt-x86_64-glib2
-            mingw-w64-ucrt-x86_64-pixman
-            mingw-w64-ucrt-x86_64-libslirp
-            mingw-w64-ucrt-x86_64-ninja
-            mingw-w64-ucrt-x86_64-python
-            mingw-w64-ucrt-x86_64-pkgconf
-            mingw-w64-ucrt-x86_64-meson
-            mingw-w64-ucrt-x86_64-SDL2
-            mingw-w64-ucrt-x86_64-dtc
+            ${{ matrix.mingw }}-${{ matrix.cc }}
+            ${{ matrix.mingw }}-glib2
+            ${{ matrix.mingw }}-pixman
+            ${{ matrix.mingw }}-libslirp
+            ${{ matrix.mingw }}-ninja
+            ${{ matrix.mingw }}-python
+            ${{ matrix.mingw }}-pkgconf
+            ${{ matrix.mingw }}-meson
+            ${{ matrix.mingw }}-SDL2
+            ${{ matrix.mingw }}-dtc
             make flex bison diffutils git
 
       - name: Download QEMU source
@@ -419,12 +427,19 @@ jobs:
         if: runner.os == 'Windows'
         shell: msys2 {0}
         run: |
+          PLATFORM_FLAGS=()
+          if [ "${{ matrix.target }}" = "win-arm64" ]; then
+            # The guest agent, which this job never builds, makes configure
+            # look for windmc, and LLVM has no such tool.
+            PLATFORM_FLAGS=(--disable-guest-agent)
+          fi
           cd qemu-${{ env.QEMU_VERSION }}
           ./configure \
             --target-list=x86_64-softmmu,aarch64-softmmu \
             --enable-slirp \
             --enable-sdl \
-            --disable-docs
+            --disable-docs \
+            "${PLATFORM_FLAGS[@]}"
           # Build only the binaries we need (skip tests — broken on Windows mingw)
           ninja -C build -j$(nproc) qemu-system-x86_64.exe qemu-system-aarch64.exe qemu-img.exe
 
@@ -617,8 +632,16 @@ jobs:
             target: darwin-arm64
           - os: windows-latest
             target: win-x64
-          - os: windows-latest
-            target: windows-arm64
+            msystem: UCRT64
+            mingw: mingw-w64-ucrt-x86_64
+            cc: gcc
+          # Windows on ARM: an ARM64 runner and CLANGARM64, the one MSYS2
+          # environment with ARM64 packages. Its compiler is clang.
+          - os: windows-11-arm
+            target: win-arm64
+            msystem: CLANGARM64
+            mingw: mingw-w64-clang-aarch64
+            cc: clang
     steps:
       # The image is bare: everything the build uses is named here.
       - name: Install dependencies (Linux)
@@ -648,20 +671,20 @@ jobs:
         if: runner.os == 'macOS'
         run: brew install gmp mpfr expat libxml2 texinfo python@${PYTHON_VERSION}
 
-      # UCRT64, as for QEMU: MINGW64 is deprecated.
+      # The environment the matrix names, as for QEMU.
       - name: Setup MSYS2 (Windows)
         if: runner.os == 'Windows'
         uses: msys2/setup-msys2@v2
         with:
-          msystem: UCRT64
+          msystem: ${{ matrix.msystem }}
           install: >-
-            mingw-w64-ucrt-x86_64-gcc
-            mingw-w64-ucrt-x86_64-gmp
-            mingw-w64-ucrt-x86_64-mpfr
-            mingw-w64-ucrt-x86_64-expat
-            mingw-w64-ucrt-x86_64-libxml2
-            mingw-w64-ucrt-x86_64-pkgconf
-            mingw-w64-ucrt-x86_64-python
+            ${{ matrix.mingw }}-${{ matrix.cc }}
+            ${{ matrix.mingw }}-gmp
+            ${{ matrix.mingw }}-mpfr
+            ${{ matrix.mingw }}-expat
+            ${{ matrix.mingw }}-libxml2
+            ${{ matrix.mingw }}-pkgconf
+            ${{ matrix.mingw }}-python
             make texinfo bison flex
 
       - name: Download GDB source (Unix)
@@ -754,6 +777,18 @@ jobs:
         shell: msys2 {0}
         run: |
           cd gdb-${GDB_VERSION}
+          PLATFORM_FLAGS=()
+          if [ "${{ matrix.target }}" = "win-arm64" ]; then
+            # GDB learns the Windows on ARM host in 18.1. Before that it takes
+            # its POSIX host code there, whose event loop is a plain select(),
+            # which Windows offers for sockets only. This is the entry 18.1
+            # adds to configure.host; it goes away with a move to GDB 18.
+            sed -i '/^aarch64\*-\*-freebsd\*)/a aarch64*-*-mingw*)\tgdb_host=mingw64a\n\t\t\tgdb_host_obs=mingw-hdep.o\n\t\t\t;;' gdb/configure.host
+            grep -q '^aarch64\*-\*-mingw\*)' gdb/configure.host
+            # The host is named: config.guess would run in MSYS2's own shell,
+            # which is an x64 program on this runner too.
+            PLATFORM_FLAGS=(--build=aarch64-w64-mingw32 --host=aarch64-w64-mingw32)
+          fi
           # See Linux/macOS step: --target=x86_64-pc-linux-gnu makes gdb
           # a cross-debugger (so configure doesn't try native Windows
           # debugging, which has its own complications); --enable-targets=all
@@ -773,7 +808,8 @@ jobs:
             --disable-sim \
             --disable-gdbserver \
             --with-python="${MINGW_PREFIX}/bin/python3" \
-            --without-guile
+            --without-guile \
+            "${PLATFORM_FLAGS[@]}"
           make -j$(nproc)
           strip gdb/gdb.exe
 
@@ -1086,7 +1122,7 @@ jobs:
             - `linux-x64` — .tar.gz archives
             - `darwin-arm64` — .tar.gz archives
             - `win-x64` — .zip archives
-            - `win-arm64` - .zip archives
+            - `win-arm64` - .zip archives of LLVM, QEMU and GDB. xorriso has no ARM64 build: Windows on ARM runs the `win-x64` one.
           files: artifacts/*
           draft: false
           prerelease: false
