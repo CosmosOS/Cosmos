@@ -18,6 +18,10 @@ public class InstallSettings : CommandSettings
     [Description("Bundle all tools into DIR for offline installer packaging")]
     public string? Setup { get; set; }
 
+    [CommandOption("--arch <ARCH>")]
+    [Description("With --setup: architecture of the Windows machines the installer is for (x64, arm64). Defaults to this machine's")]
+    public string? Arch { get; set; }
+
     [CommandOption("--tools")]
     [Description("Only install system tools (QEMU, clang, lld, xorriso) from the Cosmos tools release")]
     public bool Tools { get; set; }
@@ -25,6 +29,19 @@ public class InstallSettings : CommandSettings
     [CommandOption("--packages")]
     [Description("Only install Cosmos dotnet tools, templates, and VS Code extension")]
     public bool Packages { get; set; }
+
+    public override ValidationResult Validate()
+    {
+        if (Arch is not null && Setup is null)
+        {
+            return ValidationResult.Error("--arch only applies to --setup");
+        }
+        if (Arch is not (null or "x64" or "arm64"))
+        {
+            return ValidationResult.Error("--arch must be x64 or arm64");
+        }
+        return ValidationResult.Success();
+    }
 }
 
 public class InstallCommand : AsyncCommand<InstallSettings>
@@ -766,7 +783,15 @@ public class InstallCommand : AsyncCommand<InstallSettings>
         }
 
         string baseDir = Path.GetFullPath(settings.Setup!);
+        string arch = settings.Arch ?? (PlatformInfo.IsArm64 ? "arm64" : "x64");
+        string platform = GetPlatformTarget(OSPlatform.Windows, arch == "arm64");
+
+        // Start clean so the tools of a previous run, of the other architecture or of older versions, are not bundled too.
         string toolsDir = Path.Combine(baseDir, "tools", "windows");
+        if (Directory.Exists(toolsDir))
+        {
+            Directory.Delete(toolsDir, recursive: true);
+        }
         Directory.CreateDirectory(toolsDir);
 
         List<ReleaseAsset> assets = await FetchReleaseAssetsAsync(ToolsRepo, ToolsReleaseTag);
@@ -778,13 +803,14 @@ public class InstallCommand : AsyncCommand<InstallSettings>
 
         foreach (string releaseAsset in releaseAssets)
         {
-            string suffix = $"-win-x64.zip";
+            string assetTarget = GetAssetTarget(releaseAsset, platform);
+            string suffix = $"-{assetTarget}.zip";
             var asset = assets.FirstOrDefault(a =>
                 a.Name.StartsWith($"{releaseAsset}-", StringComparison.OrdinalIgnoreCase) &&
                 a.Name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase));
             if (asset == null)
             {
-                AnsiConsole.MarkupLine($"  [red]{releaseAsset}: no win-x64 asset in '{ToolsReleaseTag}'[/]");
+                AnsiConsole.MarkupLine($"  [red]{releaseAsset}: no {assetTarget} asset in '{ToolsReleaseTag}'[/]");
                 continue;
             }
             AnsiConsole.Markup($"  {releaseAsset} -> tools/windows/{releaseAsset}/ ... ");
@@ -825,7 +851,7 @@ public class InstallCommand : AsyncCommand<InstallSettings>
         if (File.Exists(issFile))
         {
             AnsiConsole.Markup("  Windows installer -> iscc ... ");
-            bool ok = await BuildInnoSetupAsync(issFile, baseDir);
+            bool ok = await BuildInnoSetupAsync(issFile, baseDir, arch);
             AnsiConsole.MarkupLine(ok ? "[green]OK[/]" : "[red]FAILED[/]");
         }
 
@@ -836,7 +862,7 @@ public class InstallCommand : AsyncCommand<InstallSettings>
         return 0;
     }
 
-    private static async Task<bool> BuildInnoSetupAsync(string issFile, string baseDir)
+    private static async Task<bool> BuildInnoSetupAsync(string issFile, string baseDir, string arch)
     {
         string packagesDir = Path.Combine(baseDir, "packages");
         string? version = null;
@@ -862,6 +888,8 @@ public class InstallCommand : AsyncCommand<InstallSettings>
         {
             psi.Environment["COSMOS_VERSION"] = version;
         }
+        // Cosmos.iss names the installer and the machines it accepts after it
+        psi.Environment["COSMOS_SETUP_ARCH"] = arch;
 
         using var proc = Process.Start(psi);
         if (proc == null)

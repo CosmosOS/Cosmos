@@ -74,6 +74,21 @@ public class InstallTargetTests
         WithBundle(stamp, bundleDir => Assert.Equal(expected, InstallCommand.BundleTargetDiffers(bundleDir, wanted)));
     }
 
+    [Theory]
+    [InlineData(null, null, true)]
+    [InlineData("bundle", null, true)]
+    [InlineData("bundle", "x64", true)]
+    [InlineData("bundle", "arm64", true)]
+    [InlineData(null, "arm64", false)]
+    [InlineData("bundle", "x86", false)]
+    [InlineData("bundle", "ARM64", false)]
+    public void Validate_ArchGoesWithSetupAndNamesAKnownArchitecture(string? setup, string? arch, bool valid)
+    {
+        InstallSettings settings = new InstallSettings { Setup = setup, Arch = arch };
+
+        Assert.Equal(valid, settings.Validate().Successful);
+    }
+
     // A bundle directory as an extracted archive leaves it: a VERSION stamp, and a TARGET one when given.
     private static void WithBundle(string? stamp, Action<string> check)
     {

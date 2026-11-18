@@ -11,6 +11,20 @@
 #if MyAppVersion == ""
   #error "COSMOS_VERSION env var must be set when invoking ISCC (typically via 'cosmos install')"
 #endif
+; Architecture of the machines the installer is for, from the COSMOS_SETUP_ARCH
+; environment variable: x64 (also when unset) or arm64. `cosmos install --setup`
+; sets it from its --arch option, and stages under bundle\tools\windows the
+; tools of that architecture. It names the installer and the Windows it accepts.
+#define SetupArch GetEnv('COSMOS_SETUP_ARCH')
+#if SetupArch == "arm64"
+  #define OutputSuffix "windows-arm64"
+  #define AllowedArchitectures "arm64"
+#elif SetupArch == "" || SetupArch == "x64"
+  #define OutputSuffix "windows"
+  #define AllowedArchitectures "x64compatible"
+#else
+  #error "COSMOS_SETUP_ARCH must be x64 or arm64"
+#endif
 #define MyAppPublisher "Cosmos Project"
 #define MyAppURL "https://github.com/CosmosOS/Cosmos"
 
@@ -33,13 +47,13 @@ DefaultDirName={localappdata}\Cosmos
 DefaultGroupName=Cosmos
 DisableProgramGroupPage=no
 OutputDir=output
-OutputBaseFilename=CosmosSetup-{#MyAppVersion}-windows
+OutputBaseFilename=CosmosSetup-{#MyAppVersion}-{#OutputSuffix}
 Compression=lzma2/ultra64
 SolidCompression=yes
 WizardStyle=modern
 PrivilegesRequired=lowest
-ArchitecturesAllowed=x64compatible
-ArchitecturesInstallIn64BitMode=x64compatible
+ArchitecturesAllowed={#AllowedArchitectures}
+ArchitecturesInstallIn64BitMode={#AllowedArchitectures}
 WizardImageFile=images\cosmos.bmp
 WizardSmallImageFile=images\cosmos_small.bmp
 SetupIconFile=images\Cosmos.ico
@@ -69,6 +83,8 @@ Source: "images\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion
 ; NuGet packages
 Source: "bundle\packages\*.nupkg"; DestDir: "{app}\Packages"; Flags: ignoreversion
 
+; The tools are built for the architecture of the installer, xorriso excepted:
+; it has no ARM64 build, and Windows on ARM runs the x64 one.
 ; LLVM toolchain (clang + lld + freestanding headers — handles both x64 and ARM64)
 Source: "bundle\tools\windows\llvm-tools\*"; DestDir: "{app}\Tools\llvm-tools"; Flags: ignoreversion recursesubdirs createallsubdirs
 
