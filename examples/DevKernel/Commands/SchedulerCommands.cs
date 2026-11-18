@@ -3,6 +3,7 @@ using Cosmos.Kernel.System.Diagnostics;
 using Cosmos.Kernel.System.Threading;
 using Cosmos.Kernel.System.Timers;
 using DevKernel.Diagnostics;
+using DevKernel.Diagnostics.Smp;
 using DevKernel.Shell;
 using SysThread = System.Threading.Thread;
 
@@ -76,6 +77,13 @@ internal static class SchedulerCommands
                 Usage = "cpustat",
                 Description = "Live CPU% + thread monitor with stress wave",
                 Execute = static (context, args) => CpuStat.Run(),
+            },
+            new ShellCommand
+            {
+                Name = "smpstat",
+                Usage = "smpstat",
+                Description = "Live per-CPU monitor: placement, affinity, load balancing",
+                Execute = static (context, args) => SmpStat.Run(),
             },
             new ShellCommand
             {
