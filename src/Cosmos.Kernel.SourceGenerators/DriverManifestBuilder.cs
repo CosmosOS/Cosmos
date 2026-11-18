@@ -45,12 +45,7 @@ internal static class DriverManifestBuilder
         ordered.Sort(CompareSource);
         ordered.AddRange(referencedDrivers);
 
-        HashSet<string> known = new(StringComparer.Ordinal);
-        foreach (DriverCandidate candidate in ordered)
-        {
-            known.Add(candidate.FullName);
-        }
-
+        HashSet<string> known = new(ordered.Select(static candidate => candidate.FullName), StringComparer.Ordinal);
         HashSet<string> excluded = ParseList(options.ExcludeList);
         HashSet<string> included = ParseList(options.IncludeList);
         ReportUnknown(context, known, excluded, ExcludeItemName);
@@ -104,33 +99,15 @@ internal static class DriverManifestBuilder
 
     private static HashSet<string> ParseList(string list)
     {
-        HashSet<string> names = new(StringComparer.Ordinal);
-        foreach (string part in list.Split(s_listSeparators))
-        {
-            string name = part.Trim();
-            if (name.Length != 0)
-            {
-                names.Add(name);
-            }
-        }
-
-        return names;
+        return new HashSet<string>(
+            list.Split(s_listSeparators).Select(static part => part.Trim()).Where(static name => name.Length != 0),
+            StringComparer.Ordinal);
     }
 
     private static void ReportUnknown(SourceProductionContext context, HashSet<string> known, HashSet<string> names, string itemName)
     {
-        List<string> unknown = new();
-        foreach (string name in names)
-        {
-            if (!known.Contains(name))
-            {
-                unknown.Add(name);
-            }
-        }
-
         // Sorted so the order of the warnings does not depend on hashing.
-        unknown.Sort(string.CompareOrdinal);
-        foreach (string name in unknown)
+        foreach (string name in names.Where(name => !known.Contains(name)).OrderBy(static name => name, StringComparer.Ordinal))
         {
             context.ReportDiagnostic(Diagnostic.Create(DiagnosticDescriptors.PolicyNameUnknown, Location.None, itemName, name));
         }
