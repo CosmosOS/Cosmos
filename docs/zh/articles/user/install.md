@@ -1,5 +1,5 @@
 ---
-source_hash: f5f342a8e79997a5daddd46d28caf8ecde0c9d5f
+source_hash: 27da10e54747e6c32261d3dcf35a2f37c38aef2c
 ---
 <a id="installation-guide"></a>
 
@@ -30,6 +30,25 @@ cosmos check
 ```
 
 如需卸载，请使用 Windows 设置中的**添加或删除程序**。
+
+<a id="windows-on-arm"></a>
+
+## ARM 上的 Windows
+
+采用 ARM64 处理器（例如 Snapdragon）的 Windows 计算机在同一 [Releases](https://github.com/CosmosOS/Cosmos/releases) 页面上有专用的安装程序：
+
+```
+CosmosSetup-<version>-windows-arm64.exe
+```
+
+它安装为 ARM64 构建的 Clang、LLD、QEMU 和 GDB，用法与 x64 安装程序相同。x64 安装程序也能在 ARM64 计算机上运行，此时它的所有工具都通过 Windows 的 x64 模拟运行。之后 `cosmos install --tools` 会把这些工具替换为 ARM64 版本。
+
+这台计算机需要 Windows 11，x64 模拟正是从该版本开始提供的，因为有两个程序在其上仍然是 x64 的：
+
+| 程序 | 原因 |
+|------|------|
+| xorriso | 它基于 MSYS2 运行时构建，而该运行时只有 x64 版本，因此 ARM64 安装程序附带的是 x64 构建。 |
+| ILCompiler | SDK 在所有 Windows 主机上都运行 x64 版本（`runtime.win-x64.Microsoft.DotNet.ILCompiler`）。 |
 
 ## Linux / macOS
 

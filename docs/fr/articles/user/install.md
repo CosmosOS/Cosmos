@@ -1,5 +1,5 @@
 ---
-source_hash: f5f342a8e79997a5daddd46d28caf8ecde0c9d5f
+source_hash: 27da10e54747e6c32261d3dcf35a2f37c38aef2c
 ---
 <a id="installation-guide"></a>
 
@@ -30,6 +30,25 @@ cosmos check
 ```
 
 Pour désinstaller, utilisez **Ajouter ou supprimer des programmes** dans les Paramètres de Windows.
+
+<a id="windows-on-arm"></a>
+
+## Windows sur ARM
+
+Une machine Windows à processeur ARM64, un Snapdragon par exemple, a son propre installateur sur la même page [Releases](https://github.com/CosmosOS/Cosmos/releases) :
+
+```
+CosmosSetup-<version>-windows-arm64.exe
+```
+
+Il installe Clang, LLD, QEMU et GDB compilés pour ARM64 et s'utilise comme l'installateur x64. Ce dernier fonctionne aussi sur une machine ARM64, où tous ses outils passent par l'émulation x64 de Windows. `cosmos install --tools` remplace ensuite ces outils par ceux pour ARM64.
+
+La machine doit être sous Windows 11, où l'émulation x64 est apparue, car deux programmes y restent en x64 :
+
+| Programme | Pourquoi |
+|-----------|----------|
+| xorriso | Il repose sur le runtime MSYS2, qui n'existe que pour x64 : l'installateur ARM64 embarque donc la version x64. |
+| ILCompiler | Le SDK exécute celui pour x64 (`runtime.win-x64.Microsoft.DotNet.ILCompiler`) sur tout hôte Windows. |
 
 ## Linux / macOS
 

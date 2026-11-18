@@ -338,10 +338,16 @@ jobs:
           keep_files: true
 
   # ── Windows Installer ────────────────────────────────────────────────────────
+  # One installer per architecture of the machines it is for. Both are built on
+  # the x64 runner: the tools are downloaded, not compiled, and Inno Setup
+  # writes an installer for either architecture.
   build-installer-windows:
-    name: Windows Installer
+    name: Windows Installer (${{ matrix.arch }})
     needs: build-packages
     runs-on: windows-latest
+    strategy:
+      matrix:
+        arch: [ x64, arm64 ]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -362,7 +368,7 @@ jobs:
         shell: pwsh
 
       - name: Build installer via cosmos install
-        run: cosmos install --auto --setup setup/bundle
+        run: cosmos install --auto --setup setup/bundle --arch ${{ matrix.arch }}
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -370,8 +376,11 @@ jobs:
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
-          name: installer-windows
+          name: installer-windows-${{ matrix.arch }}
           path: setup/output/CosmosSetup-*.exe
+          # cosmos install reports a failed download or a failed compile and
+          # still exits 0: without this, a release would go out one installer short
+          if-no-files-found: error
           retention-days: 30
 
   # ── Create GitHub Release ────────────────────────────────────────────────────
@@ -500,6 +509,7 @@ jobs:
             | Platform | File | Notes |
             |----------|------|-------|
             | Windows | `CosmosSetup-${{ needs.build-packages.outputs.version }}-windows.exe` | Requires .NET 10 SDK, run installer |
+            | Windows on ARM | `CosmosSetup-${{ needs.build-packages.outputs.version }}-windows-arm64.exe` | Requires .NET 10 SDK and Windows 11, run installer |
             | Linux / macOS | `dotnet tool install -g Cosmos.Tools && cosmos install` | Requires .NET 10 SDK |
 
             Already installed? Run `cosmos update` to move to this release, or `dotnet tool update -g Cosmos.Tools && cosmos install` if your CLI predates the update command.
@@ -522,4 +532,4 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            installers/installer-windows/*
+            installers/installer-windows-*/*

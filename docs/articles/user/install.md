@@ -24,6 +24,23 @@ cosmos check
 
 To uninstall, use **Add or Remove Programs** in Windows Settings.
 
+## Windows on ARM
+
+A Windows machine with an ARM64 processor, such as a Snapdragon one, has an installer of its own on the same [Releases](https://github.com/CosmosOS/Cosmos/releases) page:
+
+```
+CosmosSetup-<version>-windows-arm64.exe
+```
+
+It installs Clang, LLD, QEMU and GDB built for ARM64, and is used like the x64 installer. That one runs on an ARM64 machine too, with every tool under the x64 emulation of Windows. `cosmos install --tools` then replaces those tools with the ARM64 ones.
+
+The machine needs Windows 11, where the x64 emulation arrived, because two programs stay x64 on it:
+
+| Program | Why |
+|---------|-----|
+| xorriso | It is built on the MSYS2 runtime, which exists for x64 only, so the ARM64 installer carries the x64 build. |
+| ILCompiler | The SDK runs the x64 one (`runtime.win-x64.Microsoft.DotNet.ILCompiler`) on every Windows host. |
+
 ## Linux / macOS
 
 Install the Cosmos CLI and all dependencies:

@@ -351,11 +351,15 @@ jobs:
           path: ./tests/Cosmos.Tests.BuildCache/TestResults/Cosmos.Tests.BuildCache.trx
 
   windows-iso-tests:
-    name: Run ISO Build Tests - Windows (${{ matrix.arch }})
+    name: Run ISO Build Tests - Windows${{ matrix.host }} (${{ matrix.arch }})
     runs-on: ${{ matrix.os }}
     strategy:
+      # One host must not cancel the other: they install different tools
+      fail-fast: false
       matrix:
-        os: [ windows-latest ]
+        # windows-11-arm is the Windows on ARM host, whose tools are the
+        # win-arm64 archives of tools-latest
+        os: [ windows-latest, windows-11-arm ]
         dotnet-version: [ 10.0.x ]
         arch: [ x64, arm64 ]
         include:
@@ -363,6 +367,8 @@ jobs:
             rid: linux-x64
           - arch: arm64
             rid: linux-arm64
+          - os: windows-11-arm
+            host: " on ARM"
     steps:
       - name: 🛠️ Enable long paths in Git
         run: git config --system core.longpaths true
@@ -431,13 +437,13 @@ jobs:
       - name: 📤 Upload C# ISO
         uses: actions/upload-artifact@v4
         with:
-          name: CSharpKernel-ISO-${{ github.job }}-${{ matrix.arch }}-${{ github.run_number }}
+          name: CSharpKernel-ISO-${{ github.job }}-${{ matrix.os }}-${{ matrix.arch }}-${{ github.run_number }}
           path: ./output-${{ matrix.arch }}/CSharpKernel/CSharpKernel.iso
 
       - name: 📤 Upload Visual Basic ISO
         uses: actions/upload-artifact@v4
         with:
-          name: VisualBasicKernel-ISO-${{ github.job }}-${{ matrix.arch }}-${{ github.run_number }}
+          name: VisualBasicKernel-ISO-${{ github.job }}-${{ matrix.os }}-${{ matrix.arch }}-${{ github.run_number }}
           path: ./output-${{ matrix.arch }}/VisualBasicKernel/VisualBasicKernel.iso
 
   macos-iso-tests:
