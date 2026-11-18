@@ -201,7 +201,7 @@ Remove-Item -Path "$env:USERPROFILE\.nuget\packages\cosmos.*" -Recurse -Force -E
 
 # Restore main solution
 Write-Host "Restoring main solution..." -ForegroundColor Cyan
-dotnet restore ./nativeaot-patcher.slnx
+dotnet restore ./cosmos.slnx
 
 # Install global tools
 Write-Host "Installing global tools..." -ForegroundColor Cyan

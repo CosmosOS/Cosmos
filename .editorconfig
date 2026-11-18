@@ -290,7 +290,7 @@ dotnet_diagnostic.RS0017.severity = none
 # Namespaces follow folders (IDE0130): a file declares its project's name
 # (every RootNamespace is the project name) followed by the folders between
 # the project and the file. Error, so `dotnet build` fails on a file that
-# drifts, and so does the format CI for the projects nativeaot-patcher.slnx
+# drifts, and so does the format CI for the projects cosmos.slnx
 # lists (not the test kernels). The host-side unit tests in
 # tests/Cosmos.Kernel.Tests.System follow the same rule. IDE0130 does not see
 # generated code (the generated_code sections), files linked from outside the

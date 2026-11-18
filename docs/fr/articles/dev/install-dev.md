@@ -1,5 +1,5 @@
 ---
-source_hash: e13b28e10d02259f3eddc1aeab6dbb7dd2d1a471
+source_hash: 30f5a4cc48d325f850feea5600325964c9b0fe05
 ---
 <a id="dev-container-setup"></a>
 
@@ -32,7 +32,7 @@ Lancez le script depuis la racine du dépôt :
    - Packages HAL propres à chaque architecture (`Cosmos.Kernel.HAL.X64`, `Cosmos.Kernel.HAL.ARM64`)
    - Packages de noyau multi-architecture compilés à la fois pour `linux-x64` et `linux-arm64` (`Cosmos.Kernel.Core`, `Cosmos.Kernel.HAL`, `Cosmos.Kernel.System`, `Cosmos.Kernel.Plugs`, `Cosmos.Kernel`)
    - SDK et modèles (`Cosmos.Sdk`, `Cosmos.Build.Templates`)
-5. **Restaure** la solution principale (`nativeaot-patcher.slnx`).
+5. **Restaure** la solution principale (`cosmos.slnx`).
 6. **Installe les outils .NET globaux** : `ilc`, `Cosmos.Patcher` et `Cosmos.Tools`.
 
 ## Windows (`postCreateCommand.ps1`)
