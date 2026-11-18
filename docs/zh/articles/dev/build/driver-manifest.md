@@ -1,5 +1,5 @@
 ---
-source_hash: b2122a69708109a599e942cd5aec8fdb33a04922
+source_hash: 820fe725f1a33156a488416ddcf851ef92ed9027
 ---
 <a id="driver-manifest"></a>
 
@@ -64,7 +64,7 @@ $(IntermediateOutputPath)/generated/Cosmos.Kernel.SourceGenerators/
 
 在那里阅读 `DriverManifest.g.cs`，是检查一个内核带有哪些驱动程序的最快方式。
 
-Visual Basic 内核得到同样的两个文件，即 `CosmosEntryPoint.g.vb` 和 `DriverManifest.g.vb`，声明的类型也相同：用模块代替静态类，用 `Global.` 代替 `global::`，用 `#Disable Warning COSMOS0003` 代替 pragma 指令。Visual Basic 项目会把它声明的每个命名空间都放在其根命名空间之下，因此两个文件都以 `Namespace Global.Cosmos.Kernel.System.Internal` 开头，这样入口点的名称仍是 SDK 设置的启动对象所指的那一个。生成器通过符号而不是语法来查找驱动程序，因此用 Visual Basic 编写的 `[Driver]` 类会像 C# 类一样被找到并排序。
+Visual Basic 内核得到同样的两个文件，即 `CosmosEntryPoint.g.vb` 和 `DriverManifest.g.vb`，声明的类型也相同：用模块代替静态类，用 `Global.` 代替 `global::`，用 `#Disable Warning COSMOS0003` 代替 pragma 指令。Visual Basic 项目会把它声明的每个命名空间都放在其根命名空间之下，因此两个文件都以 `Namespace Global.Cosmos.Kernel.System.Internal` 开头，这样入口点的名称仍是 SDK 设置的启动对象所指的那一个。生成器通过符号而不是语法来查找驱动程序，因此用 Visual Basic 编写的 `[Driver]` 类会像 C# 类一样被找到并排序。这样的类派生自一个重写了 `Matches` 的 C# 类，而不是直接派生自 `Driver`，因为 `Driver.Matches` 是抽象成员，它返回的 `ReadOnlySpan` 是 Visual Basic 编译器不接受的类型（`BC30668`）。
 
 ---
 

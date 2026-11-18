@@ -57,7 +57,7 @@ $(IntermediateOutputPath)/generated/Cosmos.Kernel.SourceGenerators/
 
 Reading `DriverManifest.g.cs` there is the quickest way to check which drivers a kernel carries.
 
-A Visual Basic kernel gets the same two files, `CosmosEntryPoint.g.vb` and `DriverManifest.g.vb`, declaring the same types: modules in place of static classes, `Global.` in place of `global::`, and `#Disable Warning COSMOS0003` in place of the pragma. A Visual Basic project puts every namespace it declares under its root namespace, so both files open with `Namespace Global.Cosmos.Kernel.System.Internal`, which keeps the entry point where the SDK's startup object names it. The generator finds drivers through symbols, not syntax, so a `[Driver]` class written in Visual Basic is found and ordered the way a C# one is.
+A Visual Basic kernel gets the same two files, `CosmosEntryPoint.g.vb` and `DriverManifest.g.vb`, declaring the same types: modules in place of static classes, `Global.` in place of `global::`, and `#Disable Warning COSMOS0003` in place of the pragma. A Visual Basic project puts every namespace it declares under its root namespace, so both files open with `Namespace Global.Cosmos.Kernel.System.Internal`, which keeps the entry point where the SDK's startup object names it. The generator finds drivers through symbols, not syntax, so a `[Driver]` class written in Visual Basic is found and ordered the way a C# one is. Such a class derives from a C# class that overrides `Matches`, and not from `Driver` directly, because `Driver.Matches` is abstract and returns a `ReadOnlySpan`, a type the Visual Basic compiler rejects (`BC30668`).
 
 ---
 

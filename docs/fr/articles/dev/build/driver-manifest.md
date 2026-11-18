@@ -1,5 +1,5 @@
 ---
-source_hash: b2122a69708109a599e942cd5aec8fdb33a04922
+source_hash: 820fe725f1a33156a488416ddcf851ef92ed9027
 ---
 <a id="driver-manifest"></a>
 
@@ -64,7 +64,7 @@ $(IntermediateOutputPath)/generated/Cosmos.Kernel.SourceGenerators/
 
 Lire `DriverManifest.g.cs` à cet endroit est le moyen le plus rapide de vérifier quels pilotes un noyau embarque.
 
-Un noyau Visual Basic reçoit les deux mêmes fichiers, `CosmosEntryPoint.g.vb` et `DriverManifest.g.vb`, qui déclarent les mêmes types : des modules à la place des classes statiques, `Global.` à la place de `global::`, et `#Disable Warning COSMOS0003` à la place du pragma. Un projet Visual Basic place chaque espace de noms qu'il déclare sous son espace de noms racine ; les deux fichiers s'ouvrent donc par `Namespace Global.Cosmos.Kernel.System.Internal`, ce qui laisse le point d'entrée sous le nom que désigne l'objet de démarrage défini par le SDK. Le générateur trouve les pilotes par les symboles, et non par la syntaxe, si bien qu'une classe `[Driver]` écrite en Visual Basic est trouvée et ordonnée comme une classe C#.
+Un noyau Visual Basic reçoit les deux mêmes fichiers, `CosmosEntryPoint.g.vb` et `DriverManifest.g.vb`, qui déclarent les mêmes types : des modules à la place des classes statiques, `Global.` à la place de `global::`, et `#Disable Warning COSMOS0003` à la place du pragma. Un projet Visual Basic place chaque espace de noms qu'il déclare sous son espace de noms racine ; les deux fichiers s'ouvrent donc par `Namespace Global.Cosmos.Kernel.System.Internal`, ce qui laisse le point d'entrée sous le nom que désigne l'objet de démarrage défini par le SDK. Le générateur trouve les pilotes par les symboles, et non par la syntaxe, si bien qu'une classe `[Driver]` écrite en Visual Basic est trouvée et ordonnée comme une classe C#. Cette classe dérive d'une classe C# qui redéfinit `Matches`, et non directement de `Driver`, car `Driver.Matches` est un membre abstrait qui renvoie un `ReadOnlySpan`, un type que le compilateur Visual Basic refuse (`BC30668`).
 
 ---
 
