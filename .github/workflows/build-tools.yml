@@ -129,6 +129,9 @@ jobs:
 
           # Stamp the bundle so ToolResolver can compare against system tools
           echo "${LLVM_VERSION}" > pkg/llvm-tools/VERSION
+          # and with its target: two of them now share an operating system, and
+          # cosmos install replaces a bundle built for the other one
+          echo "${{ matrix.target }}" > pkg/llvm-tools/TARGET
 
       # The upstream Linux ld.lld is linked against libxml2.so.2 and looks for
       # it in ../lib first (its RUNPATH is $ORIGIN/../lib). A distribution on
@@ -250,6 +253,7 @@ jobs:
           mkdir -p pkg/xorriso
           cp xorriso-${{ env.XORRISO_DIR }}/xorriso/xorriso pkg/xorriso/
           echo "${{ env.XORRISO_VERSION }}" > pkg/xorriso/VERSION
+          echo "${{ matrix.target }}" > pkg/xorriso/TARGET
           tar czf xorriso-${{ env.XORRISO_VERSION }}-${{ matrix.target }}.tar.gz -C pkg xorriso
 
       - name: Package (zip)
@@ -271,6 +275,7 @@ jobs:
           Copy-Item "$msysRoot\msys-intl-8.dll" pkg/xorriso/
           Copy-Item "$msysRoot\msys-iconv-2.dll" pkg/xorriso/
           Set-Content -Path pkg/xorriso/VERSION -Value "${{ env.XORRISO_VERSION }}"
+          Set-Content -Path pkg/xorriso/TARGET -Value "${{ matrix.target }}"
 
       - name: Create zip (Windows)
         if: runner.os == 'Windows'
@@ -526,6 +531,7 @@ jobs:
           ls pkg/qemu/share/qemu/*.bin pkg/qemu/share/qemu/*.fd 2>/dev/null || echo "WARNING: no firmware files found"
           # Stamp the bundle with its version (see Windows packaging step for rationale)
           echo "${{ env.QEMU_VERSION }}" > pkg/qemu/VERSION
+          echo "${{ matrix.target }}" > pkg/qemu/TARGET
           tar czf qemu-${{ env.QEMU_VERSION }}-${{ matrix.target }}.tar.gz -C pkg qemu
 
       - name: Package (Windows)
@@ -583,6 +589,7 @@ jobs:
           # Stamp the bundle with its version so the resolver can compare
           # against system-installed QEMU and accept it when versions match.
           echo "${{ env.QEMU_VERSION }}" > pkg/qemu/VERSION
+          echo "${{ matrix.target }}" > pkg/qemu/TARGET
           echo "=== Bundled DLLs ==="
           ls pkg/qemu/bin/*.dll
 
@@ -911,6 +918,7 @@ jobs:
             -ex 'show data-directory' | tee smoke.log
           grep -q PYTHON_OK smoke.log
           echo "${GDB_VERSION}" > pkg/gdb/VERSION
+          echo "${{ matrix.target }}" > pkg/gdb/TARGET
           tar czf gdb-${GDB_VERSION}-${{ matrix.target }}.tar.gz -C pkg gdb
 
       - name: Package (Windows)
@@ -976,6 +984,7 @@ jobs:
             fi
           done
           echo "${GDB_VERSION}" > pkg/gdb/VERSION
+          echo "${{ matrix.target }}" > pkg/gdb/TARGET
           echo "=== Bundled DLLs ==="
           ls pkg/gdb/bin/*.dll || echo "(no DLLs bundled — gdb-multiarch.exe must be statically linked)"
 
