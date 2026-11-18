@@ -1,6 +1,6 @@
 ---
 _layout: landing
-source_hash: 7277f6b5f33ef20c90622f8945755ecf24727d45
+source_hash: 5bb13135b097a90a65aaa94f2e04f2ea0e6a18b8
 ---
 
 Bienvenue sur le wiki de Cosmos gen3 !
@@ -20,6 +20,7 @@ Tout ce qu'il vous faut pour créer, compiler et exécuter votre propre noyau Co
 
  - [Guide d'installation](articles/user/install.md) : installer la chaîne d'outils et créer votre premier noyau depuis VS Code.
  - [Démarrage du noyau](articles/user/startup.md) : la chaîne de démarrage et le cycle de vie `BeforeRun`/`Run`/`AfterRun`.
+ - [Noyaux en Visual Basic](articles/user/visual-basic.md) : écrire le noyau en Visual Basic, avec une bibliothèque C# pour les quelques classes qui déclarent un span.
  - [Système de fichiers](articles/user/filesystem.md) : monter un disque et utiliser l'API .NET standard `System.IO` (`File`, `Directory`, flux).
  - [Réseau](articles/user/network.md) : DHCP, UDP et TCP via l'API .NET standard `System.Net.Sockets`, ainsi que DNS.
  - [Minuteurs et alarmes](articles/user/timers.md) : bloquer pendant un moment, ou exécuter un callback plus tard depuis l'interruption du minuteur (`TimerManager`) ou depuis un thread du noyau (`AlarmManager`).

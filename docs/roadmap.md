@@ -20,6 +20,7 @@
 | Keyboard Input | ✅ | ✅ | PS/2 (x64), virtio and USB keyboards, all as driver kit drivers |
 | Mouse Input | ✅ | ✅ | PS/2 (x64), virtio and USB mice, all as driver kit drivers |
 | Audio interface | 🟡 | ✅ | Intel HD Audio: WAV playback, generated streams and `Console.Beep`. Playback only, one stream per output. |
+| Visual Basic kernels | ✅ | ✅ | `cosmos new -l vb` and the three IDE extensions. A class that declares a span is written in a C# library ([Visual Basic kernels](articles/user/visual-basic.md)). |
 
 ## Additional Gen3 Features
 

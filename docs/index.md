@@ -17,6 +17,7 @@ Everything you need to create, build and run your own Cosmos kernel:
 
  - [Installation Guide](articles/user/install.md): set up the toolchain and create your first kernel from VS Code.
  - [Kernel Startup](articles/user/startup.md): the boot chain and the `BeforeRun`/`Run`/`AfterRun` lifecycle.
+ - [Visual Basic Kernels](articles/user/visual-basic.md): write the kernel in Visual Basic, with a C# library for the few classes that declare a span.
  - [File System](articles/user/filesystem.md): mount a disk and use the standard .NET `System.IO` API (`File`, `Directory`, streams).
  - [Network](articles/user/network.md): DHCP, UDP and TCP through the standard .NET `System.Net.Sockets` API, plus DNS.
  - [Timers and Alarms](articles/user/timers.md): block for a while, or run a callback later from the timer interrupt (`TimerManager`) or a kernel thread (`AlarmManager`).

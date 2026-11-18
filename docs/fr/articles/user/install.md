@@ -1,5 +1,5 @@
 ---
-source_hash: b8511205455a0e82eb341f34d4468eec418e0c58
+source_hash: f5f342a8e79997a5daddd46d28caf8ecde0c9d5f
 ---
 <a id="installation-guide"></a>
 
@@ -114,4 +114,4 @@ Chaque extension crée, compile, lance et débogue un noyau depuis l'IDE, et peu
 
 ## Démarrage rapide
 
-Une fois l'installation terminée, consultez [Démarrage du noyau](startup.md) pour créer votre premier noyau et découvrir le déroulement du démarrage.
+Une fois l'installation terminée, consultez [Démarrage du noyau](startup.md) pour créer votre premier noyau et découvrir le déroulement du démarrage. Pour l'écrire en Visual Basic, consultez [Noyaux en Visual Basic](visual-basic.md).
