@@ -64,15 +64,8 @@ internal static class DriverDiscovery
     /// <param name="declaration">One declaration of it.</param>
     private static Location NameLocation(INamedTypeSymbol type, SyntaxNode declaration)
     {
-        foreach (Location location in type.Locations)
-        {
-            if (location.SourceTree == declaration.SyntaxTree && declaration.Span.Contains(location.SourceSpan))
-            {
-                return location;
-            }
-        }
-
-        return declaration.GetLocation();
+        return type.Locations.FirstOrDefault(location => location.SourceTree == declaration.SyntaxTree && declaration.Span.Contains(location.SourceSpan))
+            ?? declaration.GetLocation();
     }
 
     /// <summary>
