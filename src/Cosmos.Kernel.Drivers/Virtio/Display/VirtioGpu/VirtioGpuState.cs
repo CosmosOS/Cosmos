@@ -26,7 +26,7 @@ namespace Cosmos.Kernel.Drivers.Virtio.Display.VirtioGpu;
 /// signals the event. Every struct goes through the scratch span with
 /// <c>MemoryMarshal</c>, never a pointer.
 /// </summary>
-internal sealed class VirtioGpuState : IDisplay
+internal class VirtioGpuState : IDisplay
 {
     // --- Constants ---
 
@@ -414,6 +414,98 @@ internal sealed class VirtioGpuState : IDisplay
         return SendCommandCore(in command, false, in none, expectedResponseType, name);
     }
 
+    /// <summary>
+    /// Sends one command that carries a memory entry and waits for its
+    /// response: a three-descriptor chain, the command out, the entry out
+    /// and the response in. Thread context; any thread; never called with
+    /// the lock held.
+    /// </summary>
+    /// <typeparam name="T">The command struct, a header followed by its payload.</typeparam>
+    /// <param name="command">The command; copied into the scratch block.</param>
+    /// <param name="entry">The one memory entry the chain carries after the command.</param>
+    /// <param name="expectedResponseType">The response type that means success.</param>
+    /// <param name="name">The command's name for the log.</param>
+    /// <returns>True when the device answered with <paramref name="expectedResponseType"/>.</returns>
+    internal bool SendCommandWithEntry<T>(in T command, in VirtioGpuMemEntry entry, uint expectedResponseType, string name) where T : unmanaged
+    {
+        return SendCommandCore(in command, true, in entry, expectedResponseType, name);
+    }
+
+    /// <summary>
+    /// Sends one command whose bytes already sit at offset 0 of
+    /// <paramref name="commandBuffer"/> and waits for its response: a
+    /// two-descriptor chain, the command buffer out and the response in.
+    /// The 3D payloads are larger than the scratch block's command area,
+    /// so the caller writes them into its own DMA memory and names it
+    /// here; the response area, the command slot and the fault tracking
+    /// are shared with <see cref="SendCommand{T}"/> either way, so the
+    /// one-command-at-a-time protocol holds across both paths. Thread
+    /// context; any thread; never called with the lock held.
+    /// </summary>
+    /// <param name="commandBuffer">The DMA memory holding the command at offset 0.</param>
+    /// <param name="commandBytes">The command's length in bytes.</param>
+    /// <param name="expectedResponseType">The response type that means success.</param>
+    /// <param name="name">The command's name for the log.</param>
+    /// <returns>True when the device answered with <paramref name="expectedResponseType"/>.</returns>
+    internal bool SendBufferCommand(DmaBuffer commandBuffer, int commandBytes, uint expectedResponseType, string name)
+    {
+        DeviceLock? deviceLock = _lock;
+        if (deviceLock is null || _faulted)
+        {
+            return false;
+        }
+
+        // 1. The slot and the chain, in one scope.
+        ushort head = 0;
+        bool submitted = false;
+        bool exhausted = false;
+        while (!submitted)
+        {
+            using (deviceLock.Acquire())
+            {
+                if (!_busy)
+                {
+                    _busy = true;
+                    submitted = TrySubmitBufferLocked(commandBuffer, commandBytes, out head);
+                    if (!submitted)
+                    {
+                        _busy = false;
+                        exhausted = true;
+                    }
+                }
+            }
+
+            if (exhausted)
+            {
+                _binding.Log($"{name}: no free descriptor on the control queue");
+                return false;
+            }
+
+            if (!submitted)
+            {
+                _binding.Delay(PollMicroseconds);
+            }
+        }
+
+        _commandsSent++;
+
+        // 2. The wait, without the lock.
+        if (!WaitForChain(head, name))
+        {
+            return false;
+        }
+
+        // 3. The response.
+        VirtioGpuCtrlHdr response = MemoryMarshal.Read<VirtioGpuCtrlHdr>(_scratch.Span.Slice(ResponseOffset));
+        if (response.Type != expectedResponseType)
+        {
+            _binding.Log($"{name}: response type 0x{response.Type:X} instead of 0x{expectedResponseType:X}");
+            return false;
+        }
+
+        return true;
+    }
+
     // --- Private methods ---
 
     /// <summary>TRANSFER_TO_HOST_2D of one rectangle of the scanout resource. Thread context.</summary>
@@ -506,6 +598,37 @@ internal sealed class VirtioGpuState : IDisplay
         _commandsSent++;
 
         // 2. The wait, without the lock.
+        if (!WaitForChain(head, name))
+        {
+            return false;
+        }
+
+        // 3. The response.
+        VirtioGpuCtrlHdr response = MemoryMarshal.Read<VirtioGpuCtrlHdr>(_scratch.Span.Slice(ResponseOffset));
+        if (response.Type != expectedResponseType)
+        {
+            _binding.Log($"{name}: response type 0x{response.Type:X} instead of 0x{expectedResponseType:X}");
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Waits for the in-flight chain's head to come back used, up to
+    /// <see cref="CommandTimeoutMilliseconds"/>, taking the used ring under
+    /// the lock each round: the chain's head ends the wait, a foreign id is
+    /// a protocol fault (only one command is ever in flight), nothing used
+    /// waits on the event with an interrupt or pauses without one. A
+    /// timeout or a foreign id marks the state faulted. Thread context; any
+    /// thread.
+    /// </summary>
+    /// <param name="head">The in-flight chain's head descriptor.</param>
+    /// <param name="name">The command's name for the log.</param>
+    /// <returns>True when the chain was taken; false on a timeout or a foreign id.</returns>
+    private bool WaitForChain(ushort head, string name)
+    {
+        DeviceLock? deviceLock = _lock;
         long deadline = Stopwatch.GetTimestamp() + Stopwatch.Frequency / MillisecondsPerSecond * CommandTimeoutMilliseconds;
         bool taken = false;
         bool foreign = false;
@@ -569,14 +692,6 @@ internal sealed class VirtioGpuState : IDisplay
             return false;
         }
 
-        // 3. The response.
-        VirtioGpuCtrlHdr response = MemoryMarshal.Read<VirtioGpuCtrlHdr>(_scratch.Span.Slice(ResponseOffset));
-        if (response.Type != expectedResponseType)
-        {
-            _binding.Log($"{name}: response type 0x{response.Type:X} instead of 0x{expectedResponseType:X}");
-            return false;
-        }
-
         return true;
     }
 
@@ -634,6 +749,43 @@ internal sealed class VirtioGpuState : IDisplay
         _controlQueue.SetDescriptor(responseIndex, physical + ResponseOffset, (uint)responseBytes, VirtqueueDescriptorFlags.Write);
         _inFlightHasEntry = withEntry;
         _inFlightEntry = entryIndex;
+        _inFlightResponse = responseIndex;
+        _controlQueue.Submit(commandIndex);
+        _controlQueue.Notify();
+        head = commandIndex;
+        return true;
+    }
+
+    /// <summary>
+    /// Allocates the two-descriptor chain over the command buffer and a
+    /// cleared response area in the scratch block, submits the head and
+    /// notifies. Under the lock; allocation-free.
+    /// </summary>
+    /// <param name="commandBuffer">The DMA memory holding the command at offset 0.</param>
+    /// <param name="commandBytes">The command's length in bytes.</param>
+    /// <param name="head">The chain's head descriptor, when the submission went out.</param>
+    /// <returns>False when the queue has too few free descriptors; nothing was submitted.</returns>
+    private bool TrySubmitBufferLocked(DmaBuffer commandBuffer, int commandBytes, out ushort head)
+    {
+        head = 0;
+        if (!_controlQueue.TryAllocateDescriptor(out ushort commandIndex))
+        {
+            return false;
+        }
+
+        if (!_controlQueue.TryAllocateDescriptor(out ushort responseIndex))
+        {
+            _controlQueue.FreeDescriptor(commandIndex);
+            return false;
+        }
+
+        int responseBytes = Unsafe.SizeOf<VirtioGpuRespDisplayInfo>();
+        _scratch.Span.Slice(ResponseOffset, responseBytes).Clear();
+
+        _controlQueue.SetDescriptor(commandIndex, commandBuffer.PhysicalAddress, (uint)commandBytes, VirtqueueDescriptorFlags.Next, responseIndex);
+        _controlQueue.SetDescriptor(responseIndex, _scratch.PhysicalAddress + ResponseOffset, (uint)responseBytes, VirtqueueDescriptorFlags.Write);
+        _inFlightHasEntry = false;
+        _inFlightEntry = 0;
         _inFlightResponse = responseIndex;
         _controlQueue.Submit(commandIndex);
         _controlQueue.Notify();
