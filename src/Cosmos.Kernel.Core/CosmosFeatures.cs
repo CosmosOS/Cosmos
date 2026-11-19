@@ -11,11 +11,11 @@ internal static class CosmosFeatures
 {
     /// <summary>
     /// Controls whetever serial is outputed as verbose during boot.
-    /// Set via CosmosVerboseSerial property in csproj
+    /// Set via CosmosBootConsole property in csproj
     /// </summary>
-    [FeatureSwitchDefinition("Cosmos.Kernel.Serial.Enabled")]
-    public static bool VerboseSerial =>
-        AppContext.TryGetSwitch("Cosmos.Kernel.Serial.Enabled", out bool enabled) ? enabled : true;
+    [FeatureSwitchDefinition("Cosmos.Kernel.BootConsole.Enabled")]
+    public static bool BootConsoleEnabled =>
+        AppContext.TryGetSwitch("Cosmos.Kernel.BootConsole.Enabled", out bool enabled) ? enabled : true;
 
     /// <summary>
     /// Controls interrupt setup (IDT/IRQ). Disabling this also disables Timer, Keyboard,

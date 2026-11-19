@@ -14,9 +14,9 @@ public static class KernelFeatures
 {
     /// <summary>
     /// Whether serial is outputed as verbose on boot
-    /// (<c>CosmosVerboseSerial</c>).
+    /// (<c>CosmosBootConsole</c>).
     /// </summary>
-    public static bool VerboseSerial => CosmosFeatures.VerboseSerial;
+    public static bool BootConsole => CosmosFeatures.BootConsoleEnabled;
 
     /// <summary>
     /// Whether interrupt support (IDT/IRQ) is enabled

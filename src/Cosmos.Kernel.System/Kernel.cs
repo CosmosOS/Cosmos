@@ -57,17 +57,11 @@ public abstract partial class Kernel
     /// </summary>
     public virtual void Start()
     {
-        if (KernelFeatures.VerboseSerial)
-        {
-            Serial.WriteString("[Kernel] Starting kernel...\n");
-        }
+        Serial.WriteString("[Kernel] Starting kernel...\n");
 
         if (InterruptManager.IsEnabled)
         {
-            if (KernelFeatures.VerboseSerial)
-            {
-                Serial.WriteString("[Kernel] Enabling interrupts...\n");
-            }
+            Serial.WriteString("[Kernel] Enabling interrupts...\n");   
             InternalCpu.EnableInterrupts();
         }
 
@@ -79,47 +73,36 @@ public abstract partial class Kernel
         // without a scheduler.
         if (Core.CosmosFeatures.FinalizerThreadEnabled)
         {
-            if (KernelFeatures.VerboseSerial)
-            {
-                Serial.WriteString("[Kernel] Starting the finalizer thread...\n");
-            }
-
+            
+            Serial.WriteString("[Kernel] Starting the finalizer thread...\n");
             CoreGC.ThreadedFinalizer = true;
         }
 
         // The driver stage: offers every node published so far to the
         // drivers in the manifest, children included, and returns once
         // every one of them has been offered.
-        if (KernelFeatures.VerboseSerial)
-        {
-            Serial.WriteString("[Kernel] Starting drivers...\n");
-        }
+        Serial.WriteString("[Kernel] Starting drivers...\n");
         DriverEngine.Start();
-        if(KernelFeatures.VerboseSerial) {
-            Serial.WriteString("[Kernel] Calling OnBoot()...\n");
-        }
+        Serial.WriteString("[Kernel] Calling OnBoot()...\n");
+        
         OnBoot();
 
         EarlyGop.Enabled = false;
 
-        if(KernelFeatures.VerboseSerial)
-        {
-            Serial.WriteString("[Kernel] Calling BeforeRun()...\n");
-        }
+        
+        Serial.WriteString("[Kernel] Calling BeforeRun()...\n");
         BeforeRun();
 
         Started = true;
 
-        if(KernelFeatures.VerboseSerial)
-        {
-            Serial.WriteString("[Kernel] Entering main loop...\n");
-        }
+        
+        Serial.WriteString("[Kernel] Entering main loop...\n");
+        
         while (!Stopped)
         {
-            if(KernelFeatures.VerboseSerial)
-            {
-                Serial.WriteString("[Kernel] Calling Run()...\n");
-            }
+            
+            Serial.WriteString("[Kernel] Calling Run()...\n");
+            
             Run();
             Serial.WriteString("[Kernel] Run() returned\n");
         }
@@ -146,16 +129,13 @@ public abstract partial class Kernel
     /// </summary>
     protected virtual void OnBoot()
     {
-        if (KernelFeatures.VerboseSerial)
-        {
-            Serial.WriteString("[Kernel] OnBoot() called\n");
-        }
+        Serial.WriteString("[Kernel] OnBoot() called\n");
+        
         if (Core.CosmosFeatures.GraphicsEnabled)
         {
-            if (KernelFeatures.VerboseSerial)
-            {
-                Serial.WriteString("[Kernel] Initializing KernelConsole...\n");
-            }
+            
+            Serial.WriteString("[Kernel] Initializing KernelConsole...\n");
+            
             if (KernelConsole.Initialize())
             {
                 Serial.WriteString("[Kernel] KernelConsole initialized: ");
@@ -166,18 +146,14 @@ public abstract partial class Kernel
             }
             else
             {
-                if (KernelFeatures.VerboseSerial)
-                {
-                    Serial.WriteString("[Kernel] WARNING: KernelConsole initialization failed!\n");
-                }
+                Serial.WriteString("[Kernel] WARNING: KernelConsole initialization failed!\n");
+                
             }
         }
         else
         {
-            if (KernelFeatures.VerboseSerial)
-            {
-                Serial.WriteString("[Kernel] Graphics disabled via feature switch.\n");
-            }
+            Serial.WriteString("[Kernel] Graphics disabled via feature switch.\n");
+            
         }
     }
 
