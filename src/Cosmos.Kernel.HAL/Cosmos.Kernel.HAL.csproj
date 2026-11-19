@@ -49,7 +49,7 @@
        on it. Promoting a type for real is a deliberate change of that list. -->
   <Target Name="CosmosGuardHalPromotion" AfterTargets="Build">
     <PropertyGroup>
-      <_CosmosStableHalTypes>Cosmos\.Kernel\.HAL\.Devices\.Storage\.IBlockDevice|Cosmos\.Kernel\.HAL\.Devices\.Network\.MacAddress|Cosmos\.Kernel\.HAL\.Structures\.RingBuffer&lt;T&gt;</_CosmosStableHalTypes>
+      <_CosmosStableHalTypes>Cosmos\.Kernel\.HAL\.Devices\.Storage\.IBlockDevice|Cosmos\.Kernel\.HAL\.Devices\.Network\.MacAddress|Cosmos\.Kernel\.HAL\.Structures\.BufferBuilder&lt;T&gt;|Cosmos\.Kernel\.HAL\.Structures\.BufferChunk&lt;T&gt;|Cosmos\.Kernel\.HAL\.Structures\.RentedList&lt;T&gt;|Cosmos\.Kernel\.HAL\.Structures\.RentedMemory&lt;T&gt;|Cosmos\.Kernel\.HAL\.Structures\.RingBuffer&lt;T&gt;</_CosmosStableHalTypes>
       <!-- A stable line: optional modifiers (static, override), one of those types, then the end of the line or one of its members. -->
       <_CosmosStableHalLine>^(?:[a-z]+ )*(?:$(_CosmosStableHalTypes))(?:[.( ]|$)</_CosmosStableHalLine>
     </PropertyGroup>
