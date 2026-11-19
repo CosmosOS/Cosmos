@@ -251,7 +251,10 @@ internal static class Serial
         byte* p = str;
         while (*p != 0)
         {
-            EarlyGop.PutChar((char)*p); // Echo to screen for early debugging
+            if (CosmosFeatures.BootConsoleEnabled)
+            {
+                EarlyGop.PutChar((char)*p); // Echo to screen for early debugging
+            }
             ComWrite(*p);
             p++;
         }
@@ -266,7 +269,10 @@ internal static class Serial
         {
             for (int i = 0; i < str.Length; i++)
             {
-                EarlyGop.PutChar(ptr[i]); // Echo to screen for early debugging
+                if (CosmosFeatures.BootConsoleEnabled)
+                {
+                    EarlyGop.PutChar(ptr[i]); // Echo to screen for early debugging
+                }
                 ComWrite((byte)ptr[i]);
             }
         }
@@ -319,7 +325,10 @@ internal static class Serial
         PortScope port = new();
         for (int i = index - 1; i >= 0; i--)
         {
-            EarlyGop.PutChar((char)buffer[i]);
+            if (CosmosFeatures.BootConsoleEnabled)
+            {
+                EarlyGop.PutChar((char)buffer[i]);
+            }
             ComWrite(buffer[i]);
         }
 
