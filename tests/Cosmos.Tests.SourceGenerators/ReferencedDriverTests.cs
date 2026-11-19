@@ -3,8 +3,6 @@
 using System.Collections.Immutable;
 using System.Text;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Testing;
 using Xunit;
 
 namespace Cosmos.Tests.SourceGenerators;
@@ -100,9 +98,9 @@ public sealed class ReferencedDriverTests
     [Fact]
     public async Task WhenReferencedAssemblySeesTheKit_RegistersItsVisibleDriversAfterTheKernelsOwn()
     {
-        ImmutableArray<MetadataReference> framework = await FrameworkAsync();
-        MetadataReference hal = Compile(HalAssemblyName, framework, KitStubs.Hal("public"));
-        MetadataReference drivers = Compile(DriversAssemblyName, framework.Add(hal), DriverLibrary);
+        ImmutableArray<MetadataReference> framework = await StubAssemblies.FrameworkAsync();
+        MetadataReference hal = StubAssemblies.Compile(HalAssemblyName, framework, KitStubs.Hal("public"));
+        MetadataReference drivers = StubAssemblies.Compile(DriversAssemblyName, framework.Add(hal), DriverLibrary);
 
         ManifestTest test = new ManifestTest(includeKitStubs: false)
             .WithKernelClass(KitStubs.KernelClass)
@@ -121,9 +119,9 @@ public sealed class ReferencedDriverTests
     [Fact]
     public async Task WhenReferencedDriverIsExcluded_LeavesItOut()
     {
-        ImmutableArray<MetadataReference> framework = await FrameworkAsync();
-        MetadataReference hal = Compile(HalAssemblyName, framework, KitStubs.Hal("public"));
-        MetadataReference drivers = Compile(DriversAssemblyName, framework.Add(hal), DriverLibrary);
+        ImmutableArray<MetadataReference> framework = await StubAssemblies.FrameworkAsync();
+        MetadataReference hal = StubAssemblies.Compile(HalAssemblyName, framework, KitStubs.Hal("public"));
+        MetadataReference drivers = StubAssemblies.Compile(DriversAssemblyName, framework.Add(hal), DriverLibrary);
 
         ManifestTest test = new ManifestTest(includeKitStubs: false)
             .WithKernelClass(KitStubs.KernelClass)
@@ -143,8 +141,8 @@ public sealed class ReferencedDriverTests
             .WithSource("/k/Drivers.cs", KernelDriver)
             .ExpectEntryPoint(KitStubs.KernelClass)
             .ExpectManifest(GeneratedText.Registration("MyOS.Drivers.Board"));
-        ImmutableArray<MetadataReference> framework = await FrameworkAsync();
-        MetadataReference hal = Compile(HalAssemblyName, framework, KitStubs.Hal("internal"), InternalsVisibleTo(test.TestState.AssemblyName));
+        ImmutableArray<MetadataReference> framework = await StubAssemblies.FrameworkAsync();
+        MetadataReference hal = StubAssemblies.Compile(HalAssemblyName, framework, KitStubs.Hal("internal"), InternalsVisibleTo(test.TestState.AssemblyName));
 
         test.TestState.AdditionalReferences.Add(hal);
         await test.RunAsync();
@@ -162,17 +160,14 @@ public sealed class ReferencedDriverTests
                 GeneratedText.Registration("Acme.Internal.Bridge"),
                 GeneratedText.GuardedRegistration("Pci", "Acme.Internal.Slot"));
         string kernelAssemblyName = test.TestState.AssemblyName;
-        ImmutableArray<MetadataReference> framework = await FrameworkAsync();
-        MetadataReference hal = Compile(HalAssemblyName, framework, KitStubs.Hal("internal"), InternalsVisibleTo(kernelAssemblyName, InternalDriversAssemblyName));
-        MetadataReference drivers = Compile(InternalDriversAssemblyName, framework.Add(hal), InternalDriverLibrary, InternalsVisibleTo(kernelAssemblyName));
+        ImmutableArray<MetadataReference> framework = await StubAssemblies.FrameworkAsync();
+        MetadataReference hal = StubAssemblies.Compile(HalAssemblyName, framework, KitStubs.Hal("internal"), InternalsVisibleTo(kernelAssemblyName, InternalDriversAssemblyName));
+        MetadataReference drivers = StubAssemblies.Compile(InternalDriversAssemblyName, framework.Add(hal), InternalDriverLibrary, InternalsVisibleTo(kernelAssemblyName));
 
         test.TestState.AdditionalReferences.Add(hal);
         test.TestState.AdditionalReferences.Add(drivers);
         await test.RunAsync();
     }
-
-    private static Task<ImmutableArray<MetadataReference>> FrameworkAsync() =>
-        ReferenceAssemblies.Net.Net90.ResolveAsync(LanguageNames.CSharp, CancellationToken.None);
 
     /// <summary>A compilation unit that grants each of <paramref name="assemblyNames"/> access to the internals of the assembly it is compiled into.</summary>
     /// <param name="assemblyNames">The simple names of the assemblies granted access.</param>
@@ -185,22 +180,5 @@ public sealed class ReferencedDriverTests
         }
 
         return builder.ToString();
-    }
-
-    /// <summary>Compiles <paramref name="sources"/> into an in-memory library named <paramref name="assemblyName"/>, failing the test on any compile error.</summary>
-    /// <param name="assemblyName">The library's simple name, which the generator and the grants match on.</param>
-    /// <param name="references">The framework and the libraries it references.</param>
-    /// <param name="sources">One compilation unit per string.</param>
-    private static MetadataReference Compile(string assemblyName, ImmutableArray<MetadataReference> references, params string[] sources)
-    {
-        CSharpCompilation compilation = CSharpCompilation.Create(
-            assemblyName,
-            sources.Select(source => CSharpSyntaxTree.ParseText(source)),
-            references,
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-        using MemoryStream stream = new();
-        Microsoft.CodeAnalysis.Emit.EmitResult result = compilation.Emit(stream);
-        Assert.True(result.Success, string.Join("\n", result.Diagnostics));
-        return MetadataReference.CreateFromImage(stream.ToArray());
     }
 }

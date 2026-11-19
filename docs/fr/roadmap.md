@@ -1,5 +1,5 @@
 ---
-source_hash: 2bad57cfc5819f387da608190853fc35b52a1fd8
+source_hash: f55e8cd55cc32270cb4fd4711a588f54b32cb173
 ---
 <a id="gen2gen3-feature-comparison"></a>
 
@@ -25,6 +25,7 @@ source_hash: 2bad57cfc5819f387da608190853fc35b52a1fd8
 | Saisie au clavier | ✅ | ✅ | Claviers PS/2 (x64), virtio et USB, tous sous forme de pilotes du kit de pilotes |
 | Saisie à la souris | ✅ | ✅ | Souris PS/2 (x64), virtio et USB, toutes sous forme de pilotes du kit de pilotes |
 | Interface audio | 🟡 | ✅ | Intel HD Audio : lecture WAV, flux générés et `Console.Beep`. Lecture uniquement, un flux par sortie. |
+| Noyaux en Visual Basic | ✅ | ✅ | `cosmos new -l vb` et les trois extensions pour IDE. Une classe qui déclare un span s'écrit dans une bibliothèque C# ([Noyaux en Visual Basic](articles/user/visual-basic.md)). |
 
 <a id="additional-gen3-features"></a>
 

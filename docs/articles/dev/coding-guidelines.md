@@ -145,8 +145,8 @@ A file's namespace is its project's name followed by the folders between
 the project and the file: `Cosmos.Kernel.Core/Scheduler/SchedulerThread.cs`
 declares `Cosmos.Kernel.Core.Scheduler`. The build enforces it with IDE0130
 at error for every `src/Cosmos.Kernel*` project, the test kernels, the
-host-side unit tests in `tests/Cosmos.Kernel.Tests.System` and
-`examples/DevKernel`, so `dotnet build` fails on a file that drifts (the
+host-side unit tests in `tests/Cosmos.Kernel.Tests.System` and the C#
+kernels under `examples`, so `dotnet build` fails on a file that drifts (the
 format CI checks the projects in `cosmos.slnx`, which leaves out
 the test kernels). Move the file or fix the namespace rather than adding an
 exemption. The exemptions, each with its reason, close `.editorconfig`:

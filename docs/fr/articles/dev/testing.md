@@ -1,5 +1,5 @@
 ---
-source_hash: b9cbb8aeb98722a2ae3c92e34ff6ccc51a282da8
+source_hash: dbd89e6da371d74a2a6150940aa76a326c1c2c29
 ---
 <a id="testing"></a>
 
@@ -43,7 +43,7 @@ dotnet test tests/Cosmos.Kernel.Tests.System      # the kernel library tests
   - `LoadPlugs_ShouldIgnoreClassesWithoutPlugAttribute`
   - `LoadPlugs_ShouldHandleOptionalPlugs`
   - `FindPluggedAssemblies_ShouldReturnMatchingAssemblies`
-- **Cosmos.Tests.SourceGenerators** : exécute `CosmosEntryPointGenerator` et `DriverManifestGenerator` sur des compilations en mémoire et vérifie à l'identique le point d'entrée généré, le manifeste des pilotes et les diagnostics `COSMOSGEN` ; `FeatureParityTests` maintient `DriverFeature`, `KernelFeatures` et les stubs de test en phase, `ReferencedDriverTests` couvre les pilotes provenant d'assemblys référencés, publics ou sous une autorisation `InternalsVisibleTo`, et `CachingTests` vérifie que l'ajout d'un pilote laisse le point d'entrée en cache.
+- **Cosmos.Tests.SourceGenerators** : exécute `CosmosEntryPointGenerator` et `DriverManifestGenerator` sur des compilations en mémoire et vérifie à l'identique le point d'entrée généré, le manifeste des pilotes et les diagnostics `COSMOSGEN` ; `FeatureParityTests` maintient `DriverFeature`, `KernelFeatures` et les stubs de test en phase, `ReferencedDriverTests` couvre les pilotes provenant d'assemblys référencés, publics ou sous une autorisation `InternalsVisibleTo`, `VisualBasicTests` vérifie les fichiers Visual Basic que reçoit un noyau Visual Basic, et `CachingTests` vérifie que l'ajout d'un pilote laisse le point d'entrée en cache.
 - **Cosmos.Tests.Patcher** : s'assure que les plugs sont correctement appliqués aux méthodes et aux types cibles.
   - `PatchAssembly_ShouldSkipWhenNoMatchingPlugs`
   - `PatchObjectWithAThis_ShouldPlugInstanceCorrectly`

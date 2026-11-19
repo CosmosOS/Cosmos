@@ -2,9 +2,9 @@
   "$schema": "http://json.schemastore.org/template",
   "author": "CosmosOS",
   "classifications": ["Cosmos", "Kernel", "OS Development", "Bare Metal"],
-  "identity": "Cosmos.Kernel.Template",
-  "name": "Cosmos Kernel Project",
-  "shortName": "cosmos-kernel",
+  "identity": "Cosmos.Kernel.Template.CSharp",
+  "name": "Cosmos Kernel Project (C#)",
+  "shortName": "cosmos-kernel-csharp",
   "tags": {
     "language": "C#",
     "type": "project"

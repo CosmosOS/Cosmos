@@ -1,4 +1,4 @@
-<!-- source_hash: c51eb2611255fdfd661a0f3f81257c491c185ca8 -->
+<!-- source_hash: 628b5f315b34a61ed57f283d2dcc472ee22734dd -->
 <p align="center">
   <img src="https://user-images.githubusercontent.com/63316499/89792973-43587480-daf3-11ea-99d6-82f89dd2ffc3.png" width="25%" />
 </p>
@@ -26,6 +26,7 @@ Cosmos gen2 通过自定义的转译器 **IL2CPU** 把 C# IL 编译为 x86 汇�
 
 - NativeAOT 编译
 - x64 和 ARM64
+- 可用 C# 或 [Visual Basic](https://cosmosos.github.io/zh/articles/user/visual-basic.html) 编写内核
 - [Limine](https://github.com/Limine-Bootloader/Limine) 引导协议
 - [Cosmos plug 系统](https://cosmosos.github.io/zh/articles/dev/plugs.html)
 - .NET 运行时支持

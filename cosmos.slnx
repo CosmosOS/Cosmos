@@ -1,6 +1,8 @@
 <Solution>
     <Folder Name="/examples/">
+        <Project Path="examples\CSharpKernel\CSharpKernel.csproj" />
         <Project Path="examples\DevKernel\DevKernel.csproj" />
+        <Project Path="examples\VisualBasicKernel\VisualBasicKernel.vbproj" />
     </Folder>
     <Folder Name="/src/">
         <Project Path="src/Cosmos.Kernel.Boot.Limine/Cosmos.Kernel.Boot.Limine.csproj" />

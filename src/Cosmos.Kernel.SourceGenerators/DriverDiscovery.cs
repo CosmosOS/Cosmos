@@ -2,7 +2,6 @@
 
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Cosmos.Kernel.SourceGenerators;
 
@@ -31,16 +30,20 @@ internal static class DriverDiscovery
     /// <summary>
     /// Reduces one attributed class of the kernel's own source to a candidate.
     /// Called by <c>ForAttributeWithMetadataName</c> for each declaration
-    /// carrying the attribute.
+    /// carrying the attribute, in either language.
     /// </summary>
     /// <param name="context">The declaration, its symbol and the attribute.</param>
     /// <param name="cancellationToken">Cancels the inspection.</param>
-    public static DriverCandidate FromSource(GeneratorAttributeSyntaxContext context, CancellationToken cancellationToken)
+    /// <returns>The candidate, or null when the attribute is on something other than a type, which the compiler reports.</returns>
+    public static DriverCandidate? FromSource(GeneratorAttributeSyntaxContext context, CancellationToken cancellationToken)
     {
-        INamedTypeSymbol type = (INamedTypeSymbol)context.TargetSymbol;
+        if (context.TargetSymbol is not INamedTypeSymbol type)
+        {
+            return null;
+        }
+
         AttributeData attribute = context.Attributes[0];
         SyntaxNode node = context.TargetNode;
-        Location classLocation = node is BaseTypeDeclarationSyntax declaration ? declaration.Identifier.GetLocation() : node.GetLocation();
         Location? attributeLocation = attribute.ApplicationSyntaxReference?.GetSyntax(cancellationToken).GetLocation();
         return Inspect(
             type,
@@ -48,8 +51,21 @@ internal static class DriverDiscovery
             context.SemanticModel.Compilation,
             node.SyntaxTree.FilePath,
             node.SpanStart,
-            SourceLocationInfo.From(classLocation),
+            SourceLocationInfo.From(NameLocation(type, node)),
             SourceLocationInfo.From(attributeLocation));
+    }
+
+    /// <summary>
+    /// Where <paramref name="declaration"/> names <paramref name="type"/>: the
+    /// symbol's location inside that declaration, which is the class name in
+    /// both languages, or the whole declaration if none falls inside it.
+    /// </summary>
+    /// <param name="type">The declared type.</param>
+    /// <param name="declaration">One declaration of it.</param>
+    private static Location NameLocation(INamedTypeSymbol type, SyntaxNode declaration)
+    {
+        return type.Locations.FirstOrDefault(location => location.SourceTree == declaration.SyntaxTree && declaration.Span.Contains(location.SourceSpan))
+            ?? declaration.GetLocation();
     }
 
     /// <summary>
@@ -64,14 +80,9 @@ internal static class DriverDiscovery
     public static EquatableArray<DriverCandidate> FromReferences(Compilation compilation, CancellationToken cancellationToken)
     {
         ImmutableArray<DriverCandidate>.Builder found = ImmutableArray.CreateBuilder<DriverCandidate>();
-        foreach (IAssemblySymbol assembly in compilation.SourceModule.ReferencedAssemblySymbols)
+        foreach (IAssemblySymbol assembly in compilation.SourceModule.ReferencedAssemblySymbols.Where(SeesDriverKit))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (!SeesDriverKit(assembly))
-            {
-                continue;
-            }
-
             CollectNamespace(assembly.GlobalNamespace, assembly, compilation, found, cancellationToken);
         }
 
@@ -87,23 +98,8 @@ internal static class DriverDiscovery
 
     private static bool SeesDriverKit(IAssemblySymbol assembly)
     {
-        if (assembly.Name == HalAssemblyName)
-        {
-            return true;
-        }
-
-        foreach (IModuleSymbol module in assembly.Modules)
-        {
-            foreach (AssemblyIdentity referenced in module.ReferencedAssemblies)
-            {
-                if (referenced.Name == HalAssemblyName)
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return assembly.Name == HalAssemblyName
+            || assembly.Modules.Any(static module => module.ReferencedAssemblies.Any(static referenced => referenced.Name == HalAssemblyName));
     }
 
     private static void CollectNamespace(
@@ -147,15 +143,8 @@ internal static class DriverDiscovery
     /// <summary>The <c>[Driver]</c> attribute on <paramref name="type"/>, or null when it carries none.</summary>
     private static AttributeData? FindDriverAttribute(INamedTypeSymbol type)
     {
-        foreach (AttributeData candidate in type.GetAttributes())
-        {
-            if (candidate.AttributeClass is not null && candidate.AttributeClass.ToDisplayString(s_fullNameFormat) == DriverAttributeMetadataName)
-            {
-                return candidate;
-            }
-        }
-
-        return null;
+        return type.GetAttributes().FirstOrDefault(static candidate =>
+            candidate.AttributeClass is not null && candidate.AttributeClass.ToDisplayString(s_fullNameFormat) == DriverAttributeMetadataName);
     }
 
     private static DriverCandidate Inspect(
@@ -240,15 +229,8 @@ internal static class DriverDiscovery
             return null;
         }
 
-        foreach (ISymbol member in enumType.GetMembers())
-        {
-            if (member is IFieldSymbol { HasConstantValue: true } field && Equals(field.ConstantValue, constant.Value))
-            {
-                return field.Name;
-            }
-        }
-
-        return null;
+        return enumType.GetMembers().OfType<IFieldSymbol>()
+            .FirstOrDefault(field => field.HasConstantValue && Equals(field.ConstantValue, constant.Value))?.Name;
     }
 
     private static bool HasFeatureProperty(Compilation compilation, string memberName)
@@ -259,16 +241,9 @@ internal static class DriverDiscovery
             return false;
         }
 
-        foreach (ISymbol member in features.GetMembers(memberName))
-        {
-            if (member is IPropertySymbol { IsStatic: true, DeclaredAccessibility: Accessibility.Public, GetMethod: not null } property
-                && property.Type.SpecialType == SpecialType.System_Boolean)
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return features.GetMembers(memberName).Any(static member =>
+            member is IPropertySymbol { IsStatic: true, DeclaredAccessibility: Accessibility.Public, GetMethod: not null } property
+            && property.Type.SpecialType == SpecialType.System_Boolean);
     }
 
     private static DriverSkipReason SkipReasonOf(INamedTypeSymbol type, Compilation compilation)
@@ -334,14 +309,7 @@ internal static class DriverDiscovery
 
     private static bool HasAccessibleParameterlessConstructor(INamedTypeSymbol type, Compilation compilation)
     {
-        foreach (IMethodSymbol constructor in type.InstanceConstructors)
-        {
-            if (constructor.Parameters.Length == 0 && compilation.IsSymbolAccessibleWithin(constructor, compilation.Assembly))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return type.InstanceConstructors.Any(constructor =>
+            constructor.Parameters.Length == 0 && compilation.IsSymbolAccessibleWithin(constructor, compilation.Assembly));
     }
 }

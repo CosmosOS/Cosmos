@@ -25,6 +25,7 @@ Cosmos gen2 compiled C# IL to x86 assembly through **IL2CPU**, a custom transpil
 
 - NativeAOT compilation
 - x64 and ARM64
+- Kernels in C# or [Visual Basic](https://cosmosos.github.io/articles/user/visual-basic.html)
 - [Limine](https://github.com/Limine-Bootloader/Limine) boot protocol
 - [Cosmos plug system](https://cosmosos.github.io/articles/dev/plugs.html)
 - .NET runtime support

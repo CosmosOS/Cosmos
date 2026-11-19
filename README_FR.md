@@ -1,4 +1,4 @@
-<!-- source_hash: c51eb2611255fdfd661a0f3f81257c491c185ca8 -->
+<!-- source_hash: 628b5f315b34a61ed57f283d2dcc472ee22734dd -->
 <p align="center">
   <img src="https://user-images.githubusercontent.com/63316499/89792973-43587480-daf3-11ea-99d6-82f89dd2ffc3.png" width="25%" />
 </p>
@@ -26,6 +26,7 @@ Cosmos gen2 compilait l'IL C# en assembleur x86 au moyen d'**IL2CPU**, un transp
 
 - Compilation NativeAOT
 - x64 et ARM64
+- Noyaux en C# ou en [Visual Basic](https://cosmosos.github.io/fr/articles/user/visual-basic.html)
 - Protocole d'amorçage [Limine](https://github.com/Limine-Bootloader/Limine)
 - [Système de plugs de Cosmos](https://cosmosos.github.io/fr/articles/dev/plugs.html)
 - Prise en charge du runtime .NET

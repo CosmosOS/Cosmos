@@ -2,6 +2,8 @@
   href: install.md
 - name: Kernel Startup
   href: startup.md
+- name: Visual Basic Kernels
+  href: visual-basic.md
 - name: File System
   href: filesystem.md
 - name: Network
