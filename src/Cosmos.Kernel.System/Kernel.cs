@@ -61,7 +61,7 @@ public abstract partial class Kernel
 
         if (InterruptManager.IsEnabled)
         {
-            Serial.WriteString("[Kernel] Enabling interrupts...\n");   
+            Serial.WriteString("[Kernel] Enabling interrupts...\n");
             InternalCpu.EnableInterrupts();
         }
 
@@ -73,7 +73,7 @@ public abstract partial class Kernel
         // without a scheduler.
         if (Core.CosmosFeatures.FinalizerThreadEnabled)
         {
-            
+
             Serial.WriteString("[Kernel] Starting the finalizer thread...\n");
             CoreGC.ThreadedFinalizer = true;
         }
@@ -84,25 +84,25 @@ public abstract partial class Kernel
         Serial.WriteString("[Kernel] Starting drivers...\n");
         DriverEngine.Start();
         Serial.WriteString("[Kernel] Calling OnBoot()...\n");
-        
+
         OnBoot();
 
         EarlyGop.Enabled = false;
 
-        
+
         Serial.WriteString("[Kernel] Calling BeforeRun()...\n");
         BeforeRun();
 
         Started = true;
 
-        
+
         Serial.WriteString("[Kernel] Entering main loop...\n");
-        
+
         while (!Stopped)
         {
-            
+
             Serial.WriteString("[Kernel] Calling Run()...\n");
-            
+
             Run();
             Serial.WriteString("[Kernel] Run() returned\n");
         }
@@ -130,12 +130,12 @@ public abstract partial class Kernel
     protected virtual void OnBoot()
     {
         Serial.WriteString("[Kernel] OnBoot() called\n");
-        
+
         if (Core.CosmosFeatures.GraphicsEnabled)
         {
-            
+
             Serial.WriteString("[Kernel] Initializing KernelConsole...\n");
-            
+
             if (KernelConsole.Initialize())
             {
                 Serial.WriteString("[Kernel] KernelConsole initialized: ");
@@ -147,13 +147,13 @@ public abstract partial class Kernel
             else
             {
                 Serial.WriteString("[Kernel] WARNING: KernelConsole initialization failed!\n");
-                
+
             }
         }
         else
         {
             Serial.WriteString("[Kernel] Graphics disabled via feature switch.\n");
-            
+
         }
     }
 
