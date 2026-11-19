@@ -87,6 +87,7 @@ internal static class KitStubs
         {
             public static class KernelFeatures
             {
+                public static bool BootConsole => true;
                 public static bool Interrupts => true;
                 public static bool Uart => true;
                 public static bool Pci => true;
