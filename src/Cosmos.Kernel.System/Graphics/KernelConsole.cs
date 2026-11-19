@@ -58,7 +58,8 @@ public class KernelConsole
         0xFFFF0000, // Red
         0xFFFF00FF, // Magenta
         0xFFFFFF00, // Yellow
-        0xFFFFFFFF  // White
+        0xFFFFFFFF, // White
+        0x00000000, // Custom (for ExtendedConsole)
     ];
 
     private Font _font;
@@ -467,11 +468,33 @@ public class KernelConsole
     }
 
     /// <summary>
+    /// Sets the background color from a given Color struct.
+    /// </summary>
+    /// <remarks>
+    /// Allows for more customization, but should only be called from the ExtendedConsole class.
+    /// </remarks>
+    internal void SetForegroundColor(Color color)
+    {
+        _foregroundColor = (uint)color.ToArgb();
+    }
+
+    /// <summary>
     /// Sets the background color from ConsoleColor enum.
     /// </summary>
     internal void SetBackgroundColor(ConsoleColor color)
     {
         _backgroundColor = s_palette[(int)color];
+    }
+
+    /// <summary>
+    /// Sets the background color from a given Color struct.
+    /// </summary>
+    /// <remarks>
+    /// Allows for more customization, but should only be called from the ExtendedConsole class.
+    /// </remarks>
+    internal void SetBackgroundColor(Color color)
+    {
+        _backgroundColor = (uint)color.ToArgb();
     }
 
     /// <summary>
