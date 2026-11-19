@@ -272,6 +272,24 @@ public class KernelConsole
     }
 
     /// <summary>
+    /// Gets and sets the background color as an unsigned integer.
+    /// </summary>
+    internal uint BackgroundColor
+    {
+        get => _backgroundColor;
+        set => _backgroundColor = value;
+    }
+
+    /// <summary>
+    /// Gets and sets the foreground color as an unsigned integer.
+    /// </summary>
+    internal uint ForegroundColor
+    {
+        get => _foregroundColor;
+        set => _foregroundColor = value;
+    }
+
+    /// <summary>
     /// Creates a new KernelConsole on the given canvas.
     /// </summary>
     /// <param name="canvas">The canvas to render to.</param>
@@ -468,33 +486,11 @@ public class KernelConsole
     }
 
     /// <summary>
-    /// Sets the background color from a given Color struct.
-    /// </summary>
-    /// <remarks>
-    /// Allows for more customization, but should only be called from the ExtendedConsole class.
-    /// </remarks>
-    internal void SetForegroundColor(Color color)
-    {
-        _foregroundColor = (uint)color.ToArgb();
-    }
-
-    /// <summary>
     /// Sets the background color from ConsoleColor enum.
     /// </summary>
     internal void SetBackgroundColor(ConsoleColor color)
     {
         _backgroundColor = s_palette[(int)color];
-    }
-
-    /// <summary>
-    /// Sets the background color from a given Color struct.
-    /// </summary>
-    /// <remarks>
-    /// Allows for more customization, but should only be called from the ExtendedConsole class.
-    /// </remarks>
-    internal void SetBackgroundColor(Color color)
-    {
-        _backgroundColor = (uint)color.ToArgb();
     }
 
     /// <summary>

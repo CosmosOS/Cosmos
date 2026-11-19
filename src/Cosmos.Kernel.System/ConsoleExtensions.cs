@@ -21,8 +21,7 @@ namespace Cosmos.Kernel.System
                 }
 
                 session.BackgroundColor = colorToSet;
-                session.Screen.SetBackgroundColor(color);
-                return;
+                session.Screen.BackgroundColor = (uint)color.ToArgb();
             }
 
             public static void SetForegroundColor(Color color)
@@ -37,8 +36,7 @@ namespace Cosmos.Kernel.System
                 }
 
                 session.ForegroundColor = colorToSet;
-                session.Screen.SetForegroundColor(color);
-                return;
+                session.Screen.ForegroundColor = (uint)color.ToArgb();
             }
         }
     }
