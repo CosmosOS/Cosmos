@@ -7,7 +7,12 @@
 
 // External managed functions
 .extern RhThrowEx                   // C# exception dispatcher
-.extern __cosmos_exinfo_head        // &head of the running thread's ExInfo chain (ExceptionNative)
+
+// The head of the running thread's ExInfo chain is reached through the per-CPU block
+// (Core/CPU/PerCpuBlock.cs, the layout's home): its CurrentExInfoHead slot holds the address of
+// the running thread's chain head, kept current by the scheduler's switch path, and the boot
+// code's before a thread is current. One load through IA32_GS_BASE, no callout.
+.equ PERCPU_CURRENT_EXINFO_HEAD,  0x38
 
 //=============================================================================
 // Structure offsets (from AsmOffsetsCpu.h)
@@ -103,11 +108,8 @@ RhpThrowEx:
     // Save exception object temporarily
     mov     rbx, rdi                // rbx = exception object
 
-    // RAX = &head of this thread's ExInfo chain. A managed callout, so it may clobber every
-    // caller-saved register: it runs before RSI is set up below. The exception object sits in RBX,
-    // which it preserves, and RSP is 16-byte aligned here (the pushes above plus
-    // STACKSIZEOF_ExInfo are a multiple of 16).
-    call    __cosmos_exinfo_head
+    // RAX = &head of this thread's ExInfo chain, one load through the per-CPU block.
+    mov     rax, qword ptr gs:[PERCPU_CURRENT_EXINFO_HEAD]
 
     // RSI = ExInfo* (current RSP)
     mov     rsi, rsp
@@ -149,7 +151,7 @@ RhpThrowEx:
 //                              region; pRbx/pRbp/pR12..pR15 -> the establisher's body register
 //                              values; the dispatcher fills these from the CFI unwind)
 //         RCX = ExInfo*       (unused — the ExInfo pop loop below walks this thread's chain from
-//                              the head __cosmos_exinfo_head returns, so RCX is not saved)
+//                              the head the per-CPU block points at, so RCX is not saved)
 //
 // The catch funclet runs with the establisher frame's RBP/RBX/R12-R15 (restored below) and the
 // exception object in RDI; it returns, in RAX, the IP in the catching method right after the
@@ -167,9 +169,9 @@ RhpThrowEx:
 // CFI: the prologue is described so the precise GC stack scan / exception unwinder (issue #346)
 // can step from inside the funclet up through this trampoline into the dispatcher's managed frame.
 // Only the post-`call qword ptr [rsp + 8]` IP is ever a CFI target here (GC cannot fire elsewhere
-// in this stub — interrupts off, no allocations; the __cosmos_exinfo_head callout allocates
-// nothing), and the `mov rsp, r9 / jmp r8` resume tail runs strictly after that point, so
-// describing just the prologue is sufficient and correct.
+// in this stub — interrupts off, no allocations, no callout), and the `mov rsp, r9 / jmp r8`
+// resume tail runs strictly after that point, so describing just the prologue is sufficient and
+// correct.
 //=============================================================================
 .global RhpCallCatchFunclet
 .cfi_startproc
@@ -232,15 +234,13 @@ RhpCallCatchFunclet:
     mov     rdi, [rsp + 16]         // exception object
     call    qword ptr [rsp + 8]     // call handler funclet
 
-    // RAX = the IP in the catching method right after the protected region. Keep it in the handler
-    // slot, dead now, across the callout for the head of this thread's ExInfo chain: a managed call
-    // that may clobber every caller-saved register. RSP is still 16-byte aligned here, as it was
-    // for the funclet call. Then reload REGDISPLAY* (the funclet may have clobbered RDX).
+    // RAX = the IP in the catching method right after the protected region. The head of this
+    // thread's ExInfo chain is one load through the per-CPU block (the funclet may have switched
+    // CPUs, under SMP, so it is read now, not before the call). Then reload REGDISPLAY* (the
+    // funclet may have clobbered RDX).
     // Stack layout from the prologue pushes: [rsp+0]=REGDISPLAY* [rsp+8]=handler [rsp+16]=exObj
-    mov     [rsp + 8], rax          // [rsp+8] = resume IP
-    call    __cosmos_exinfo_head
-    mov     r11, rax                // r11 = &head of this thread's ExInfo chain
-    mov     r8, [rsp + 8]           // r8 = resume IP
+    mov     r8, rax                 // r8 = resume IP
+    mov     r11, qword ptr gs:[PERCPU_CURRENT_EXINFO_HEAD]   // r11 = &head of this thread's ExInfo chain
     mov     rdx, [rsp]              // rdx = REGDISPLAY*
 
     // r9 = the catching method's body RSP at the protected region (REGDISPLAY.SP). The dispatcher
@@ -449,12 +449,9 @@ RhpCallFinallyFunclet:
 //=============================================================================
 .global RhpRethrow
 RhpRethrow:
-    // The exception to rethrow is the one at the head of this thread's ExInfo chain. The head comes
-    // from a managed callout, which wants a 16-byte aligned stack: on entry here, right after the
-    // funclet's call, RSP is off by 8.
-    sub     rsp, 8
-    call    __cosmos_exinfo_head
-    add     rsp, 8
+    // The exception to rethrow is the one at the head of this thread's ExInfo chain, one load
+    // through the per-CPU block.
+    mov     rax, qword ptr gs:[PERCPU_CURRENT_EXINFO_HEAD]
     mov     rax, [rax]
     test    rax, rax
     jz      .Lhalt

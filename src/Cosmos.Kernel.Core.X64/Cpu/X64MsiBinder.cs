@@ -129,16 +129,24 @@ internal sealed class X64MsiBinder : IMsiBinder
             ReleaseVector(device, entryIndex);
         }
 
-        byte vector = InterruptManager.AllocateVector(handler);
-        device?.Vectors[entryIndex] = vector;
-
         // The CPU index is not the LAPIC destination ID: the BSP's APIC ID
         // is not architecturally guaranteed to be 0 (QEMU's is; real
         // multi-socket parts often differ), and an MSI aimed at a
-        // nonexistent LAPIC is silently dropped. Until SMP brings a
-        // MADT-backed index→APIC-ID map, resolve the boot CPU's real ID at
-        // bind time; other indices are unreachable today (single-CPU).
-        byte apicId = targetCpu == 0 ? LocalApic.GetId() : (byte)targetCpu;
+        // nonexistent LAPIC is silently dropped. The per-CPU block of the
+        // target records the id its LAPIC bring-up read; a CPU that is not
+        // online has none, and a message aimed there would vanish, so it is
+        // refused here, before a vector is allocated for it.
+        ref PerCpuBlock target = ref PerCpuBlock.At(targetCpu);
+        if (target.Online == 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(targetCpu), "X64MsiBinder: the target CPU is not online");
+        }
+
+        byte apicId = (byte)target.HardwareId;
+
+        byte vector = InterruptManager.AllocateVector(handler);
+        device?.Vectors[entryIndex] = vector;
+
         address = MsiAddressBase | ((ulong)apicId << MsiDestinationIdShift);
         data = vector;
     }

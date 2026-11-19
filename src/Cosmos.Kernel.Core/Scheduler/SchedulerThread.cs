@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Cosmos.Kernel.Core.Memory.GarbageCollector;
 using Cosmos.Kernel.Core.Runtime.ExceptionHandling;
@@ -212,6 +213,14 @@ public sealed unsafe class SchedulerThread : SchedulerExtensible
     {
         return ref _exceptionDispatchState;
     }
+
+    /// <summary>
+    /// The address of this thread's ExInfo chain head slot
+    /// (<see cref="ExceptionDispatchState.ExInfoHead"/>): what the scheduler writes into the
+    /// per-CPU block's <c>CurrentExInfoHead</c> when the thread becomes current, so the native
+    /// stubs link a throw into this thread's chain. Stable: the collector does not move objects.
+    /// </summary>
+    internal nuint ExInfoHeadSlot => (nuint)Unsafe.AsPointer(ref _exceptionDispatchState.ExInfoHead);
 
     /// <summary>
     /// Gets a pointer to the thread's saved context.
