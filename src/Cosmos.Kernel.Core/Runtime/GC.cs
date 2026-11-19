@@ -75,7 +75,7 @@ internal static unsafe class GC
             data->_index = info.CollectionIndex;
             data->_generation = info.CondemnedGeneration;
 
-            data->_finalizationPendingCount = GetFinalizationPendingCount();
+            data->_finalizationPendingCount = GarbageCollector.GetFinalizationPendingCount();
 
             // not tracked currently
             data->_pauseTimePercentage = 0;
@@ -150,14 +150,14 @@ internal static unsafe class GC
     [RuntimeExport("RhReRegisterForFinalize")]
     internal static bool RhReRegisterForFinalize(GCObject* obj)
     {
-        return TryRegisterForFinalize(obj);
+        return GarbageCollector.TryRegisterForFinalize(obj);
     }
 
     [RuntimeExport("RhWaitForPendingFinalizers")]
     internal static void RhWaitForPendingFinalizers(int allowReentrantWait)
     {
         // Waits for the finalizer thread when it is on, runs what is pending otherwise
-        WaitPendingFinalizers();
+        GarbageCollector.WaitPendingFinalizers();
     }
 
     [RuntimeExport("RhGetMaxGcGeneration")]

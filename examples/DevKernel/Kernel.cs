@@ -31,7 +31,7 @@ public class Kernel : Sys.Kernel
 
         Console.Clear();
         Console.WriteLine(BannerRule);
-        Console.WriteLine($"         CosmosOS {VersionString} Shell       ");
+        Console.WriteLine($"         CosmosOS {Sys.Kernel.VersionString} Shell       ");
         Console.WriteLine(BannerRule);
         Console.WriteLine();
 
