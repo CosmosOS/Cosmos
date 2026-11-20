@@ -58,7 +58,8 @@ public class KernelConsole
         0xFFFF0000, // Red
         0xFFFF00FF, // Magenta
         0xFFFFFF00, // Yellow
-        0xFFFFFFFF  // White
+        0xFFFFFFFF, // White
+        0x00000000, // Custom (for ExtendedConsole)
     ];
 
     private Font _font;
@@ -268,6 +269,24 @@ public class KernelConsole
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Gets and sets the background color as an unsigned integer.
+    /// </summary>
+    internal Color BackgroundColor
+    {
+        get => Color.FromArgb((int)_backgroundColor);
+        set => _backgroundColor = (uint)value.ToArgb();
+    }
+
+    /// <summary>
+    /// Gets and sets the foreground color as an unsigned integer.
+    /// </summary>
+    internal Color ForegroundColor
+    {
+        get => Color.FromArgb((int)_foregroundColor);
+        set => _foregroundColor = (uint)value.ToArgb();
     }
 
     /// <summary>
