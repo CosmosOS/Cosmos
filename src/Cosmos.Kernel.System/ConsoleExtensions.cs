@@ -9,6 +9,16 @@ namespace Cosmos.Kernel.System
     {
         extension(Console)
         {
+            public static Color GetBackgroundColor()
+            {
+                return SessionManager.RequireCurrent().Screen.BackgroundColor;
+            }
+
+            public static Color GetForegroundColor()
+            {
+                return SessionManager.RequireCurrent().Screen.ForegroundColor;
+            }
+
             public static void SetBackgroundColor(Color color)
             {
                 ConsoleSession session = SessionManager.RequireCurrent();
@@ -21,7 +31,7 @@ namespace Cosmos.Kernel.System
                 }
 
                 session.BackgroundColor = colorToSet;
-                session.Screen.BackgroundColor = (uint)color.ToArgb();
+                session.Screen.BackgroundColor = color;
             }
 
             public static void SetForegroundColor(Color color)
@@ -36,7 +46,7 @@ namespace Cosmos.Kernel.System
                 }
 
                 session.ForegroundColor = colorToSet;
-                session.Screen.ForegroundColor = (uint)color.ToArgb();
+                session.Screen.ForegroundColor = color;
             }
         }
     }

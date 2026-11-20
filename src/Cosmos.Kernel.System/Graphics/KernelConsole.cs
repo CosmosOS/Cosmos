@@ -274,19 +274,19 @@ public class KernelConsole
     /// <summary>
     /// Gets and sets the background color as an unsigned integer.
     /// </summary>
-    internal uint BackgroundColor
+    internal Color BackgroundColor
     {
-        get => _backgroundColor;
-        set => _backgroundColor = value;
+        get => Color.FromArgb((int)_backgroundColor);
+        set => _backgroundColor = (uint)value.ToArgb();
     }
 
     /// <summary>
     /// Gets and sets the foreground color as an unsigned integer.
     /// </summary>
-    internal uint ForegroundColor
+    internal Color ForegroundColor
     {
-        get => _foregroundColor;
-        set => _foregroundColor = value;
+        get => Color.FromArgb((int)_foregroundColor);
+        set => _foregroundColor = (uint)value.ToArgb();
     }
 
     /// <summary>
