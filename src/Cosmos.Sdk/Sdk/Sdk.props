@@ -107,13 +107,13 @@
 
   <!-- Determine host runtime identifier (where the build runs) -->
   <PropertyGroup>
-    <HostRuntimeIdentifier Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))">win-x64</HostRuntimeIdentifier>
-    <HostRuntimeIdentifier Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux))) AND '$(HostRuntimeIdentifier)' == ''">linux-x64</HostRuntimeIdentifier>
-    <HostRuntimeIdentifier Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX))) AND '$(HostRuntimeIdentifier)' == ''">osx-x64</HostRuntimeIdentifier>
-    <!-- Fallback for ARM64 hosts -->
-    <HostRuntimeIdentifier Condition="'$(HostRuntimeIdentifier)' == ''">$(RuntimeIdentifier)</HostRuntimeIdentifier>
+    <HostRuntimeOs Condition="'$(OS)' == 'Windows_NT'">win</HostRuntimeOs>
+    <HostRuntimeOs Condition="'$(OS)' != 'Windows_NT' and Exists('/System/Library/CoreServices/SystemVersion.plist')">osx</HostRuntimeOs>
+    <HostRuntimeOs Condition="'$(HostRuntimeOs)' == ''">linux</HostRuntimeOs>
+    <HostRuntimeArch>$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant())</HostRuntimeArch>
+    <HostRuntimeIdentifier Condition="'$(HostRuntimeIdentifier)' == ''">$(HostRuntimeOs)-$(HostRuntimeArch)</HostRuntimeIdentifier>
   </PropertyGroup>
-
+ 
   <!-- Ensure AOT Reference and ILCompiler are present in nuget cache -->
   <ItemGroup>
     <PackageDownload Include="Microsoft.NETCore.App.Runtime.NativeAOT.$(RuntimeIdentifier)"

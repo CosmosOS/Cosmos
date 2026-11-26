@@ -12,19 +12,20 @@
 
   <!-- Resolves the path of 'ilc' to IlcToolsPath. -->
   <Target Name="ResolveIlcToolsPath" Condition="'$(IlcToolsPath)' == ''" DependsOnTargets="ResolvePackageAssets">
-    <PropertyGroup>
+    <PropertyGroup Condition="'$(HostRuntimeIdentifier)' == ''">
       <!-- Determine host OS for ILC compiler selection -->
       <IlcHostOs Condition="'$(OS)' == 'Windows_NT'">win</IlcHostOs>
       <IlcHostOs Condition="'$(OS)' != 'Windows_NT' and Exists('/System/Library/CoreServices/SystemVersion.plist')">osx</IlcHostOs>
       <IlcHostOs Condition="'$(IlcHostOs)' == ''">linux</IlcHostOs>
       <IlcHostArch>$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant())</IlcHostArch>
+      <HostRuntimeIdentifier Condition="'$(HostRuntimeIdentifier)' == ''">$(IlcHostOs)-$(IlcHostArch)</HostRuntimeIdentifier>
     </PropertyGroup>
 
     <ItemGroup>
       <!-- Always use the host OS ILC tools (ILC runs on the build machine, not the target) -->
-      <IlcHostCompilerPack Include="runtime.$(IlcHostOs)-$(IlcHostArch).Microsoft.DotNet.ILCompiler">
+      <IlcHostCompilerPack Include="runtime.$(HostRuntimeIdentifier).Microsoft.DotNet.ILCompiler">
         <NuGetPackageVersion>$(BundledNETCoreAppPackageVersion)</NuGetPackageVersion>
-        <NuGetPackageId>runtime.$(IlcHostOs)-$(IlcHostArch).Microsoft.DotNet.ILCompiler</NuGetPackageId>
+        <NuGetPackageId>runtime.$(HostRuntimeIdentifier).Microsoft.DotNet.ILCompiler</NuGetPackageId>
       </IlcHostCompilerPack>
     </ItemGroup>
 
