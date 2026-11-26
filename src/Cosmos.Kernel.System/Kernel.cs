@@ -73,6 +73,7 @@ public abstract partial class Kernel
         // without a scheduler.
         if (Core.CosmosFeatures.FinalizerThreadEnabled)
         {
+
             Serial.WriteString("[Kernel] Starting the finalizer thread...\n");
             CoreGC.ThreadedFinalizer = true;
         }
@@ -82,21 +83,26 @@ public abstract partial class Kernel
         // every one of them has been offered.
         Serial.WriteString("[Kernel] Starting drivers...\n");
         DriverEngine.Start();
-
         Serial.WriteString("[Kernel] Calling OnBoot()...\n");
+
         OnBoot();
 
         EarlyGop.Enabled = false;
+
 
         Serial.WriteString("[Kernel] Calling BeforeRun()...\n");
         BeforeRun();
 
         Started = true;
 
+
         Serial.WriteString("[Kernel] Entering main loop...\n");
+
         while (!Stopped)
         {
+
             Serial.WriteString("[Kernel] Calling Run()...\n");
+
             Run();
             Serial.WriteString("[Kernel] Run() returned\n");
         }
@@ -127,7 +133,9 @@ public abstract partial class Kernel
 
         if (Core.CosmosFeatures.GraphicsEnabled)
         {
+
             Serial.WriteString("[Kernel] Initializing KernelConsole...\n");
+
             if (KernelConsole.Initialize())
             {
                 Serial.WriteString("[Kernel] KernelConsole initialized: ");
@@ -139,11 +147,13 @@ public abstract partial class Kernel
             else
             {
                 Serial.WriteString("[Kernel] WARNING: KernelConsole initialization failed!\n");
+
             }
         }
         else
         {
             Serial.WriteString("[Kernel] Graphics disabled via feature switch.\n");
+
         }
     }
 

@@ -1054,6 +1054,7 @@ static Cosmos.Kernel.System.KernelFeatures.Storage.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Timer.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Uart.get -> bool
 static Cosmos.Kernel.System.KernelFeatures.Usb.get -> bool
+static Cosmos.Kernel.System.KernelFeatures.BootConsole.get -> bool
 static Cosmos.Kernel.System.Network.Address.operator !=(Cosmos.Kernel.System.Network.Address! a, Cosmos.Kernel.System.Network.Address! b) -> bool
 static Cosmos.Kernel.System.Network.Address.operator &(Cosmos.Kernel.System.Network.Address! a, Cosmos.Kernel.System.Network.Address! b) -> Cosmos.Kernel.System.Network.MaskedAddress
 static Cosmos.Kernel.System.Network.Address.operator ==(Cosmos.Kernel.System.Network.Address! a, Cosmos.Kernel.System.Network.Address! b) -> bool

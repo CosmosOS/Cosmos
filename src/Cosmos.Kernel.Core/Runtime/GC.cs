@@ -143,7 +143,7 @@ internal static unsafe class GC
     [RuntimeExport("RhSuppressFinalize")]
     internal static void RhSuppressFinalize(GCObject* obj)
     {
-        GarbageCollector.SuppressFinalize(obj);
+        SuppressFinalize(obj);
     }
 
     // CoreLib throws OutOfMemoryException when this returns false

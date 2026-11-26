@@ -41,6 +41,7 @@
   <PropertyGroup>
     <CosmosEnableInterrupts Condition="'$(CosmosEnableInterrupts)' == ''">true</CosmosEnableInterrupts>
     <CosmosEnableUART Condition="'$(CosmosEnableUART)' == ''">true</CosmosEnableUART>
+    <CosmosEnableBootConsole Condition="'$(CosmosEnableBootConsole)' == ''">true</CosmosEnableBootConsole> 
     <CosmosEnablePCI Condition="'$(CosmosEnablePCI)' == ''">true</CosmosEnablePCI>
     <CosmosEnableTimer Condition="'$(CosmosEnableTimer)' == ''">true</CosmosEnableTimer>
     <CosmosEnableKeyboard Condition="'$(CosmosEnableKeyboard)' == ''">true</CosmosEnableKeyboard>
@@ -78,6 +79,7 @@
     <!-- Cosmos Feature Switches -->
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.HAL.Interrupts.Enabled" Value="$(CosmosEnableInterrupts)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.HAL.UART.Enabled" Value="$(CosmosEnableUART)" Trim="true"/>
+    <RuntimeHostConfigurationOption Include="Cosmos.Kernel.Core.BootConsole.Enabled" Value="$(CosmosEnableBootConsole)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.HAL.PCI.Enabled" Value="$(CosmosEnablePCI)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.System.Timer.Enabled" Value="$(CosmosEnableTimer)" Trim="true"/>
     <RuntimeHostConfigurationOption Include="Cosmos.Kernel.System.Input.Keyboard.Enabled" Value="$(CosmosEnableKeyboard)" Trim="true"/>
