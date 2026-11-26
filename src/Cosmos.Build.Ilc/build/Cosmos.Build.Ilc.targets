@@ -11,39 +11,37 @@
   <!-- ComputeInputsHashTask is registered in Cosmos.Build.Common.props -->
 
   <!-- Resolves the path of 'ilc' to IlcToolsPath. -->
-  <Target Name="ResolveIlcToolsPath" AfterTargets="Build" DependsOnTargets="ResolvePackageAssets">
-    <PropertyGroup>
+  <Target Name="ResolveIlcToolsPath" Condition="'$(IlcToolsPath)' == ''" DependsOnTargets="ResolvePackageAssets">
+    <PropertyGroup Condition="'$(HostRuntimeIdentifier)' == ''">
       <!-- Determine host OS for ILC compiler selection -->
-      <IlcHostOs Condition="'$(OS)' == 'Windows_NT'">win</IlcHostOs>
-      <IlcHostOs Condition="'$(OS)' != 'Windows_NT' and Exists('/System/Library/CoreServices/SystemVersion.plist')">osx</IlcHostOs>
-      <IlcHostOs Condition="'$(IlcHostOs)' == ''">linux</IlcHostOs>
+      <IlcHostOs Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))">win</IlcHostOs>
+      <IlcHostOs Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'">linux</IlcHostOs>
+      <IlcHostOs Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))">osx</IlcHostOs>
+      <IlcHostArch>$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant())</IlcHostArch>
+      <HostRuntimeIdentifier Condition="'$(HostRuntimeIdentifier)' == ''">$(IlcHostOs)-$(IlcHostArch)</HostRuntimeIdentifier>
     </PropertyGroup>
 
     <ItemGroup>
       <!-- Always use the host OS ILC tools (ILC runs on the build machine, not the target) -->
-      <HostILCompilerPack Include="runtime.$(IlcHostOs)-x64.Microsoft.DotNet.ILCompiler">
+      <IlcHostCompilerPack Include="runtime.$(HostRuntimeIdentifier).Microsoft.DotNet.ILCompiler">
         <NuGetPackageVersion>$(BundledNETCoreAppPackageVersion)</NuGetPackageVersion>
-        <NuGetPackageId>runtime.$(IlcHostOs)-x64.Microsoft.DotNet.ILCompiler</NuGetPackageId>
-      </HostILCompilerPack>
+        <NuGetPackageId>runtime.$(HostRuntimeIdentifier).Microsoft.DotNet.ILCompiler</NuGetPackageId>
+      </IlcHostCompilerPack>
     </ItemGroup>
 
     <GetPackageDirectory
-      Items="@(HostILCompilerPack)"
+      Items="@(IlcHostCompilerPack)"
       PackageFolders="@(AssetsFilePackageFolder)"
     >
-      <Output TaskParameter="Output" ItemName="ResolvedILCompilerPack"/>
+      <Output TaskParameter="Output" ItemName="ResolvedIlcHostCompilerPack" />
     </GetPackageDirectory>
 
     <PropertyGroup>
-      <IlcHostPackagePath>@(ResolvedILCompilerPack->'%(PackageDirectory)')</IlcHostPackagePath>
-      <IlcToolsPath Condition="$(IlcHostPackagePath) != ''">$([MSBuild]::NormalizePath($(IlcHostPackagePath)/tools/))</IlcToolsPath>
+      <IlcHostPackagePath>@(ResolvedIlcHostCompilerPack->'%(PackageDirectory)')</IlcHostPackagePath>
+      <IlcToolsPath Condition="'$(IlcHostPackagePath)' != ''">$([MSBuild]::NormalizePath('$(IlcHostPackagePath)/tools/'))</IlcToolsPath>
     </PropertyGroup>
-    <Message Importance="High" Text="⚙️ [ILC] RuntimeIdentifier: $(RuntimeIdentifier)"/>
-    <Message Importance="High" Text="⚙️ [ILC] CosmosArch: $(CosmosArch)"/>
-    <Message Importance="High" Text="⚙️ [ILC] IlcHostOs: $(IlcHostOs)"/>
-    <Message Importance="High" Text="⚙️ [ILC] HostILCompilerPack: @(HostILCompilerPack->'%(NuGetPackageId)')"/>
-    <Message Importance="High" Text="⚙️ [ILC] ResolvedILCompilerPack count: @(ResolvedILCompilerPack->Count())"/>
-    <Message Importance="High" Text="⚙️ [ILC] IlcHostPackagePath: $(IlcHostPackagePath)"/>
+
+    <Message Importance="High" Text="⚙️ [ILC] Host compiler pack: @(IlcHostCompilerPack->'%(NuGetPackageId)')"/>
     <Message Importance="High" Text="⚙️ [ILC] Using ILCompiler from: $(IlcToolsPath)"/>
   </Target>
 

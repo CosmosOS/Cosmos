@@ -15,7 +15,7 @@ source_hash: ee61aff975b1787e32ccfaf0cf29273e348482b2
 
 ```mermaid
 flowchart TD
-    A[ResolveIlcPath] --> B[WriteIlcRsp]
+    A[ResolveIlcToolsPath] --> B[WriteIlcRsp]
     B --> C[CompileWithIlc]
     C --> D[Native binary]
 ```
@@ -28,7 +28,7 @@ flowchart TD
 
 | 名称 | 说明 | 默认值 |
 | --- | --- | --- |
-| `IlcToolsPath` | 从 `Microsoft.DotNet.ILCompiler` 运行时包中解析出的 `ilc` 可执行文件的路径。 | 自动解析 |
+| `IlcToolsPath` | `ilc` 可执行文件的路径；未设置时从主机编译器包中解析。 | 自动解析 |
 | `IlcIntermediateOutputPath` | 写入 `.ilc.rsp` 和 `.o` 文件的目录。 | `$(IntermediateOutputPath)/cosmos/native/` |
 | `IlcSystemModule` | 用作 ILCompiler 入口点的系统模块。 | `System.Private.CoreLib` |
 | `UnmanagedEntryPointsAssembly` | 其方法通过 `--generateunmanagedentrypoints` 导出的程序集。 | `Cosmos.Kernel.Runtime` |
@@ -41,8 +41,8 @@ flowchart TD
 
 | 任务 | 说明 | 依赖于 |
 | --- | --- | --- |
-| `ResolveIlcPath` | 下载并定位 ILCompiler，同时设置 `IlcToolsPath`。 | `Build` |
-| `WriteIlcRsp` | 生成 ILCompiler 响应文件，其中列出输入、引用和选项。 | `ResolveIlcPath` |
+| `ResolveIlcToolsPath` | 仅当 `IlcToolsPath` 未设置时解析主机 ILCompiler 包。 | `ResolvePackageAssets` |
+| `WriteIlcRsp` | 生成 ILCompiler 响应文件，其中列出输入、引用和选项。 | `ResolveIlcToolsPath` |
 | `CheckIlcCache` | 对输入、引用和响应文件计算哈希，并与上一次编译的哈希进行比较。 | `WriteIlcRsp` |
 | `CompileWithIlc` | 使用响应文件运行 `ilc` 以生成原生目标文件，除非 `CheckIlcCache` 发现该目标文件已是最新。 | `WriteIlcRsp`, `CheckIlcCache` |
 
@@ -52,7 +52,7 @@ flowchart TD
 
 ## 详细工作流程
 
-1. **ResolveIlcPath** 使用 `GetPackageDirectory` 查找 `runtime.<RID>.Microsoft.DotNet.ILCompiler` 包，并设置 `IlcToolsPath`。
+1. **ResolveIlcToolsPath** 仅在 `IlcToolsPath` 尚未设置时解析主机 `Microsoft.DotNet.ILCompiler` 包。
 2. **WriteIlcRsp** 创建 `$(IlcIntermediateOutputPath)$(AssemblyName).ilc.rsp`，从 `$(IntermediateOutputPath)/cosmos` 收集修补后的程序集，从 `cosmos/ref` 收集引用，并加入 `--runtimeknob` 和 `--feature` 标志等 ILCompiler 选项。
 3. **CheckIlcCache** 对输入程序集、引用程序集和响应文件计算一个 SHA-256 哈希，并将其与上一次编译留下的 `.ilc-hash` 进行比较。响应文件是有意纳入键中的：在内核的 `.csproj` 中切换一个功能开关不会改变任何程序集，只会改变响应文件中的 `--runtimeknob` 参数，如果键只基于程序集计算，就会保留按旧值编译的目标文件。
 4. **CompileWithIlc** 使用生成的响应文件执行 `ilc`，在 `$(IlcIntermediateOutputPath)` 中生成 `$(AssemblyName).o`，并写入新的哈希。哈希一致时，该步骤会被跳过，日志中输出 `ILC cache hit`。

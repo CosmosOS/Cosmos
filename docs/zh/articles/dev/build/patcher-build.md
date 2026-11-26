@@ -137,7 +137,7 @@ flowchart TD
 
 | 任务 | 说明 | 依赖于 |
 | --- | --- | --- |
-| `SetupPatcher` | 收集候选程序集，解析 plug 引用，并准备输出目录。 | `Build`, `ResolveIlcPath` |
+| `SetupPatcher` | 收集候选程序集，解析 plug 引用，并准备输出目录。 | `Build`, `ResolveNAOTRuntimePack` |
 | `RunPatcher` | 对 `AssembliesToPatch` 中的每一项执行 `Cosmos.Patcher`。 | `SetupPatcher` |
 | `CleanPatcher` | 删除 patcher 生成的文件。 | `Clean` |
 | `FindPluggedAssembliesTask` | 筛选候选程序集，只保留包含目标类型的程序集。 | `SetupPatcher` |
