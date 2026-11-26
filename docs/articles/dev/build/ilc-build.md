@@ -8,7 +8,7 @@
 
 ```mermaid
 flowchart TD
-    A[ResolveIlcPath] --> B[WriteIlcRsp]
+    A[ResolveIlcToolsPath] --> B[WriteIlcRsp]
     B --> C[CompileWithIlc]
     C --> D[Native binary]
 ```
@@ -19,7 +19,7 @@ flowchart TD
 
 | Name | Description | Default |
 | --- | --- | --- |
-| `IlcToolsPath` | Path to the `ilc` executable resolved from the `Microsoft.DotNet.ILCompiler` runtime pack. | auto-resolved |
+| `IlcToolsPath` | Path to the `ilc` executable, resolved from the host compiler pack when unset. | auto-resolved |
 | `IlcIntermediateOutputPath` | Directory where `.ilc.rsp` and `.o` files are written. | `$(IntermediateOutputPath)/cosmos/native/` |
 | `IlcSystemModule` | System module used as ILCompiler entry point. | `System.Private.CoreLib` |
 | `UnmanagedEntryPointsAssembly` | Assemblies whose methods are exported via `--generateunmanagedentrypoints`. | `Cosmos.Kernel.Runtime` |
@@ -30,8 +30,8 @@ flowchart TD
 
 | Task | Description | Depends On |
 | --- | --- | --- |
-| `ResolveIlcPath` | Downloads and locates ILCompiler, setting `IlcToolsPath`. | `Build` |
-| `WriteIlcRsp` | Produces the ILCompiler response file listing inputs, references, and options. | `ResolveIlcPath` |
+| `ResolveIlcToolsPath` | Resolves the host ILCompiler pack only when `IlcToolsPath` is unset. | `ResolvePackageAssets` |
+| `WriteIlcRsp` | Produces the ILCompiler response file listing inputs, references, and options. | `ResolveIlcToolsPath` |
 | `CheckIlcCache` | Hashes the inputs, the references and the response file and compares the hash with the one of the last compilation. | `WriteIlcRsp` |
 | `CompileWithIlc` | Runs `ilc` using the response file to emit a native object file, unless `CheckIlcCache` found the object up to date. | `WriteIlcRsp`, `CheckIlcCache` |
 
@@ -39,7 +39,7 @@ flowchart TD
 
 ## Detailed workflow
 
-1. **ResolveIlcPath** uses `GetPackageDirectory` to find the `runtime.<RID>.Microsoft.DotNet.ILCompiler` package and sets `IlcToolsPath`.
+1. **ResolveIlcToolsPath** resolves the host `Microsoft.DotNet.ILCompiler` pack and sets `IlcToolsPath` only when that property is unset.
 2. **WriteIlcRsp** creates `$(IlcIntermediateOutputPath)$(AssemblyName).ilc.rsp`, gathering patched assemblies from `$(IntermediateOutputPath)/cosmos`, references from `cosmos/ref`, and ILCompiler options such as `--runtimeknob` and `--feature` flags.
 3. **CheckIlcCache** computes one SHA-256 over the input assemblies, the reference assemblies and the response file, and compares it with `.ilc-hash` from the last compilation. The response file is part of the key on purpose: a feature switch flipped in the kernel's `.csproj` changes no assembly, only the `--runtimeknob` arguments in the response file, and a key over the assemblies alone would keep the object compiled for the old value.
 4. **CompileWithIlc** executes `ilc` with the generated response file, producing `$(AssemblyName).o` in `$(IlcIntermediateOutputPath)`, and writes the new hash. When the hash matched, the step is skipped and the log says `ILC cache hit`.

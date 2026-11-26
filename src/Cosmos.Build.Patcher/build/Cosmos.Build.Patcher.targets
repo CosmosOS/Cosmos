@@ -33,7 +33,7 @@
     Run SetupPatcher before the ILCompiler step to ensure we operate on IL assemblies.
     This avoids trying to read NativeAOT outputs (native PE) with Mono.Cecil.
   -->
-  <Target Name="SetupPatcher" AfterTargets="Build" BeforeTargets="CompileWithIlc" DependsOnTargets="ResolveIlcPath">
+  <Target Name="SetupPatcher" AfterTargets="Build" BeforeTargets="CompileWithIlc" DependsOnTargets="ResolveNAOTRuntimePack">
     <PropertyGroup>
       <PatcherOutputPath Condition="$(PatcherOutputPath) == ''">$(IntermediateOutputPath)/cosmos/ref/</PatcherOutputPath>
       <!-- The Main Assembly is patched to the root folder of Cosmos to make it easy to be found by other build tools -->

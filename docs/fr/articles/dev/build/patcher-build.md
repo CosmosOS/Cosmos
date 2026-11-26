@@ -137,7 +137,7 @@ flowchart TD
 
 | Tâche | Description | Dépend de |
 | --- | --- | --- |
-| `SetupPatcher` | Rassemble les assemblies candidats, résout les références de plugs et prépare les répertoires de sortie. | `Build`, `ResolveIlcPath` |
+| `SetupPatcher` | Rassemble les assemblies candidats, résout les références de plugs et prépare les répertoires de sortie. | `Build`, `ResolveNAOTRuntimePack` |
 | `RunPatcher` | Exécute `Cosmos.Patcher` pour chaque entrée de `AssembliesToPatch`. | `SetupPatcher` |
 | `CleanPatcher` | Supprime les fichiers générés par le patcher. | `Clean` |
 | `FindPluggedAssembliesTask` | Filtre les assemblies candidats pour ne garder que ceux qui contiennent des types cibles. | `SetupPatcher` |
