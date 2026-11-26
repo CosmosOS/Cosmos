@@ -107,11 +107,11 @@
 
   <!-- Determine host runtime identifier (where the build runs) -->
   <PropertyGroup>
-    <HostRuntimeOs Condition="'$(OS)' == 'Windows_NT'">win</HostRuntimeOs>
-    <HostRuntimeOs Condition="'$(OS)' != 'Windows_NT' and Exists('/System/Library/CoreServices/SystemVersion.plist')">osx</HostRuntimeOs>
-    <HostRuntimeOs Condition="'$(HostRuntimeOs)' == ''">linux</HostRuntimeOs>
+    <HostRuntimeOs Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))">win</HostRuntimeOs>
+    <HostRuntimeOs Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))">linux</HostRuntimeOs>
+    <HostRuntimeOs Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))">osx</HostRuntimeOs>
     <HostRuntimeArch>$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant())</HostRuntimeArch>
-    <HostRuntimeIdentifier Condition="'$(HostRuntimeIdentifier)' == ''">$(HostRuntimeOs)-$(HostRuntimeArch)</HostRuntimeIdentifier>
+    <HostRuntimeIdentifier Condition="'$(HostRuntimeIdentifier)' == '' and '$(HostRuntimeOs)' != ''">$(HostRuntimeOs)-$(HostRuntimeArch)</HostRuntimeIdentifier>
   </PropertyGroup>
  
   <!-- Ensure AOT Reference and ILCompiler are present in nuget cache -->

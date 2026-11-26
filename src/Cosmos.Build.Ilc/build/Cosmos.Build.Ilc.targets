@@ -14,9 +14,9 @@
   <Target Name="ResolveIlcToolsPath" Condition="'$(IlcToolsPath)' == ''" DependsOnTargets="ResolvePackageAssets">
     <PropertyGroup Condition="'$(HostRuntimeIdentifier)' == ''">
       <!-- Determine host OS for ILC compiler selection -->
-      <IlcHostOs Condition="'$(OS)' == 'Windows_NT'">win</IlcHostOs>
-      <IlcHostOs Condition="'$(OS)' != 'Windows_NT' and Exists('/System/Library/CoreServices/SystemVersion.plist')">osx</IlcHostOs>
-      <IlcHostOs Condition="'$(IlcHostOs)' == ''">linux</IlcHostOs>
+      <IlcHostOs Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))">win</IlcHostOs>
+      <IlcHostOs Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))'">linux</IlcHostOs>
+      <IlcHostOs Condition="$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))">osx</IlcHostOs>
       <IlcHostArch>$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant())</IlcHostArch>
       <HostRuntimeIdentifier Condition="'$(HostRuntimeIdentifier)' == ''">$(IlcHostOs)-$(IlcHostArch)</HostRuntimeIdentifier>
     </PropertyGroup>
