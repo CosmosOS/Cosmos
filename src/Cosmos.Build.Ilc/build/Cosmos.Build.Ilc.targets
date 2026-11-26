@@ -22,8 +22,7 @@
 
     <ItemGroup>
       <!-- Always use the host OS ILC tools (ILC runs on the build machine, not the target) -->
-      <IlcHostCompilerPack Include="runtime.$(IlcHostOs)-$(IlcHostArch).Microsoft.DotNet.ILCompiler"
-                           Condition="'$(IlcHostOs)' != 'osx'">
+      <IlcHostCompilerPack Include="runtime.$(IlcHostOs)-$(IlcHostArch).Microsoft.DotNet.ILCompiler">
         <NuGetPackageVersion>$(BundledNETCoreAppPackageVersion)</NuGetPackageVersion>
         <NuGetPackageId>runtime.$(IlcHostOs)-$(IlcHostArch).Microsoft.DotNet.ILCompiler</NuGetPackageId>
       </IlcHostCompilerPack>
