@@ -205,6 +205,10 @@ public class Kernel : Sys.Kernel
         Assert.True(SysMath.Truncate(-1.9) == -1.0, "Truncate(-1.9) == -1");
         Assert.True(SysMath.Truncate(3.0) == 3.0, "Truncate(3.0) == 3");
         Assert.True(double.IsNaN(SysMath.Truncate(double.NaN)), "Truncate(NaN) == NaN");
+        Assert.True(SysMathF.Truncate(1.9f) == 1.0f, "MathF.Truncate(1.9f) == 1");
+        Assert.True(SysMathF.Truncate(-1.9f) == -1.0f, "MathF.Truncate(-1.9f) == -1");
+        Assert.True(SysMathF.Truncate(12345.75f) == 12345.0f, "MathF.Truncate(12345.75f) == 12345");
+        Assert.True(float.IsNaN(SysMathF.Truncate(float.NaN)), "MathF.Truncate(NaN) == NaN");
     }
 
     private static void Test_Round()
